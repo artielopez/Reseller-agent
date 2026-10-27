@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 import Link from "next/link";
 import {
   ArrowDownLeft,
@@ -109,6 +109,18 @@ export function Workspace() {
     setMessage(`${result.title} saved.`);
     window.scrollTo({ top: 0 });
   }
+  function returnToInventory(event: MouseEvent<HTMLAnchorElement>) {
+    if (!editing) return;
+    event.preventDefault();
+    if (
+      !window.confirm(
+        "Return to inventory? Any unsaved changes will be discarded.",
+      )
+    )
+      return;
+    setEditing(null);
+    window.scrollTo({ top: 0 });
+  }
   async function signOut() {
     if (editing && !window.confirm("Sign out and discard any unsaved changes?"))
       return;
@@ -140,7 +152,7 @@ export function Workspace() {
         Skip to content
       </a>
       <aside className="sidebar">
-        <Link href="/" className="brand">
+        <Link href="/" className="brand" onClick={returnToInventory}>
           <span className="brand-icon">
             <ArrowUpRight size={23} />
           </span>
@@ -151,7 +163,11 @@ export function Workspace() {
         </Link>
         <div className="sidebar-label">WORKSPACE</div>
         <nav aria-label="Main navigation">
-          <Link href="/" className="nav-item active">
+          <Link
+            href="/"
+            className="nav-item active"
+            onClick={returnToInventory}
+          >
             <LayoutGrid size={19} />
             Inventory<span>{items.length}</span>
           </Link>

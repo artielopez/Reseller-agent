@@ -137,3 +137,27 @@ test("removing photos persists and unsaved changes require confirmation", async 
   await page.getByRole("button", { name: "Edit Oak bedside table" }).click();
   await expect(page.getByRole("img", { name: "Item photo 1" })).toHaveCount(0);
 });
+
+test("inventory navigation preserves edits until discard is confirmed", async ({
+  page,
+  isMobile,
+}) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Edit Oak bedside table" }).click();
+  await page.getByLabel("Item title").fill("Unsaved title");
+  const back = isMobile
+    ? page.getByRole("button", { name: "Inventory", exact: true })
+    : page.getByRole("link", { name: /^Inventory/ });
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await back.click();
+  await expect(page.getByLabel("Item title")).toHaveValue("Unsaved title");
+  page.removeAllListeners("dialog");
+  page.once("dialog", (dialog) => dialog.accept());
+  await back.click();
+  await expect(
+    page.getByRole("heading", { name: "Your inventory" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Edit Oak bedside table" }),
+  ).toBeVisible();
+});
