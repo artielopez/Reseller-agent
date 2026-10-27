@@ -50,14 +50,14 @@ NEXT_PUBLIC_DEMO_MODE=false
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
 OPENAI_API_KEY=YOUR_SERVER_ONLY_KEY
-OPENAI_MODEL=gpt-4.1-mini
+OPENAI_MODEL=gpt-6-luna
 ```
 
 Restart the dev server after changing environment variables. `NEXT_PUBLIC_*` variables are embedded at build time, so rebuild/redeploy when changing them.
 
 `OPENAI_API_KEY` is optional. Without it, the signed-in cloud workspace works and generation returns clearly labeled templates. With it, the server requests structured title/description output for all three channels. Only the written item facts are sent to OpenAI, **not photos**. Responses use `store: false`. Your provider's account and retention policies still apply. Review AI copy for accuracy before posting.
 
-The model is configurable. The default is `gpt-4.1-mini`; ensure your OpenAI project has access and API billing enabled. No background jobs or continuous AI polling run. Each click makes at most one provider request, capped at 1,800 output tokens, with a 25-second timeout and no automatic retries. A database counter allows **20 paid generation attempts per user per Manila calendar day**, including failed attempts. Configure project budgets/alerts in your OpenAI dashboard too; this request limit is not a currency cap. Keep signups disabled to bound who can consume your key.
+The model is configurable. The default is [`gpt-6-luna`](https://developers.openai.com/api/docs/models/gpt-6-luna), with reasoning disabled to keep this focused drafting request fast and bounded. If overriding, choose a Responses API model that supports structured outputs and `reasoning.effort: none`; ensure your OpenAI project has access and API billing enabled. No background jobs or continuous AI polling run. Each click makes at most one provider request, capped at 1,800 output tokens, with a 25-second timeout and no automatic retries. A database counter allows **20 paid generation attempts per user per Manila calendar day**, including failed attempts. Configure project budgets/alerts in your OpenAI dashboard too; this request limit is not a currency cap. Keep signups disabled to bound who can consume your key.
 
 ## Everyday workflow
 

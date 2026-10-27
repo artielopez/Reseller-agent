@@ -47,7 +47,8 @@ export async function POST(request: Request) {
         maxRetries: 0,
       });
       const response = await openai.responses.parse({
-        model: process.env.OPENAI_MODEL || "gpt-4.1-mini",
+        model: process.env.OPENAI_MODEL || "gpt-6-luna",
+        reasoning: { effort: "none" },
         store: false,
         max_output_tokens: 1800,
         input: [
