@@ -64,7 +64,9 @@ These are planning defaults, grounded in the handoff. They are not implemented y
 
 ## Branch and review strategy
 
-PR 1 (`feat/reseller-mvp` → `main`) remains the application foundation. The planning branch `codex/handoff-buyer-reply-plan` starts from its verified head `11defd0`. Publish these documents in a dependent PR targeting `feat/reseller-mvp`, so review shows documentation changes only. Do not force-push or merge either PR. Before future implementation, fetch and re-evaluate branch ancestry; a proposed `codex/buyer-replies` branch should start from the latest reviewed application plus accepted planning changes.
+The owner approved the existing stack with “Merge and commit.” PR 3 (Sites demo) was merged into PR 2's planning branch, PR 2 into the MVP branch, and PR 1 into `main`. The tested application, planning documents and demo support are now on `main`; see the [status record](project-status.md#completed-integration) for exact merge commits.
+
+Future implementation should branch from the latest `main` (for example `codex/buyer-replies`), use a new PR, and obtain explicit approval before its merge. The prior approval applies to the existing release, not future features. Preserve the independent Sites identity and source checkout when updating the hosted demo.
 
 ## Maintaining the project
 
