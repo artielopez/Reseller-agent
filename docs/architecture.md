@@ -21,6 +21,8 @@ Composite foreign keys prevent a child row from referencing another owner's item
 
 The demo repository uses IndexedDB to hold complete item records and compressed photo data. It never calls Supabase. It uses the same validation and editor as cloud mode. Demo entries do not migrate automatically to a signed-in account.
 
+Demo listing generation also runs locally in the browser, so the same UI can be exported as a static Site. `scripts/prepare-sites-demo.mjs` prepares an isolated Next.js export with API routes omitted and constant demo-only configuration. ChatGPT Sites hosts this separate output; the canonical app retains its Node.js API route for cloud use. Each browser/origin has its own inventory, including when opening the hosted Site on different devices.
+
 ## Generation
 
 The route accepts only bounded JSON item facts (16 KiB request maximum). Unknown properties are stripped by validation. A server dependency boundary handles verified authentication, durable quota reservation and provider calls independently, allowing API failure paths to be tested without a paid service.

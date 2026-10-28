@@ -10,6 +10,8 @@ See the [current status](docs/project-status.md), [project plan](docs/project-pl
 
 ## Try it in demo mode
 
+**Hosted demo:** [Open Reseller Agent on ChatGPT Sites](https://reseller-agent-demo.pandabur.chatgpt.site). Sign in with the same ChatGPT account that owns the Site. This link works across computers and phones, but inventory/photos remain in each browser's storage and do not sync. Drafts are deterministic templates; there is no paid AI or Supabase connection in this demo.
+
 Requires Node.js 22 and npm.
 
 ```sh
@@ -76,6 +78,18 @@ Publication status and overall inventory status are separate. A published channe
 Photos are resized to a maximum 1,600-pixel edge and re-encoded as JPEG before storage, reducing size and removing camera metadata. The input limit is 10 MB per photo; stored files are limited to 2 MB. For iPhone HEIC files, export JPEG first or use a compatible capture/export format. Cloud images use private signed URLs valid for 24 hours; reload a long-open page if they expire.
 
 ## Deploy
+
+### ChatGPT Sites demo
+
+The Sites version is a separate static export of this app. Demo generation runs in the browser, and the export excludes all API routes and hard-codes demo mode with empty Supabase settings. The full application's server-side AI and Supabase behavior remain available for a separate cloud deployment.
+
+Run `node scripts/prepare-sites-demo.mjs` to create or refresh the isolated source checkout at `.sites/reseller-agent-demo` (ignored by this repository). It copies only selected source/configuration files, never local environment files, Git metadata or browser data. Existing Site identity and source Git metadata in that directory are preserved. The generated README records the application source revision. Install its locked dependencies and build it; `out/` is the static output. Use the Sites skill's source/version/deployment workflow to publish that exact build, reusing the existing `project_id` in `.openai/hosting.json`.
+
+For browser verification, serve the exported `out/` directory locally and run `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3100 npm run test:e2e` against that server. The URL override skips starting Next.js and tests the actual static files.
+
+See [current status](docs/project-status.md) for Site identity and deployment evidence. On a fresh computer, reopen that existing Site with the Sites source helper instead of registering another Site. Updating the source repository does not automatically republish the Site. Publishing the demo does not merge any GitHub PR.
+
+### Full cloud application
 
 Deploy to Vercel or another host that supports a Next.js Node.js server. A static export cannot run the AI route.
 
