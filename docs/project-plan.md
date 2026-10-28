@@ -6,6 +6,8 @@ Updated 28 October 2026. [Status and evidence](project-status.md) · [Imported h
 
 Take over the existing repository, make the local demo available, maintain this plan and the status tracker, and prepare the buyer reply implementation plan. Do not merge without the owner's explicit approval.
 
+On 28 October the owner also requested a shared demo link, then explicitly selected ChatGPT Sites. That authorizes publishing a credential-free demo. It does not authorize merging PRs, connecting real inventory services, or expanding access to other people. The Site remains owner-private and can be opened from the owner's Windows, Mac or iPhone while signed into the same ChatGPT account.
+
 The existing inventory/listing MVP is in PR 1. Its original buyer requirement was a data model, which exists. The handoff proposes a user-facing buyer workflow as the next milestone; preparing that implementation does not mean it has been built or released.
 
 ## Delivery sequence

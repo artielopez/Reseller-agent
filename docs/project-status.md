@@ -1,8 +1,8 @@
 # Reseller Agent status
 
-Updated **28 October 2026, 17:04 UTC+08:00 (Asia/Manila)**. This is the shared status record; the imported handoff is a historical snapshot.
+Updated **28 October 2026, 19:44 UTC+08:00 (Asia/Singapore)**. This is the shared status record; the imported handoff is a historical snapshot.
 
-**Ready:** existing MVP and local demo verified; project and buyer reply implementation plans prepared. **Next:** implement the manual inquiry/reply milestone when requested. **Needs the owner now:** nothing to use the demo or read the plan. No merge or deployment has been performed.
+**Ready:** the [ChatGPT Sites demo](https://reseller-agent-demo.pandabur.chatgpt.site) is published and the project/buyer plans are prepared. Open the Site using the same ChatGPT account on Windows, Mac or iPhone. **Next:** implement the manual inquiry/reply milestone when requested. No GitHub PR has been merged.
 
 ## Repository and demo
 
@@ -24,7 +24,7 @@ The dev server is a local process, not an always-on deployment. Restart with the
 
 ## Verification evidence
 
-Fresh local checks on 28 October, against application code at `11defd0`. The planning changes do not modify application code, dependencies or migrations.
+Fresh local checks on 28 October, against application code at `11defd0`. Those earlier planning changes did not modify application code, dependencies or migrations. The newer Sites work and its separate verification are recorded below.
 
 | Check                                         | Result                                                                                                                                                  |
 | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -58,6 +58,22 @@ Fresh local checks on 28 October, against application code at `11defd0`. The pla
 - Use a dependent documentation PR so PR 1 stays intact and review shows only planning changes. Do not force-push, merge or enable auto-merge.
 - Plan manual questions, saved-record-based drafting, shared 20-attempt quota, explicit approval, and revision-aware invalidation. Copying and marking Answered remain separate.
 - Keep the existing [known limitations](mvp-checklist.md#known-limitations). In particular: no real cloud/device acceptance, no automated posting or sending, no photo-based AI, no demo/cloud sync, and last-write-wins inventory edits.
-- No Dot integration, monitor, external task assignment or deployment was created. These Markdown documents can be read by a future coordinator; they do not synchronize themselves.
+- No Dot integration, monitor or external task assignment was created. The owner subsequently authorized the Sites demo deployment recorded below. These Markdown documents can be read by a future coordinator; they do not synchronize themselves.
 
 After each meaningful change, update this record with the actual branch/commit, check results and next action. Do not copy historical test counts forward as evidence for new code.
+
+## Shared demo — published 28 October
+
+- URL: https://reseller-agent-demo.pandabur.chatgpt.site
+- Audience: owner-private (unchanged from creation); sign in with the owning ChatGPT account. This is a hosted link usable across devices, not public sharing with other people.
+- Site ID: `appgprj_6ae1ded43d0c8191829f70cf2c592317`.
+- Published version ID: `appgprj_6ae1ded43d0c8191829f70cf2c592317~appgver_140480f9ace88191abb3c182133fabf2`.
+- Deployment ID: `appgdep_6ae1dfc1307081919274686515021d18`; native Sites result **succeeded**, 28 October 2026 at 19:43 UTC+08:00.
+- Exact deployed Sites source commit: `157c4a2d88b5338710840401c9129a5917b510c6`. Its dedicated checkout and persisted identity are in `.sites/reseller-agent-demo`; the Sites source repository is separate from the GitHub application repository.
+- GitHub feature branch: `codex/shared-sites-demo`, based on planning PR 2. No merges or auto-merge. Application changes: browser-local demo templates, reproducible static-demo preparation, and browser-test URL override. The full cloud API remains intact.
+- Verification: `npm run check` passed (lint, types, 31 tests, production build); the static export built successfully; all **14** desktop/phone-size Chromium tests passed against the actual exported files, including accessibility and generation with all API requests blocked.
+- The first static-browser run exposed a test reload occurring immediately after clicking Save, before persistence completed. The test now waits for the saved inventory view before reloading; all 14 pass afterward. No persistence assertion was removed.
+- Vercel was not used: its saved login was invalid, the owner selected Sites, and the pending Vercel device flow was canceled. No Vercel project was created or deployed.
+- Limits: no paid AI, no Supabase connection or cross-device data sync. Browser-local photos/items stay on each device. Hosted Auth/Storage/OpenAI acceptance and physical Safari testing remain pending. Publishing success verifies hosting; automated functional QA ran against the exact static build before publication.
+
+RA10 — Publish shared demo: **Done** (Codex). Evidence: successful Sites deployment and 14 passing static-browser checks. Publishing was explicitly authorized; merge approval remains pending.

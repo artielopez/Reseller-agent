@@ -1,4 +1,26 @@
 import { test, expect } from "@playwright/test";
+test("demo generation works without a backend or paid API", async ({
+  page,
+}) => {
+  let apiRequests = 0;
+  await page.route("**/api/**", async (route) => {
+    apiRequests++;
+    await route.abort();
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Add item", exact: true }).click();
+  await page.getByLabel("Item title").fill("Offline demo lamp");
+  await page.getByLabel("Price (PHP)").fill("850");
+  await page.getByLabel("Description & known flaws").fill("Scratch on base.");
+  await page.getByRole("button", { name: "Generate listing copy" }).click();
+  await expect(page.getByLabel("Carousell description")).toHaveValue(
+    /Scratch on base/,
+  );
+  await expect(
+    page.getByText(/Template drafts are ready — no AI was used/),
+  ).toBeVisible();
+  expect(apiRequests).toBe(0);
+});
 test("create, draft channel copy, track publication, and keep inventory after reload", async ({
   page,
 }) => {
@@ -133,6 +155,9 @@ test("removing photos persists and unsaved changes require confirmation", async 
   await page.getByRole("button", { name: "Inventory", exact: true }).click();
   await expect(page.getByLabel("Item title")).toBeVisible();
   await page.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Your inventory" }),
+  ).toBeVisible();
   await page.reload();
   await page.getByRole("button", { name: "Edit Oak bedside table" }).click();
   await expect(page.getByRole("img", { name: "Item photo 1" })).toHaveCount(0);
