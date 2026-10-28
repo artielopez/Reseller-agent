@@ -18,6 +18,7 @@ import {
   channels,
   conditions,
   errorMessage,
+  generateTemplate,
   generatedCopySchema,
   itemInputSchema,
   MAX_PHOTOS,
@@ -120,20 +121,26 @@ export function ItemEditor({
     setBusy("generate");
     try {
       const facts = currentItem();
-      const token = demoMode
-        ? null
-        : (await getSupabase().auth.getSession()).data.session?.access_token;
-      const response = await fetch("/api/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify(itemInputSchema.parse(facts)),
-      });
-      const result = await response.json();
-      if (!response.ok)
-        throw new Error(result.error || "Generation failed. Please try again.");
+      let result;
+      if (demoMode) {
+        result = { source: "template", copy: generateTemplate(facts) };
+      } else {
+        const token = (await getSupabase().auth.getSession()).data.session
+          ?.access_token;
+        const response = await fetch("/api/generate", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          },
+          body: JSON.stringify(itemInputSchema.parse(facts)),
+        });
+        result = await response.json();
+        if (!response.ok)
+          throw new Error(
+            result.error || "Generation failed. Please try again.",
+          );
+      }
       const copy = generatedCopySchema.parse(result.copy);
       update({
         listings: item.listings.map((entry) => ({
