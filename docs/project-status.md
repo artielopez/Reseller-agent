@@ -40,6 +40,8 @@ Fresh local checks on 28 October, against application code at `11defd0`. Those e
 
 ## Tracker
 
+Research update: the owner confirmed OpenClaw and Hermes both run on the Mac mini and requested investigation of automatic message intake before implementation. [API and computer-use findings](research/buyer-message-access.md) are prepared. Page messaging has a documented API path; personal Marketplace/Groups and Carousell browser collection remain unapproved/untested. No account access or automation was configured. See the memo's next-investigation list before changing implementation scope.
+
 | ID   | Work                                                        | Owner                        | Status                          | Evidence / next step                                                                                                                             |
 | ---- | ----------------------------------------------------------- | ---------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | RA01 | Establish checkout and demo baseline                        | Codex                        | Done                            | Verified branch/head, locked install, running demo, checks above                                                                                 |
@@ -61,6 +63,8 @@ Fresh local checks on 28 October, against application code at `11defd0`. Those e
 - No Dot integration, monitor or external task assignment was created. The owner subsequently authorized the Sites demo deployment recorded below. These Markdown documents can be read by a future coordinator; they do not synchronize themselves.
 
 After each meaningful change, update this record with the actual branch/commit, check results and next action. Do not copy historical test counts forward as evidence for new code.
+
+RA11 — Research buyer-message intake: **Done** (public-documentation research only). No implementation, live compatibility test, platform permission or future merge approval is implied.
 
 ## Shared demo — published 28 October
 
