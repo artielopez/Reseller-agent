@@ -4,6 +4,10 @@ A mobile-first workspace for selling personal secondhand items in the Philippine
 
 Built with Next.js App Router, TypeScript, Tailwind CSS, Supabase and the server-side OpenAI Responses API. No scraping, platform credentials, automatic posting or buyer-message access.
 
+## Project continuity
+
+See the [current status](docs/project-status.md), [project plan](docs/project-plan.md), and [buyer reply implementation plan](docs/superpowers/plans/2026-10-28-buyer-replies.md). The [imported handoff](docs/project-handoff.md) is a historical reference. Buyer inquiry/reply tables exist; their user-facing workflow is planned, not implemented. Pull requests remain unmerged until the owner approves.
+
 ## Try it in demo mode
 
 Requires Node.js 22 and npm.
