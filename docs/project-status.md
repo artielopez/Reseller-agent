@@ -1,24 +1,24 @@
 # Reseller Agent status
 
-Updated **28 October 2026, 17:02 UTC+08:00 (Asia/Manila)**. This is the shared status record; the imported handoff is a historical snapshot.
+Updated **28 October 2026, 17:04 UTC+08:00 (Asia/Manila)**. This is the shared status record; the imported handoff is a historical snapshot.
 
 **Ready:** existing MVP and local demo verified; project and buyer reply implementation plans prepared. **Next:** implement the manual inquiry/reply milestone when requested. **Needs the owner now:** nothing to use the demo or read the plan. No merge or deployment has been performed.
 
 ## Repository and demo
 
-| Item                 | Verified state                                                                                                           |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Checkout             | `/Users/artielopez/Projects/reseller agent`                                                                              |
-| Repository           | [artielopez/Reseller-agent](https://github.com/artielopez/Reseller-agent)                                                |
-| Application baseline | `11defd0c757d292474c86a456d526b549a6c5d42`                                                                               |
-| Application PR       | [PR 1](https://github.com/artielopez/Reseller-agent/pull/1): open, unmerged, mergeable; auto-merge disabled when checked |
-| Base                 | `main` at `8b50ae063afa9ec45d7a67abad9897ab4c06b4f9` (empty initialization); application is on `feat/reseller-mvp`       |
-| Planning branch      | `codex/handoff-buyer-reply-plan`, based on the verified application head; documentation only                             |
-| Planning review      | Dependent PR targeting `feat/reseller-mvp`; publish after documentation verification                                     |
-| Local demo           | [http://127.0.0.1:3000](http://127.0.0.1:3000), HTTP 200 and browser workflows verified                                  |
-| Demo start command   | `NEXT_PUBLIC_DEMO_MODE=true npm run dev -- --hostname 127.0.0.1`                                                         |
-| Local configuration  | Ignored `.env.local` created with demo mode only; no credentials supplied or committed                                   |
-| Toolchain            | Node 22.23.1; npm 10.9.8; dependencies installed from the existing lockfile                                              |
+| Item                 | Verified state                                                                                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Checkout             | `/Users/artielopez/Projects/reseller agent`                                                                                                                          |
+| Repository           | [artielopez/Reseller-agent](https://github.com/artielopez/Reseller-agent)                                                                                            |
+| Application baseline | `11defd0c757d292474c86a456d526b549a6c5d42`                                                                                                                           |
+| Application PR       | [PR 1](https://github.com/artielopez/Reseller-agent/pull/1): open, unmerged, mergeable; auto-merge disabled when checked                                             |
+| Base                 | `main` at `8b50ae063afa9ec45d7a67abad9897ab4c06b4f9` (empty initialization); application is on `feat/reseller-mvp`                                                   |
+| Planning branch      | `codex/handoff-buyer-reply-plan`, based on the verified application head; documentation only                                                                         |
+| Planning review      | [PR 2](https://github.com/artielopez/Reseller-agent/pull/2), open against `feat/reseller-mvp`; initial planning commit `366fef0`; check its Checks tab for latest CI |
+| Local demo           | [http://127.0.0.1:3000](http://127.0.0.1:3000), HTTP 200 and browser workflows verified                                                                              |
+| Demo start command   | `NEXT_PUBLIC_DEMO_MODE=true npm run dev -- --hostname 127.0.0.1`                                                                                                     |
+| Local configuration  | Ignored `.env.local` created with demo mode only; no credentials supplied or committed                                                                               |
+| Toolchain            | Node 22.23.1; npm 10.9.8; dependencies installed from the existing lockfile                                                                                          |
 
 The dev server is a local process, not an always-on deployment. Restart with the command above if it stops. Demo data is local to each browser/origin and does not sync to iPhone. Use the same `127.0.0.1` address for a consistent browser store. Physical phone use and hosted synchronization require later setup.
 
