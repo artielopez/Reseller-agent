@@ -6,7 +6,7 @@ Updated after the owner-approved integration of PRs **#1, #2 and #3**. GitHub me
 
 ## Current implementation — 30 October 2026
 
-Branch `codex/shared-buyer-inbox` starts from `76b55c6` (PR #6). It preserves the synthetic lab and adds a real saved manual inbox; review delivery is recorded below after publication.
+Branch `codex/shared-buyer-inbox` starts from `76b55c6` (PR #6). It preserves the synthetic lab and adds a real saved manual inbox; [PR #7](https://github.com/artielopez/Reseller-agent/pull/7) is open against `main`; implementation commit `94d8c15`. It includes unmerged PRs #5/#6, which remain intact. GitHub read-back confirms it is open, mergeable and unmerged. Local verification below applies to this implementation tree; no release is implied.
 
 - **RA02 / RA03 — Manual questions and reviewed replies: implemented locally.** `/inbox`, bounded owner-checked Supabase RPC, additive migration, revision-aware context, copy revalidation and separate Answered action. Private messages and public Group comments are explicitly distinguished. Templates are deterministic and labeled; no paid inference or agent call.
 - **RA04 — Local verification: passed.** Lint with no warnings, TypeScript and **76 unit/API/database tests**. Production build passed with `NEXT_PUBLIC_DEMO_MODE=true npm run build -- --webpack`. The default Turbopack build hit a local sandbox port-binding restriction, including the escalated retry; this is not recorded as a passing default build. CI retains the normal build command.
@@ -125,3 +125,5 @@ The owner requested **“Merge and commit.”** The clean application tree was v
 Fresh pre-merge checks passed: lint, types, 31 unit/API/database tests, production build and all 14 browser checks. The post-merge unit/API/database suite also passed on the same application tree. These checks do not replace the pending hosted service and physical-device acceptance. This merge did not republish the already-live Sites demo or implement the buyer reply workflow.
 
 PR delivery read-back: #6 verified OPEN against main, mergedAt null and autoMergeRequest null. GitHub Application checks were in progress at this read-back; local checks above passed on implementation commit 02ca02b. Subsequent changes only record delivery evidence. No hosted deployment was performed.
+
+PR #7 delivery read-back: OPEN against main at implementation commit `94d8c15`, mergedAt null, autoMergeRequest null. GitHub Application checks were running at this read-back ([run](https://github.com/artielopez/Reseller-agent/actions/runs/40946742440)). The following documentation-only commit records this handoff; application code is unchanged.
