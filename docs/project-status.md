@@ -40,10 +40,10 @@ Fresh local checks on 28 October, against application code at `11defd0`. Those e
 
 ## Current implementation — 29 October 2026
 
-Branch `codex/buyer-foundation`, based on research commit `c055265`. Owner approved implementation after the research proposal and signed into both platforms for read-only feasibility checks.
+Branch `codex/buyer-foundation`, based on research commit `c055265`. [PR #6](https://github.com/artielopez/Reseller-agent/pull/6) is open against `main`, with implementation commit `02ca02b`. It includes research PR #5; neither is merged and auto-merge is disabled. Owner approved implementation after the research proposal and signed into both platforms for read-only feasibility checks.
 
 - **RA13 — Account feasibility: partial.** [Desktop evidence and unsent support questions](research/channel-capability-evidence.md). Both logins confirmed; no native seller AI/auto-reply controls visible in inspected desktop surfaces. Mobile eligibility, approved integration, message completeness and delivery semantics remain unverified. No buyer conversations opened or sent; no settings changed.
-- **RA14 — Synthetic buyer lab: implemented and locally verified; PR review pending.** [Usage and limitations](buyer-lab.md). Local event validation, exact-fact templates, private draft approval, pause/takeover/native exclusion, persisted simulated outcomes and uncertain-result freeze. No live reader, sender, model adapter or new paid usage.
+- **RA14 — Synthetic buyer lab: implemented and locally verified; PR #6 review pending.** [Usage and limitations](buyer-lab.md). Local event validation, exact-fact templates, private draft approval, pause/takeover/native exclusion, persisted simulated outcomes and uncertain-result freeze. No live reader, sender, model adapter or new paid usage.
 - Final checks: `npm run check` passed lint, type checks, **57 unit/API/database tests** and production build. `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3012 npx playwright test --workers=2` passed **26 browser checks** against that production build, including desktop/mobile accessibility, persistence, two-tab contention, stale reviews, draft retention and existing inventory navigation. Chrome visual inspection confirmed the layout. Physical Safari/cloud acceptance was not performed.
 - Independent review found stale-context and draft-preservation issues; each was reproduced in a failing test and fixed. Follow-up cases (stale text after refresh and actual completed text display) were also reproduced and fixed. Application checks were rerun after the final changes.
 - Remaining: Supabase conversation/outbox migrations with ownership tests, restricted agent profile, permission evidence before connector investment, and staged live acceptance. Existing shared Sites deployment is unchanged.
@@ -109,3 +109,5 @@ The owner requested **“Merge and commit.”** The clean application tree was v
 | [#1 — complete MVP](https://github.com/artielopez/Reseller-agent/pull/1)      | `f0c9d09f3342e4bc883f1884b43b4acad5cd8b15` | 2026-10-28 18:09:39     |
 
 Fresh pre-merge checks passed: lint, types, 31 unit/API/database tests, production build and all 14 browser checks. The post-merge unit/API/database suite also passed on the same application tree. These checks do not replace the pending hosted service and physical-device acceptance. This merge did not republish the already-live Sites demo or implement the buyer reply workflow.
+
+PR delivery read-back: #6 verified OPEN against main, mergedAt null and autoMergeRequest null. GitHub Application checks were in progress at this read-back; local checks above passed on implementation commit 02ca02b. Subsequent changes only record delivery evidence. No hosted deployment was performed.

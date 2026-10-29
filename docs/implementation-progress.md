@@ -20,3 +20,5 @@ Owner requested “Go ahead and work on it” after the proposal. This authorize
 
 - Final verification: `npm run check` passed lint/types/57 tests/production build; full Playwright against the restarted production server on 127.0.0.1:3012 passed 26/26 desktop/mobile checks. Review failures all have passing regressions. Chrome visual inspection complete. No new dependencies or credentials. Shared Sites deployment unchanged.
 - Delivery choice: create a feature PR targeting main as the owner originally requested; do not merge or enable auto-merge. This branch includes the research commits from PR #5, which remains open; preserve both branches. Managed worktree is retained for review.
+
+- Delivery: implementation commit `02ca02b` pushed and PR #6 created against main. Connector PR creation returned 403; authenticated GitHub CLI succeeded. Read-back confirmed open/unmerged and no auto-merge. GitHub checks in progress; local Markdown file targets also pass.
