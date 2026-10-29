@@ -2,7 +2,7 @@
 
 Updated after the owner-approved integration of PRs **#1, #2 and #3**. GitHub merge timestamps below are recorded in UTC. This is the shared status record; the imported handoff is a historical snapshot.
 
-**Ready:** the [ChatGPT Sites demo](https://reseller-agent-demo.pandabur.chatgpt.site) is published and the project/buyer plans are prepared. Open the Site using the same ChatGPT account on Windows, Mac or iPhone. **Next:** review the [automatic sales-assistant proposal](superpowers/specs/2026-10-29-sales-assistant-design.md), then establish account-specific access/feature evidence when requested. PRs #1, #2 and #3 are merged into `main`. Buyer reply implementation remains planned; the latest instruction is research and planning only.
+**Ready for review:** the browser-local [buyer reply lab](buyer-lab.md) is implemented on `codex/buyer-foundation`; [desktop account checks](research/channel-capability-evidence.md) are recorded. **Next:** resolve native-feature eligibility and permitted access before investing in a real connector. The existing [Sites inventory demo](https://reseller-agent-demo.pandabur.chatgpt.site) is unchanged. Live buyer capture/replies, cloud queue and agent integration remain unimplemented. No new merge or sending was enabled.
 
 ## Repository and demo
 
@@ -38,7 +38,17 @@ Fresh local checks on 28 October, against application code at `11defd0`. Those e
 
 `npm ci` reported that the locked ESLint 9.39.5 version is no longer supported. It still passed lint. Treat upgrading the lint toolchain as a future maintenance task with compatibility checks; dependencies were not changed during this handoff. The npm audit result is a point-in-time report, not a security guarantee. No new secret scan or ongoing audit job was added.
 
-## Tracker
+## Current implementation — 29 October 2026
+
+Branch `codex/buyer-foundation`, based on research commit `c055265`. Owner approved implementation after the research proposal and signed into both platforms for read-only feasibility checks.
+
+- **RA13 — Account feasibility: partial.** [Desktop evidence and unsent support questions](research/channel-capability-evidence.md). Both logins confirmed; no native seller AI/auto-reply controls visible in inspected desktop surfaces. Mobile eligibility, approved integration, message completeness and delivery semantics remain unverified. No buyer conversations opened or sent; no settings changed.
+- **RA14 — Synthetic buyer lab: implemented and locally verified; PR review pending.** [Usage and limitations](buyer-lab.md). Local event validation, exact-fact templates, private draft approval, pause/takeover/native exclusion, persisted simulated outcomes and uncertain-result freeze. No live reader, sender, model adapter or new paid usage.
+- Final checks: `npm run check` passed lint, type checks, **57 unit/API/database tests** and production build. `PLAYWRIGHT_BASE_URL=http://127.0.0.1:3012 npx playwright test --workers=2` passed **26 browser checks** against that production build, including desktop/mobile accessibility, persistence, two-tab contention, stale reviews, draft retention and existing inventory navigation. Chrome visual inspection confirmed the layout. Physical Safari/cloud acceptance was not performed.
+- Independent review found stale-context and draft-preservation issues; each was reproduced in a failing test and fixed. Follow-up cases (stale text after refresh and actual completed text display) were also reproduced and fixed. Application checks were rerun after the final changes.
+- Remaining: Supabase conversation/outbox migrations with ownership tests, restricted agent profile, permission evidence before connector investment, and staged live acceptance. Existing shared Sites deployment is unchanged.
+
+## Historical planning tracker
 
 29 October update: personal Facebook profile confirmed; scope includes Group comments and DMs with eventual automatic reading, processing and replies. [Updated research](research/personal-account-automation-update.md) adds native Marketplace AI replies and Beeper as conditional candidates. [Six-stage plan](superpowers/plans/2026-10-29-sales-assistant.md) and design prepared on `codex/research-buyer-message-access`, extending [PR #5](https://github.com/artielopez/Reseller-agent/pull/5), which was verified open against `main`. No code, account connections or automation settings changed. No messages read or sent. OpenClaw version metadata reports 2026.9.6; Hermes version check failed on an install lock and was not repaired. A fresh builder review identified native/custom control ambiguity; the design now explicitly separates their modes and pause semantics. Documentation checks are recorded with the planning commit; prior application tests are not evidence for these unimplemented features.
 
@@ -48,8 +58,8 @@ Research update: the owner confirmed OpenClaw and Hermes both run on the Mac min
 | ---- | ----------------------------------------------------------- | ---------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
 | RA01 | Establish checkout and demo baseline                        | Codex                        | Done                            | Verified branch/head, locked install, running demo, checks above                                                                                 |
 | RA09 | Maintain project plan, status and buyer implementation plan | Codex                        | Done                            | [Project plan](project-plan.md), this tracker, [six-task buyer plan](superpowers/plans/2026-10-28-buyer-replies.md), preserved reference handoff |
-| RA02 | Manual buyer inquiry workflow                               | Codex, future implementation | Planned; not implemented        | Buyer plan Tasks 1–3 and 5; current app has database tables only                                                                                 |
-| RA03 | Draft, edit, approve and copy replies                       | Codex, future implementation | Planned; not implemented        | Buyer plan Tasks 2–5; no reply UI/API exists yet                                                                                                 |
+| RA02 | Manual buyer inquiry workflow                               | Codex, future implementation | Planned; not implemented        | Buyer plan Tasks 1–3 and 5; cloud workflow remains planned; synthetic lab is separate                                                            |
+| RA03 | Draft, edit, approve and copy replies                       | Codex, future implementation | Planned; not implemented        | Buyer plan Tasks 2–5; synthetic reply UI exists; live/cloud reply API and copy workflow remain planned                                           |
 | RA04 | Verify buyer behavior and regressions                       | Codex, future implementation | Pending implementation          | Existing baseline passes; buyer tests have not been written or run                                                                               |
 | RA05 | Choose/connect real services                                | Owner with Codex guidance    | Awaiting future setup           | Confirm Supabase/hosting targets and configure credentials securely when cloud setup begins                                                      |
 | RA06 | Cloud and physical-device acceptance                        | Codex + owner                | Pending RA05 and implementation | [Existing live checklist](mvp-checklist.md#live-acceptance-checklist), plus buyer plan Task 6                                                    |
@@ -58,7 +68,7 @@ Research update: the owner confirmed OpenClaw and Hermes both run on the Mac min
 
 ## Decisions and remaining limits
 
-- Current assignment is setup, verification and planning. The handoff's proposed buyer workflow is the next milestone; it is not a retroactive claim that the original data-model-only MVP requirement was unfulfilled.
+- The earlier assignment was setup, verification and planning; the owner has now authorized the implementation slice recorded above. The handoff's proposed buyer workflow is the next milestone; it is not a retroactive claim that the original data-model-only MVP requirement was unfulfilled.
 - The owner explicitly approved integration of the existing PR stack. It was merged #3 → #2 → #1 without force-pushing or auto-merge. Future changes still require their own merge approval.
 - Plan manual questions, saved-record-based drafting, shared 20-attempt quota, explicit approval, and revision-aware invalidation. Copying and marking Answered remain separate.
 - Keep the existing [known limitations](mvp-checklist.md#known-limitations). In particular: no real cloud/device acceptance, no automated posting or sending, no photo-based AI, no demo/cloud sync, and last-write-wins inventory edits.
@@ -68,7 +78,7 @@ After each meaningful change, update this record with the actual branch/commit, 
 
 RA11 — Research buyer-message intake: **Done** (public-documentation research only). No implementation, live compatibility test, platform permission or future merge approval is implied.
 
-RA12 — Personal-account automation research and staged proposal: **Done as planning**, owner review pending. Native feature eligibility, bridge/Marketplace coverage, Group-comment permission, Carousell access and agent isolation remain unverified. Next proposed work is Task 1 of the new plan; no implementation or live pilot started.
+RA12 — Personal-account automation research and staged proposal: **Done as planning**, owner subsequently approved execution. Native feature eligibility, bridge/Marketplace coverage, Group-comment permission, Carousell access and agent isolation remain unverified. Next proposed work is Task 1 of the new plan; no implementation or live pilot started.
 
 Planning verification: Prettier check passed on all seven changed Markdown files, local Markdown file targets resolved, and `git diff --check` passed. A fresh design reviewer raised one material native-control issue, resolved in the design and outbox test plan. Application tests were not rerun for this documentation-only change. All implementation checkboxes remain unchecked.
 

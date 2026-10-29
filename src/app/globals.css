@@ -1266,3 +1266,93 @@ main {
     scroll-behavior: auto !important;
   }
 }
+
+.buyer-lab {
+  max-width: 1040px;
+  margin: auto;
+  padding: 28px 20px;
+}
+.buyer-lab .page-heading {
+  margin: 30px 0;
+}
+.buyer-lab h2 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+.buyer-lab h3 {
+  font-size: 17px;
+  margin: 16px 0 8px;
+}
+.buyer-lab p {
+  line-height: 1.6;
+  margin: 12px 0;
+}
+.buyer-lab fieldset {
+  min-width: 0;
+}
+.buyer-lab legend {
+  font-weight: 700;
+  padding: 0 8px;
+}
+.buyer-lab .panel {
+  margin-top: 24px;
+}
+.lab-form {
+  display: grid;
+  gap: 16px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.lab-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+}
+.lab-actions label {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.lab-actions .field {
+  display: grid;
+}
+.lab-queue {
+  margin-top: 32px;
+}
+.lab-status {
+  font-size: 13px;
+  padding: 5px 12px;
+  background: #e4ece6;
+  color: #264b37;
+  border-radius: 20px;
+}
+.lab-question {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-weight: 600;
+}
+.buyer-lab textarea {
+  min-height: 90px;
+}
+.buyer-lab .field {
+  min-width: 0;
+}
+.buyer-lab select {
+  width: 100%;
+}
+.buyer-lab .lab-actions .field {
+  max-width: 100%;
+}
+@media (max-width: 600px) {
+  .buyer-lab {
+    padding: 20px 14px;
+  }
+  .buyer-lab .two-fields {
+    grid-template-columns: 1fr;
+  }
+  .buyer-lab .button {
+    white-space: normal;
+  }
+}

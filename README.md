@@ -6,7 +6,7 @@ Built with Next.js App Router, TypeScript, Tailwind CSS, Supabase and the server
 
 ## Project continuity
 
-See the [current status](docs/project-status.md), [project plan](docs/project-plan.md), and [buyer reply implementation plan](docs/superpowers/plans/2026-10-28-buyer-replies.md). The [imported handoff](docs/project-handoff.md) is a historical reference. Buyer inquiry/reply tables exist; their user-facing workflow is planned, not implemented. Pull requests remain unmerged until the owner approves.
+See the [current status](docs/project-status.md), [project plan](docs/project-plan.md), and [buyer reply implementation plan](docs/superpowers/plans/2026-10-28-buyer-replies.md). The [imported handoff](docs/project-handoff.md) is a historical reference. The browser-local [buyer reply lab](docs/buyer-lab.md) now tests sample questions, review rules and simulated delivery at `/buyer-lab`. The live buyer workflow, cloud queue and messaging integrations are not implemented. Pull requests remain unmerged until the owner approves.
 
 ## Try it in demo mode
 

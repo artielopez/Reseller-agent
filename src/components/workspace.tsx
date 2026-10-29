@@ -249,7 +249,11 @@ export function Workspace() {
                     <span className="banner-divider">·</span> Sample items and
                     your changes stay in this browser. AI uses templates.
                   </span>
-                  <span className="demo-dot" />
+                  {!editing && (
+                    <Link href="/buyer-lab" className="text-link">
+                      Try buyer replies
+                    </Link>
+                  )}
                 </div>
               )}
               {editing ? (

@@ -1,6 +1,6 @@
 # Personal Sales Assistant Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task only after implementation is requested. Steps use checkbox (`- [ ]`) syntax for tracking. The current request authorizes research and planning only. No implementation, account connection, sending, deployment or merge is authorized by this document.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task only after implementation is requested. Steps use checkbox (`- [ ]`) syntax for tracking. The owner later authorized implementation with “Go ahead and work on it.” This document itself grants no account connection, sending, deployment or merge permission. See the execution update below.
 
 **Goal:** Progress toward automatic intake, processing and routine replies for the owner's personal resale conversations, with human attention reserved for exceptions and explicit coverage limits.
 
@@ -12,7 +12,7 @@
 
 ## Global constraints
 
-- Current assignment is research and planning only; all task boxes remain unchecked.
+- Execution is authorized. Only evidence-backed individual steps may be marked complete; the synthetic vertical slice does not complete the cloud/worker tasks.
 - No scraping, unauthorized message access, private endpoint reverse engineering, stealth techniques or automatic sending before a permitted channel and explicit release decision exist.
 - Credentials remain outside Git, frontend bundles and logs. Buyer text is untrusted.
 - Demo remains labeled, browser-local and credential-free; sends are simulated.
@@ -31,7 +31,7 @@
 
 ## Order and scope gates
 
-Task 1 is the first future assignment. It produces a go/no-go report before connector code. Tasks 2 and 4 can be developed with synthetic fixtures after approval even when some channels remain unavailable. Task 3 implements only a connector whose access checkpoint has passed. Task 5 can be tested against a fake sender but live delivery remains disabled. Task 6 admits one channel at a time; no release can represent unavailable channels as complete.
+Task 1 is the first assignment. It produces a go/no-go report before connector code. Tasks 2 and 4 can be developed with synthetic fixtures after approval even when some channels remain unavailable. Task 3 implements only a connector whose access checkpoint has passed. Task 5 can be tested against a fake sender but live delivery remains disabled. Task 6 admits one channel at a time; no release can represent unavailable channels as complete.
 
 The [earlier manual buyer plan](2026-10-28-buyer-replies.md) remains useful for domain schemas, reviewed drafts, RLS/revisions, demo persistence and clipboard fallback. Before implementing Task 2, reconcile its tables/RPCs with the message/outbox schema below in one migration design. Do not implement both plans independently or drop the existing manual safety properties. Its manual-only sending scope applies to that fallback, not the newly proposed long-term objective.
 
@@ -57,7 +57,7 @@ Paths below are planned, not present functionality. Migration timestamps must be
 
 **Produces:** Per-channel capability record: permission basis, allowed operations, account/region, source completeness, item IDs, public/private destinations, acknowledgment semantics, native responder visibility and blockers. No credentials in the report.
 
-- [ ] Check Marketplace native availability replies on the owner's account in a later authorized read-only session; do not toggle or publish anything. Record what is actually offered.
+- [x] Check Marketplace native availability replies on the owner's account in an authorized read-only desktop session; no toggle or publishing. No seller AI control was visible on the inspected surfaces; mobile/later-stage eligibility remains unverified. See account evidence.
 - [ ] Confirm Carousell account type, relevant email examples and native-reply eligibility. Draft any support questions about authorized integration for owner review; do not send them without instruction.
 - [ ] Establish Beeper/Meta access basis before a live integration; confirm API entitlement, local/cloud connection mode, Marketplace/message-request and listing-ID support. If testing requires installation/account connection, make that a separately described future pilot rather than silently expanding a read-only check.
 - [ ] Record the local agent versions, available restricted execution interfaces and retention controls. Hermes version check currently fails on an install lock; resolve only if authorized later, not by broad permission changes. Do not inspect unrelated memories/private chats.
@@ -128,4 +128,8 @@ Paths below are planned, not present functionality. Migration timestamps must be
 
 ## Review result and next action
 
-Planning is complete as a conditional staged proposal; access feasibility remains unproven. The design is not a live integration result. Native execution task-by-task is the default proposed approach for this small codebase; no runtime agents or monitors were started. Next action is owner review of this proposal, followed by Task 1 if requested. Do not jump to installing Beeper, connecting personal accounts or enabling agent APIs.
+Planning is complete as a conditional staged proposal; access feasibility remains unproven. The design is not a live integration result. Native execution task-by-task is the default proposed approach for this small codebase; no runtime agents or monitors were started. Owner authorized execution after planning. Task 1 desktop checks and a synthetic vertical slice are recorded in [execution progress](../../implementation-progress.md). Do not jump to installing Beeper, connecting personal accounts or enabling agent APIs.
+
+## Execution update — 29 October 2026
+
+[Account evidence](../../research/channel-capability-evidence.md) and the [buyer lab](../../buyer-lab.md) are prepared on `codex/buyer-foundation`. Tasks 2, 4 and 5 are **partial**: browser-local validated events, narrow templates, editable private drafts, policy controls and simulated outbox only. The owner-scoped Supabase queue/migration, worker enrollment and daemon, agent isolation, external connectors and live acceptance remain unimplemented. Task 3 and live parts of Tasks 5–6 are blocked by unresolved permitted access. Existing manual buyer cloud/copy workflow is still planned. No plan checkbox claims these broader tasks complete.

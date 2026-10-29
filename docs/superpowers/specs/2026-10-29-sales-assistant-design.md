@@ -1,10 +1,10 @@
 # Personal resale assistant: proposed design
 
-29 October 2026 · **Research/design only; awaiting owner review.**
+29 October 2026 · **Owner authorized staged implementation; live access and sending remain gated.**
 
 ## Outcome and scope
 
-The owner sells 11–30 personal items monthly through a personal Facebook profile, Facebook Groups and Carousell PH. Capture both sale-post comments and private messages, process them promptly, and eventually answer routine questions without requiring the owner to approve each one. Use the Mac mini and its OpenClaw/Hermes installations where useful. Keep costs and maintenance small. Do not build, connect accounts or activate sending under the current research-only request.
+The owner sells 11–30 personal items monthly through a personal Facebook profile, Facebook Groups and Carousell PH. Capture both sale-post comments and private messages, process them promptly, and eventually answer routine questions without requiring the owner to approve each one. Use the Mac mini and its OpenClaw/Hermes installations where useful. Keep costs and maintenance small. The owner subsequently approved implementation. The [synthetic lab](../../buyer-lab.md) is the first local slice; account integrations and live sending still require their access/release checkpoints.
 
 The target is an assistant that handles routine work and brings the owner exceptions, rather than permanent copy/paste. It cannot guarantee higher sales, complete inbox access, or unattended operation on every platform. [Research and evidence limits](../../research/personal-account-automation-update.md) govern channel feasibility.
 
