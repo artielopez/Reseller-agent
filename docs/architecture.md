@@ -11,8 +11,8 @@ Using the same provider for auth, database and images avoids operating a separat
 - `items`: facts, PHP asking price and the five inventory states.
 - `item_photos`: ordered private object paths; at most six positions per item. The first photo is the cover.
 - `listings`: one row per item/channel, independently editable title/description, manual publication state, URL and publication timestamp.
-- `buyer_inquiries`: future manually supplied or authorized messages, linked to an owned item. No ingestion is implemented.
-- `suggested_replies`: future draft/approved/dismissed replies linked to an owned inquiry. No send action exists.
+- `buyer_inquiries`: manually recorded questions linked to an owned item, with explicit private/public surface and database-managed revision. No platform ingestion is implemented.
+- `suggested_replies`: manual/template drafts linked to an owned inquiry, with immutable item/question context and revision-bound approval. No send action exists.
 - `ai_usage`: user/day counter for paid generation attempts. Readable by its owner; mutable only through a constrained security-definer quota function.
 
 Composite foreign keys prevent a child row from referencing another owner's item or inquiry. Every application table has RLS. The Storage bucket is private, accepts JPEGs up to 2 MB, and restricts reads/inserts/deletes to the user's folder. Clients cannot overwrite objects. Signed URLs are short-lived bearer links (24 hours); anyone given one can view that photo until expiry, so avoid sharing them publicly.
@@ -40,3 +40,11 @@ The application does not reconcile external platform state. Inventory status is 
 Images are resized locally; no image transformation service is required. The app makes one AI request per generation click and no background requests. The limit is 20 requests per user per Asia/Manila day, with a bounded output and no retries. Disable public Supabase signups, use a project-specific OpenAI key and configure account budgets/alerts. Providers' free tiers and commercial terms may change.
 
 Last-write-wins saves are appropriate for an initial personal workspace, but simultaneous editing on two devices can overwrite changes. A future revision can add optimistic concurrency with `updated_at` or a revision counter. No realtime subscription, analytics service or external font/image host is required.
+
+## Reviewed buyer inbox
+
+`/inbox` uses the existing authenticated Supabase client and the `buyer_workspace(jsonb)` RPC. This security-definer function explicitly filters every operation by `auth.uid()`, caps command size at 16 KiB, locks item → inquiry → reply, and rejects stale revisions/context. Direct authenticated buyer-table writes are revoked; RLS still scopes reads. Helper functions are not client-callable. Database triggers invalidate approvals when relevant item/question facts change, even outside the UI. IDs make inquiry/draft creation retries idempotent when content is identical.
+
+Cloud context preserves exact saved text, including whitespace. Legacy nullable buyer names normalize to an empty string; old approvals without snapshots return to Draft with text intact. Copy rechecks approval and context in the database, but cannot recall text already on the clipboard. Marking Answered is a separate manual action.
+
+The browser demo upgrades the existing IndexedDB to version 2 and evaluates inbox commands in one transaction spanning inventory and buyer stores. Cloud and demo data stay separate. Account changes unmount private UI; explicit sign-out and navigation protect unsaved text. Session expiry clears private UI immediately. All buyer replies are labeled templates or manual text; no paid model, worker, outbound queue or sending endpoint is added. Existing inventory saves still use last-write-wins; buyer mutations use revision checks.

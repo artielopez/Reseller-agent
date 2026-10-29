@@ -309,6 +309,11 @@ export function Workspace() {
                       </button>
                     </div>
                   )}
+                  <p className="inbox-toolbar">
+                    <Link href="/inbox" className="button secondary">
+                      Open buyer inbox
+                    </Link>
+                  </p>
                   <div className="stats-grid">
                     <div className="stat">
                       <div>

@@ -2,7 +2,21 @@
 
 Updated after the owner-approved integration of PRs **#1, #2 and #3**. GitHub merge timestamps below are recorded in UTC. This is the shared status record; the imported handoff is a historical snapshot.
 
-**Ready for review:** the browser-local [buyer reply lab](buyer-lab.md) is implemented on `codex/buyer-foundation`; [desktop account checks](research/channel-capability-evidence.md) are recorded. **Next:** resolve native-feature eligibility and permitted access before investing in a real connector. The existing [Sites inventory demo](https://reseller-agent-demo.pandabur.chatgpt.site) is unchanged. Live buyer capture/replies, cloud queue and agent integration remain unimplemented. No new merge or sending was enabled.
+**Ready for review:** the saved [buyer inbox](shared-inbox-stage.md) is implemented on `codex/shared-buyer-inbox`, extending PR #6. It supports manual questions, editable template/manual drafts, exact-context approval and clipboard copy with demo/Supabase adapters. Local checks passed; hosted Supabase acceptance is pending. Real capture, automatic sending, cloud outbox and OpenClaw/Hermes integration remain unimplemented. The [Sites inventory demo](https://reseller-agent-demo.pandabur.chatgpt.site) is unchanged. No new merge or sending was enabled.
+
+## Current implementation — 30 October 2026
+
+Branch `codex/shared-buyer-inbox` starts from `76b55c6` (PR #6). It preserves the synthetic lab and adds a real saved manual inbox; review delivery is recorded below after publication.
+
+- **RA02 / RA03 — Manual questions and reviewed replies: implemented locally.** `/inbox`, bounded owner-checked Supabase RPC, additive migration, revision-aware context, copy revalidation and separate Answered action. Private messages and public Group comments are explicitly distinguished. Templates are deterministic and labeled; no paid inference or agent call.
+- **RA04 — Local verification: passed.** Lint with no warnings, TypeScript and **76 unit/API/database tests**. Production build passed with `NEXT_PUBLIC_DEMO_MODE=true npm run build -- --webpack`. The default Turbopack build hit a local sandbox port-binding restriction, including the escalated retry; this is not recorded as a passing default build. CI retains the normal build command.
+- All **34 desktop/iPhone-size Chromium browser checks** passed against the production build at local port 3014, including the eight new inbox checks. These cover persistence, original IndexedDB upgrade, stale facts across tabs, clipboard fallback, public comments, draft retention and automated accessibility. Physical iPhone/Safari and hosted Supabase Auth/PostgREST remain untested.
+- Independent review found exact-text parsing, legacy nullable buyer-name and unsaved-draft issues. Regression cases reproduced them, fixes passed, and sign-out discard protection has dedicated tests. Relevant item/question edits invalidate prior approval; text already copied outside the app cannot be recalled.
+- Migration `202610300001_buyer_inbox.sql` retains legacy bodies and resets legacy Approved replies to Draft because they have no trusted context snapshot. Initial migration is preserved. No migration was applied to a live project.
+- **RA13 — Access feasibility: still partial.** [Documentation follow-up](research/channel-capability-evidence.md#documentation-follow-up--30-october-2026) verifies documented native reply options and Beeper API limitations, without establishing permission or account eligibility. Optional iPhone native-toggle check awaits the owner. No bridge installed, chats read, settings changed or support messages sent this turn.
+- **RA15 — Shared inbox foundation: implementation complete, hosted setup pending.** Latest 200 questions shown; demo capped at 200 questions/2,000 drafts. No realtime refresh, inquiry edit/delete UI, paid buyer AI, worker enrollment, delivery queue or real connector.
+
+Next: review the feature PR; configure a selected private Supabase project and apply both migrations in order; run the live checklist on desktop and physical iPhone. Independently verify channel permission/coverage and native eligibility before connector work. Only then build a restricted drafting adapter and supervised pilot. No new merge approval is inferred.
 
 ## Repository and demo
 
@@ -38,7 +52,7 @@ Fresh local checks on 28 October, against application code at `11defd0`. Those e
 
 `npm ci` reported that the locked ESLint 9.39.5 version is no longer supported. It still passed lint. Treat upgrading the lint toolchain as a future maintenance task with compatibility checks; dependencies were not changed during this handoff. The npm audit result is a point-in-time report, not a security guarantee. No new secret scan or ongoing audit job was added.
 
-## Current implementation — 29 October 2026
+## Previous implementation — 29 October 2026
 
 Branch `codex/buyer-foundation`, based on research commit `c055265`. [PR #6](https://github.com/artielopez/Reseller-agent/pull/6) is open against `main`, with implementation commit `02ca02b`. It includes research PR #5; neither is merged and auto-merge is disabled. Owner approved implementation after the research proposal and signed into both platforms for read-only feasibility checks.
 
@@ -48,7 +62,7 @@ Branch `codex/buyer-foundation`, based on research commit `c055265`. [PR #6](htt
 - Independent review found stale-context and draft-preservation issues; each was reproduced in a failing test and fixed. Follow-up cases (stale text after refresh and actual completed text display) were also reproduced and fixed. Application checks were rerun after the final changes.
 - Remaining: Supabase conversation/outbox migrations with ownership tests, restricted agent profile, permission evidence before connector investment, and staged live acceptance. Existing shared Sites deployment is unchanged.
 
-## Historical planning tracker
+## Historical planning tracker (superseded by the current implementation above)
 
 29 October update: personal Facebook profile confirmed; scope includes Group comments and DMs with eventual automatic reading, processing and replies. [Updated research](research/personal-account-automation-update.md) adds native Marketplace AI replies and Beeper as conditional candidates. [Six-stage plan](superpowers/plans/2026-10-29-sales-assistant.md) and design prepared on `codex/research-buyer-message-access`, extending [PR #5](https://github.com/artielopez/Reseller-agent/pull/5), which was verified open against `main`. No code, account connections or automation settings changed. No messages read or sent. OpenClaw version metadata reports 2026.9.6; Hermes version check failed on an install lock and was not repaired. A fresh builder review identified native/custom control ambiguity; the design now explicitly separates their modes and pause semantics. Documentation checks are recorded with the planning commit; prior application tests are not evidence for these unimplemented features.
 
@@ -70,7 +84,7 @@ Research update: the owner confirmed OpenClaw and Hermes both run on the Mac min
 
 - The earlier assignment was setup, verification and planning; the owner has now authorized the implementation slice recorded above. The handoff's proposed buyer workflow is the next milestone; it is not a retroactive claim that the original data-model-only MVP requirement was unfulfilled.
 - The owner explicitly approved integration of the existing PR stack. It was merged #3 → #2 → #1 without force-pushing or auto-merge. Future changes still require their own merge approval.
-- Plan manual questions, saved-record-based drafting, shared 20-attempt quota, explicit approval, and revision-aware invalidation. Copying and marking Answered remain separate.
+- Manual questions, templates, explicit approval and revision-aware invalidation are implemented. Paid buyer drafting and a shared 20-attempt quota remain planned; existing listing quota is unchanged. Copying and marking Answered remain separate.
 - Keep the existing [known limitations](mvp-checklist.md#known-limitations). In particular: no real cloud/device acceptance, no automated posting or sending, no photo-based AI, no demo/cloud sync, and last-write-wins inventory edits.
 - No Dot integration, monitor or external task assignment was created. The owner subsequently authorized the Sites demo deployment recorded below. These Markdown documents can be read by a future coordinator; they do not synchronize themselves.
 

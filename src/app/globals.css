@@ -1356,3 +1356,34 @@ main {
     white-space: normal;
   }
 }
+
+.inbox-toolbar {
+  margin: 20px 0;
+}
+.inbox-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+.inbox-list .button {
+  text-align: left;
+  justify-content: flex-start;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  width: 100%;
+}
+.inbox-facts {
+  background: #f2f5ef;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 16px 0;
+}
+.inbox-reply {
+  border-top: 1px solid #dce2dc;
+  margin-top: 20px;
+  padding-top: 16px;
+}
+.inbox-draft-select {
+  margin-top: 20px;
+}

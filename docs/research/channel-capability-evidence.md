@@ -43,3 +43,14 @@ Next, verify the native features in the platforms' mobile UI and obtain answers 
 4. Which data leaves the Mac and what retention/deletion controls apply?
 
 Before any live reply pilot, collect the owner's exact permitted pickup area, hours, delivery/payment terms, price floors and escalation rules. The current demo infers none of these and makes no sale commitments.
+
+## Documentation follow-up — 30 October 2026
+
+No additional account UI was inspected and no bridge was installed or connected during this follow-up.
+
+- **Carousell native tools:** the [Philippines quick/auto-reply documentation](https://support.carousell.com/hc/en-us/articles/900006211046--Philippines-CarouBiz-tools-Quick-and-Auto-Reply) describes CarouBiz templates and scheduled replies on app/web, up to 50 quick replies, a 1,000-character auto-reply limit and one auto-reply per buyer/listing in 24 hours. This is useful acknowledgment, not evidence of general AI conversation handling or an API entitlement. This account's eligibility/cost remains unconfirmed.
+- **Facebook native availability replies:** [Meta's announcement](https://about.fb.com/news/2026/03/facebook-marketplace-new-meta-ai-tools-make-selling-faster-and-easier/) describes previewing/editing/enabling replies during listing creation using listing facts. The owner has been asked whether the option appears on their iPhone; no answer has been recorded. Country/account eligibility is not established by the announcement.
+- **Beeper:** its [Desktop API](https://developers.beeper.com/desktop-api/) is local and requires Beeper running. [Messenger support](https://help.beeper.com/chat-networks/messenger) covers personal Facebook, not business profiles, and documents missing-message/disconnection troubleshooting. These pages do not establish complete Marketplace coverage, Group comments, or Meta permission for this proposed automation. A local API does not establish that all bridge processing stays on the Mac.
+- **Access and delivery:** [Beeper auth](https://developers.beeper.com/desktop-api/auth/) describes approved connections/token access. The [send endpoint](https://developers.beeper.com/desktop-api-reference/resources/messages/methods/send/) returns a pending message ID; pending is not confirmed external delivery. Its returned chat ID can differ for a merged chat. No idempotency parameter appears on the inspected send reference. A future permitted pilot must establish reconciliation and destination verification before dispatch; none is implemented here.
+
+Decision remains **no-go for live custom readers/senders** until permission and actual coverage are established independently per channel. The saved manual inbox can be built and tested without these connections. Public Group comments remain a separate unresolved source; a private Messenger bridge does not solve them. Existing support questions above are still drafts, not sent requests.

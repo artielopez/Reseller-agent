@@ -1,5 +1,5 @@
 import { PGlite } from "@electric-sql/pglite";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 import { beforeAll, afterAll, expect, it } from "vitest";
 const db = new PGlite();
 const alice = "11111111-1111-4111-8111-111111111111";
@@ -45,9 +45,8 @@ beforeAll(async () => {
     grant all on storage.objects to authenticated, anon;
     create function storage.foldername(text) returns text[] language sql immutable as $$ select (string_to_array($1, '/'))[1:array_length(string_to_array($1, '/'), 1)-1] $$;
   `);
-  await db.exec(
-    readFileSync("supabase/migrations/202610280001_initial.sql", "utf8"),
-  );
+  for (const name of readdirSync("supabase/migrations").sort())
+    await db.exec(readFileSync("supabase/migrations/" + name, "utf8"));
 }, 30000);
 afterAll(async () => {
   await db.close();
