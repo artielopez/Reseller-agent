@@ -2,7 +2,7 @@
 
 Updated after the owner-approved integration of PRs **#1, #2 and #3**. GitHub merge timestamps below are recorded in UTC. This is the shared status record; the imported handoff is a historical snapshot.
 
-**Ready:** the [ChatGPT Sites demo](https://reseller-agent-demo.pandabur.chatgpt.site) is published and the project/buyer plans are prepared. Open the Site using the same ChatGPT account on Windows, Mac or iPhone. **Next:** implement the manual inquiry/reply milestone when requested. PRs #1, #2 and #3 are merged into `main`. Buyer reply implementation remains planned.
+**Ready:** the [ChatGPT Sites demo](https://reseller-agent-demo.pandabur.chatgpt.site) is published and the project/buyer plans are prepared. Open the Site using the same ChatGPT account on Windows, Mac or iPhone. **Next:** review the [automatic sales-assistant proposal](superpowers/specs/2026-10-29-sales-assistant-design.md), then establish account-specific access/feature evidence when requested. PRs #1, #2 and #3 are merged into `main`. Buyer reply implementation remains planned; the latest instruction is research and planning only.
 
 ## Repository and demo
 
@@ -40,6 +40,8 @@ Fresh local checks on 28 October, against application code at `11defd0`. Those e
 
 ## Tracker
 
+29 October update: personal Facebook profile confirmed; scope includes Group comments and DMs with eventual automatic reading, processing and replies. [Updated research](research/personal-account-automation-update.md) adds native Marketplace AI replies and Beeper as conditional candidates. [Six-stage plan](superpowers/plans/2026-10-29-sales-assistant.md) and design prepared on `codex/research-buyer-message-access`, extending [PR #5](https://github.com/artielopez/Reseller-agent/pull/5), which was verified open against `main`. No code, account connections or automation settings changed. No messages read or sent. OpenClaw version metadata reports 2026.9.6; Hermes version check failed on an install lock and was not repaired. A fresh builder review identified native/custom control ambiguity; the design now explicitly separates their modes and pause semantics. Documentation checks are recorded with the planning commit; prior application tests are not evidence for these unimplemented features.
+
 Research update: the owner confirmed OpenClaw and Hermes both run on the Mac mini and requested investigation of automatic message intake before implementation. [API and computer-use findings](research/buyer-message-access.md) are prepared. Page messaging has a documented API path; personal Marketplace/Groups and Carousell browser collection remain unapproved/untested. No account access or automation was configured. See the memo's next-investigation list before changing implementation scope.
 
 | ID   | Work                                                        | Owner                        | Status                          | Evidence / next step                                                                                                                             |
@@ -65,6 +67,10 @@ Research update: the owner confirmed OpenClaw and Hermes both run on the Mac min
 After each meaningful change, update this record with the actual branch/commit, check results and next action. Do not copy historical test counts forward as evidence for new code.
 
 RA11 — Research buyer-message intake: **Done** (public-documentation research only). No implementation, live compatibility test, platform permission or future merge approval is implied.
+
+RA12 — Personal-account automation research and staged proposal: **Done as planning**, owner review pending. Native feature eligibility, bridge/Marketplace coverage, Group-comment permission, Carousell access and agent isolation remain unverified. Next proposed work is Task 1 of the new plan; no implementation or live pilot started.
+
+Planning verification: Prettier check passed on all seven changed Markdown files, local Markdown file targets resolved, and `git diff --check` passed. A fresh design reviewer raised one material native-control issue, resolved in the design and outbox test plan. Application tests were not rerun for this documentation-only change. All implementation checkboxes remain unchecked.
 
 ## Shared demo — published 28 October
 

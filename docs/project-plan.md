@@ -1,8 +1,14 @@
 # Reseller Agent project plan
 
-Updated 28 October 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Buyer reply implementation plan](superpowers/plans/2026-10-28-buyer-replies.md)
+Updated 29 October 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
 ## Current assignment
+
+The owner confirmed use of a personal Facebook profile and wants both Group comments and private messages captured, processed and answered promptly with minimal engagement. OpenClaw and Hermes on the Mac mini are available resources. The current instruction is **research and plan first, before building anything**. The [new design](superpowers/specs/2026-10-29-sales-assistant-design.md), [research update](research/personal-account-automation-update.md) and [conditional staged plan](superpowers/plans/2026-10-29-sales-assistant.md) are the current roadmap. Implementation and live sending remain unapproved. Native Marketplace replies and a Beeper personal-Messenger bridge are candidates to investigate, not verified integrations for this account. Group comments and Carousell have separate unresolved access gates.
+
+The manual inquiry/review milestone below is retained as a foundation and fallback. Its no-sending boundary applies to that milestone; it does not redefine the owner's newer objective. No existing runtime restriction is relaxed by planning. Next proposed assignment: account-specific feasibility evidence before custom connector investment. Native replies and custom sending use separate modes; the app cannot promise to pause external native features.
+
+### Earlier assignment and completed delivery
 
 Take over the existing repository, make the local demo available, maintain this plan and the status tracker, and prepare the buyer reply implementation plan. Do not merge without the owner's explicit approval.
 

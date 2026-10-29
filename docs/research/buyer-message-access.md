@@ -1,5 +1,7 @@
 # Buyer message access: APIs, browser control and local agents
 
+**Follow-up, 29 October 2026:** the owner confirmed personal Facebook selling and wants automatic processing/replies for both Group comments and DMs. [Updated research](personal-account-automation-update.md) adds Meta's native Marketplace AI replies and Beeper's personal-Messenger API as investigation candidates. This original memo remains the initial evidence record; read the update and [new staged plan](../superpowers/plans/2026-10-29-sales-assistant.md) before selecting the next milestone.
+
 ## Scope and conclusion
 
 The owner has both OpenClaw and Hermes on a Mac mini and requested research before implementation. This memo evaluates automatically reading Carousell, personal Facebook Marketplace and Facebook Groups inquiries. No account was opened, message read, agent configuration changed, monitor installed or message sent. Installed agent versions and account-specific capabilities have not been verified.
