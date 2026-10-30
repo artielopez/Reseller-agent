@@ -46,7 +46,7 @@ Implementation below describes the reviewable repository; [current release statu
 
 Complete after setting up Supabase and optional OpenAI credentials:
 
-1. Confirm all three migrations completed and the `item-photos` bucket is **private**.
+1. Confirm the three application migrations (through `202610300002_draft_queue.sql`) completed and the `item-photos` bucket is **private**.
 2. Disable public signups, create/invite your account, and verify email-link sign-in and sign-out on desktop and iPhone.
 3. Add an item with two photos, reload, and sign in on the other device; confirm fields and photos sync.
 4. Use a second test account to verify the first account's inventory and images are inaccessible.
@@ -78,3 +78,5 @@ Use a dedicated synthetic item/question and an explicit model choice before real
 8. On desktop and physical iPhone/Safari, reload the inbox, review/edit a generated Draft, approve and copy deliberately, then mark Answered separately. Confirm account switching and expired sessions do not reveal another owner's drafts.
 
 Existing PGlite, fake HTTP/provider and Chromium tests do not satisfy this checklist. Actual platform account intake/send integration remains a separate permission and feasibility decision.
+
+The optional fourth migration supports a [durable fake-delivery engineering lab](durable-delivery-simulation.md). Local synthetic tests are separate from any live sending claim; it is not connected to the app UI or Mac draft worker.
