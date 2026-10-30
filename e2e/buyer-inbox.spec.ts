@@ -190,3 +190,54 @@ test("preserves written drafts during other saves and protects unsaved saved-rep
     "Keep my unsaved edit.",
   );
 });
+test("labels persisted agent drafts and keeps copying gated on explicit review", async ({
+  page,
+}) => {
+  await question(page);
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await expect(page.getByLabel("Reply text")).toBeVisible();
+  // Synthetic saved result: no model or cloud connection is used by this fixture.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const open = indexedDB.open("reseller-agent-demo", 2);
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result,
+            tx = db.transaction("buyer", "readwrite"),
+            store = tx.objectStore("buyer");
+          const request = store.get("state");
+          request.onsuccess = () => {
+            const state = request.result as {
+              replies: Array<{ source: string; review_note?: string }>;
+            };
+            state.replies[0].source = "agent";
+            state.replies[0].review_note =
+              "Synthetic test: check the saved price.";
+            store.put(state, "state");
+          };
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+          };
+        };
+      }),
+  );
+  await page.reload();
+  await page.getByRole("button", { name: /How much/ }).click();
+  await expect(page.getByText(/Agent draft — review required/)).toBeVisible();
+  await expect(
+    page.getByText("Review note: Synthetic test: check the saved price."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeEnabled();
+});

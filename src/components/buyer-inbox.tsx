@@ -725,8 +725,11 @@ function ReplyReview({
         Reply status: {reply.status} ·{" "}
         {reply.source === "template"
           ? "Template — no AI used"
-          : "Written by you"}
+          : reply.source === "agent"
+            ? "Agent draft — review required"
+            : "Written by you"}
       </p>
+      {reply.review_note && <p>Review note: {reply.review_note}</p>}
       {stale && (
         <p role="status">
           Saved facts changed. Prepare a fresh draft before approval or copying.
