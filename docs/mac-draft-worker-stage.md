@@ -28,4 +28,21 @@ Ruling: this stage provides a foreground worker and explicit stop/recovery behav
 - Config/lock and serial-runner tests failed against stubs before implementation and now pass. Existing ambiguous locks are retained; cleanup precedes each subsequent poll.
 - Full synthetic PGlite queue → transport adapter → actual OpenClaw → one-use endpoint → fake OpenAI adapter → Draft passed, with exactly one shared attempt and no second inference when the queue is empty. Installed-runtime cancellation test passed. No hosted or real-model acceptance implied.
 - `npm run worker:check` passed against the actual installation with an ignored, owner-private worktree state directory. No credentials or service request used.
-- Full verification: lint, app typecheck, worker compilation, **140 standard tests (5 optional skipped by default)**, and Webpack production build passed. The five optional installed-runtime cases also passed separately (six tests including the baseline unconfigured guard). UI/SQL unchanged in this stage; existing browser checks were not redundantly rerun locally. CI retains them and now compiles the worker too. Fresh review remains pending.
+- Full verification: lint, app typecheck, worker compilation, **140 standard tests (6 optional skipped by default)**, and Webpack production build passed. The six optional installed-runtime cases also passed separately (seven tests including the baseline unconfigured guard). UI/SQL unchanged in this stage; existing browser checks were not redundantly rerun locally. CI retains them and now compiles the worker too. Fresh review and its single fix pass are recorded below.
+
+
+## Final review and fix pass
+
+Fresh read-only review (`review_mac_worker`, GPT-6 Astra high) covered `4fac5e8..492cef4` plus documentation corrections. No Critical findings. One Important listener-cleanup finding was accepted: evaluating both control-listener creations before recording either leaked the first listener if the second bind failed.
+
+Final: fixed startup listener leak — `closes the first preflight listener if creating the second fails` reproduced `listening: true` (RED), then passed after registering each listener immediately (GREEN). All seven installed-runtime tests passed in the same run. Full final suite/build results accompany the delivery below. No second review was requested.
+
+Final: minor (deferred): runtime cleanup tests assert the state directory's canary removal, but do not directly assert removal of the specific `/private/tmp/reseller-draft-run-*` directory on success/cancellation. Production code awaits its removal; a regression omitting that cleanup would not be caught by these assertions. Add a precise run-directory assertion in a future test improvement; never sweep unrelated temporary directories.
+
+Final: Ruling: hosted Auth/PostgREST, real separate-session contention, paid model compatibility and retention remain acceptance gates, not claims established by fake HTTP/PGlite/provider tests. Cost if wrong: rejected or mis-accounted live jobs/data exposure; no live activation until verified.
+
+Final: Ruling: channel ingestion/sending, Hermes parity, autostart and automatic crash recovery remain excluded. The foreground OpenClaw pilot provides draft preparation for explicitly queued saved private questions only. Cost: manual intake/review and terminal/recovery work remain, so this is not the eventual unattended sales assistant.
+
+Final: Ruling: same-user malicious processes, compromised trusted runtime/dependency directories and OS exploits are outside this boundary's threat model. Cost: this local sandbox cannot promise isolation against those actors; trusted installation/administrator is required.
+
+Final: Ruling: physical iPhone/Safari acceptance remains pending because this stage changes no UI and local emulation is insufficient. Cost: device-specific cloud interaction problems may remain undiscovered until the live checklist.

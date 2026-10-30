@@ -242,7 +242,8 @@ export function createOpenClawRuntime(
       );
       if (metadata.name !== "openclaw" || metadata.version !== "2026.9.6")
         throw failure();
-      controls.push(await localControl(), await localControl());
+      controls.push(await localControl());
+      controls.push(await localControl());
       root = await scratch(
         installation,
         node,
