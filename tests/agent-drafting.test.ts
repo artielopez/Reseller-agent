@@ -111,8 +111,11 @@ it("does not retry provider failures or return their private error details", asy
 });
 it("rejects a result if saved facts or inquiry changed during generation", async () => {
   const d = dependencies();
-  d.reloadContext.mockResolvedValue({ ...context, item_revision: "3" });
+  d.reloadContext
+    .mockResolvedValueOnce(context)
+    .mockResolvedValueOnce({ ...context, item_revision: "3" });
   await expect(prepareAgentDraft(context, d)).rejects.toThrow("changed");
+  expect(d.generate).toHaveBeenCalledTimes(1);
 });
 it("checks current context before spending an attempt", async () => {
   const d = dependencies();
