@@ -85,3 +85,5 @@ The owner approved merge/deploy and a continuation goal on 30 October. PR #7 is 
 Continuation: [owned draft queue stage](owned-draft-queue-stage.md) implements durable draft-only worker capability and shared quota while hosted access is pending. This is part of Tasks 2/4, not completion of event ingestion, outbound delivery, runtime isolation or live acceptance. Next independent work is owner queue controls and the dedicated runtime feasibility harness.
 
 Owner [worker controls](worker-controls-stage.md) are now implemented on `codex/draft-worker-controls`, following PR #9. They expose the existing draft-only RPC without starting a runtime. Next independent work is isolated runtime feasibility; selected Supabase access still gates hosted acceptance.
+
+The [runtime experiment](research/runtime-isolation-probe.md) establishes a synthetic OpenClaw path, but found an internal second model request after a rejected tool. Require a single-use model connection before connecting the restricted runtime; do not treat a successful CLI exit or tool-deny configuration as quota enforcement.

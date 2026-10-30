@@ -1,0 +1,101 @@
+{
+  "purpose": "synthetic experiment, not live worker admission",
+  "openclaw_version": "2026.9.6",
+  "platform": "Darwin",
+  "launcher_sha256": "e4a0f34ab2c0b01be203f8e385db286beec19649f6bdc751065de445ca2c38dd",
+  "observations": [
+    {
+      "mode": "success",
+      "exit_code": 0,
+      "status": "ok",
+      "model_requests": 1,
+      "offered_tools": [
+        0
+      ],
+      "output_caps": [
+        1800
+      ],
+      "store_fields": [
+        null
+      ],
+      "request_bytes": [
+        7357
+      ],
+      "tool_executed": false,
+      "tool_summary": null,
+      "workspace_context_leaked": false,
+      "retained_prompt_files": [],
+      "temporary_run_dirs_remaining": 0,
+      "file_read_guard": true,
+      "other_port_network_guard": true,
+      "cleanup_diagnostic_warning": true
+    },
+    {
+      "mode": "tool",
+      "exit_code": 0,
+      "status": "ok",
+      "model_requests": 2,
+      "offered_tools": [
+        0,
+        0
+      ],
+      "output_caps": [
+        1800,
+        1800
+      ],
+      "store_fields": [
+        null,
+        null
+      ],
+      "request_bytes": [
+        7354,
+        7674
+      ],
+      "tool_executed": false,
+      "tool_summary": {
+        "calls": 1,
+        "tools": [
+          "exec"
+        ],
+        "failures": 1,
+        "unresolvedError": {
+          "toolName": "exec"
+        }
+      },
+      "workspace_context_leaked": false,
+      "retained_prompt_files": [],
+      "temporary_run_dirs_remaining": 0,
+      "file_read_guard": true,
+      "other_port_network_guard": true,
+      "cleanup_diagnostic_warning": true
+    },
+    {
+      "mode": "timeout",
+      "exit_code": 2,
+      "status": "timeout",
+      "model_requests": 1,
+      "offered_tools": [
+        0
+      ],
+      "output_caps": [
+        1800
+      ],
+      "store_fields": [
+        null
+      ],
+      "request_bytes": [
+        7357
+      ],
+      "tool_executed": false,
+      "tool_summary": null,
+      "workspace_context_leaked": false,
+      "retained_prompt_files": [],
+      "temporary_run_dirs_remaining": 0,
+      "file_read_guard": true,
+      "other_port_network_guard": true,
+      "cleanup_diagnostic_warning": true
+    }
+  ],
+  "requires_one_request_gate": true,
+  "live_worker_admitted": false
+}
