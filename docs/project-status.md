@@ -41,6 +41,15 @@ Branch `codex/shared-buyer-inbox` starts from `76b55c6` (PR #6). It preserves th
 
 Next: review the feature PR; configure a selected private Supabase project and apply both migrations in order; run the live checklist on desktop and physical iPhone. Independently verify channel permission/coverage and native eligibility before connector work. Only then build a restricted drafting adapter and supervised pilot. No new merge approval is inferred.
 
+## Seller preferences continuation — 31 October 2026
+
+Branch `codex/seller-reply-preferences`, based on final PR #14 head `bdf6541`, implements private reply terms and an optional in-app inbox review reminder. Final PR #14 [CI 41084269679](https://github.com/artielopez/Reseller-agent/actions/runs/41084269679) passed. Implementation commit `9d6a3c2` received one fresh review; its Important clipboard-fallback finding is fixed and verified. This increment is not merged or deployed.
+
+- [Usage/setup](seller-preferences.md) and [stage evidence](seller-preferences-stage.md). Business terms start blank; reminder off. A separate terms revision makes changes invalidate approvals, while reminder/review changes preserve them. Public templates exclude private terms. The summary covers up to 200 saved questions, not uncaptured platform messages.
+- Additive owner-only preferences migration tested without the optional simulation migration; demo uses existing IndexedDB storage atomically. Stale writes preserve edits, settings changes preserve unsaved reply text, and account changes discard old-account state/late responses.
+- Final local verification: **171 standard tests passed**, 6 optional installed-runtime cases skipped; lint/types/worker compilation/Webpack production build passed. **44 production demo browser checks and 10 synthetic cloud checks passed**, including already-visible and delayed clipboard fallback invalidation, edit preservation, two-tab stale writes, account switching and accessibility. One review/fix pass; no Critical or remaining Important findings. Hosted/default CI evidence is recorded separately when available.
+- Hosted Supabase connection/project selection, real model/worker acceptance, physical iPhone checks and permitted personal-channel capture/delivery remain pending. No hosted migration, paid model request, live reading, sending or new public release occurred.
+
 ## Repository and demo
 
 | Item                 | Verified state                                                                                                  |

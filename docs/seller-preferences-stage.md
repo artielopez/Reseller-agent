@@ -40,3 +40,17 @@ Ruling: keep business terms blank and reminders off by default. The owner can su
 - Preference validation/defaults/revisions and Manila timing: 3 RED then GREEN cases. Private terms/context integration: 3 RED then GREEN cases. Owner/database acceptance: 2 RED then GREEN cases, applying the migration without optional delivery simulation.
 - Full local suite: 171 passed, 6 optional installed-runtime cases skipped; lint/types, worker compilation and Webpack production build passed. Four new desktop/mobile preference checks passed before final styling. Full final browser suites are rerunning with isolated artifact directories after concurrent runs collided in Playwright's shared output folder; this was a test-runner artifact error, not a UI assertion failure.
 - Next: final browser evidence, one fresh reviewer, any Critical/Important fixes and reviewable PR. No live setup or sending.
+
+## Final review and fix pass
+
+One fresh read-only review of `bdf6541..9d6a3c2` found no Critical and one Important defect: retained clipboard fallback text and pending copy completions could outlive approval invalidation after terms changed. No Minor findings. Both visible-fallback and delayed-clipboard-rejection regressions were reproduced RED in a production browser. The fix gates fallback/notices on current eligibility and fences asynchronous copy completions against the latest committed UI context, while retaining editor text. A clipboard write already handed to the operating system cannot be recalled; the app does not claim otherwise. One fix pass; no second reviewer.
+
+Review rulings:
+- Hosted separate-session contention/two-account service acceptance stays pending; local database checks are not proof of live contention.
+- Actual model/runtime and physical iPhone/Safari acceptance stays pending; synthetic browser/runtime fixtures are not those live checks.
+- External notifications, platform ingestion/sending and history beyond 200 questions stay outside this stage as documented; no release authority is inferred.
+- Unrelated PR #8–14 behavior remains governed by its existing evidence; this review covers regressions introduced by saved terms/context and inbox UI.
+
+The account-switch test assertion was corrected to check the old form is no longer visible (the new account's collapsed form may already exist), then verify blank new-account values after the delayed old save. Mobile visual inspection also corrected checkbox alignment and the primary save-button style.
+
+Final fix-pass verification: **171 standard tests passed**, 6 optional installed-runtime tests skipped; lint, types, worker build and Webpack production build passed. **44 production demo browser checks and 10 synthetic cloud browser checks passed**, including both new RED→GREEN regression cases on desktop and mobile. Reviewable PR publication and exact-head CI remain the final delivery steps.

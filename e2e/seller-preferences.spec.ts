@@ -98,3 +98,91 @@ test("stale preference writes retain typed edits and background inbox refresh do
     "Keep my edit",
   );
 });
+
+test("withdraws approved clipboard fallback when saved seller terms change", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: async () => {
+          throw new Error("denied");
+        },
+      },
+    }),
+  );
+  await page.goto("/inbox");
+  await page.getByLabel("Buyer question").fill("Can I pick it up?");
+  await page
+    .getByRole("button", { name: "Save question", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await page.getByRole("button", { name: "Copy approved reply" }).click();
+  await expect(page.getByLabel("Approved text to copy manually")).toBeVisible();
+  const original = await page.getByLabel("Reply text").inputValue();
+  await page.getByText("Seller terms and reminder", { exact: true }).click();
+  await page.getByLabel("General pickup area").fill("New pickup area");
+  await page
+    .getByRole("button", { name: "Save preferences", exact: true })
+    .click();
+  await expect(page.getByText(/Preferences saved/)).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeDisabled();
+  await expect(page.getByLabel("Approved text to copy manually")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(/Select the approved text below/)).toHaveCount(0);
+  await expect(page.getByLabel("Reply text")).toHaveValue(original);
+});
+
+test("ignores a late clipboard rejection after terms change without losing reply text", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      value: {
+        writeText: () =>
+          new Promise<void>((_resolve, reject) => {
+            (
+              window as unknown as { rejectClipboard: () => void }
+            ).rejectClipboard = () => reject(new Error("denied"));
+          }),
+      },
+    }),
+  );
+  await page.goto("/inbox");
+  await page.getByLabel("Buyer question").fill("Late clipboard test");
+  await page
+    .getByRole("button", { name: "Save question", exact: true })
+    .click();
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  const original = await page.getByLabel("Reply text").inputValue();
+  await page.getByRole("button", { name: "Copy approved reply" }).click();
+  await expect
+    .poll(() =>
+      page.evaluate(
+        () =>
+          typeof (window as unknown as { rejectClipboard?: () => void })
+            .rejectClipboard,
+      ),
+    )
+    .toBe("function");
+  await page.getByText("Seller terms and reminder", { exact: true }).click();
+  await page.getByLabel("General pickup area").fill("New area");
+  await page
+    .getByRole("button", { name: "Save preferences", exact: true })
+    .click();
+  await expect(page.getByText(/Preferences saved/)).toBeVisible();
+  await page.evaluate(() =>
+    (window as unknown as { rejectClipboard: () => void }).rejectClipboard(),
+  );
+  await expect(page.getByLabel("Reply text")).toBeEnabled();
+  await expect(page.getByLabel("Approved text to copy manually")).toHaveCount(
+    0,
+  );
+  await expect(page.getByText(/Select the approved text below/)).toHaveCount(0);
+  await expect(page.getByLabel("Reply text")).toHaveValue(original);
+});

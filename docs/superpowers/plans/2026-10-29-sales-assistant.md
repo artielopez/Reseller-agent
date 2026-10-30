@@ -142,3 +142,7 @@ PR #7 merged and the existing private Sites demo was updated after owner approva
 ## Execution update — durable simulation, 30 October 2026
 
 PR #13 implements the restricted foreground OpenClaw draft worker with local synthetic acceptance. PR #14 adds an owner-only server-persisted delivery simulation over saved inbox records, a fenced claim/start/outcome protocol and an in-memory fake executor. It verifies stale-context/native/takeover controls, uncertain outcomes and explicit fake reconciliation. No real capture/delivery or new worker sending capability exists. Tasks 2/5 now have this additional tested synthetic foundation, but are not complete for real channel operation. Seller policy/digest/exception UI, real event ingestion/coverage, history lifecycle, hosted concurrent-session acceptance and live release gates remain separate work; do not mark the original whole-task checkboxes complete from these narrower tests.
+
+## Execution update — seller preferences, 31 October 2026
+
+The [seller preferences stage](../../seller-preferences-stage.md) adds saved general private-reply terms and Task 4's in-app review settings/summary. Terms changes bind to fresh draft context and invalidate approvals; reminders alone do not. This is not an external digest or unattended reply release. Tasks 1/3/live5/6 still require permitted access, a selected hosted project and separate live acceptance; original whole-task checkboxes remain incomplete.

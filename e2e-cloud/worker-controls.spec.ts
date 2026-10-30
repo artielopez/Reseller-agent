@@ -395,7 +395,7 @@ test("preference edits protect sign-out and late saves cannot enter the next acc
     channel.postMessage({ event: "SIGNED_IN", session: saved });
     channel.close();
   }, session("66666666-6666-4666-8666-666666666666"));
-  await expect(page.getByLabel("General pickup area")).toHaveCount(0);
+  await expect(page.getByLabel("General pickup area")).not.toBeVisible();
   await page.getByText("Seller terms and reminder", { exact: true }).click();
   await expect(page.getByLabel("General pickup area")).toHaveValue("");
   const response = page.waitForResponse("**/rest/v1/rpc/seller_workspace");

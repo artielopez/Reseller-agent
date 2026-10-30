@@ -272,7 +272,11 @@ export function SellerPreferencesPanel({
               The reminder appears when you open or refresh this inbox after the
               chosen time. It does not send a notification.
             </p>
-            <button className="button" disabled={busy || !dirty} type="submit">
+            <button
+              className="button primary"
+              disabled={busy || !dirty}
+              type="submit"
+            >
               {busy ? "Saving…" : "Save preferences"}
             </button>
           </form>

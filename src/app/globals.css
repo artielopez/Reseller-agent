@@ -1452,6 +1452,7 @@ main {
 }
 .seller-preferences label:has(input[type="checkbox"]) {
   display: flex;
+  flex-direction: row;
   align-items: center;
   gap: 10px;
 }
