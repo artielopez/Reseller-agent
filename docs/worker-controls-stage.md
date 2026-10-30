@@ -36,3 +36,5 @@ One independent read-only reviewer examined `22858da..f3ba8df`, including the ac
 - Final: Ruling: physical iPhone/Safari clipboard/layout behavior remains unverified. Chromium emulation is partial evidence; the read-only key field supports manual copying if clipboard access fails.
 
 Next independent work: isolated runtime feasibility harness. No personal config, credentials, memory or transcripts are to be copied into it. Supabase target/connection still gates hosted setup.
+
+Delivery: [PR #10](https://github.com/artielopez/Reseller-agent/pull/10) is open against main, auto-merge disabled, head `87a1308` before this delivery-only documentation commit. [GitHub Application checks](https://github.com/artielopez/Reseller-agent/actions/runs/41063818802) were queued. PR #9 also passed CI on its final documentation head `22858da`. No additional merge or deployment occurred.
