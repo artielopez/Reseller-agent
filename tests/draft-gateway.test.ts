@@ -1,3 +1,4 @@
+import { request as httpRequest } from "node:http";
 import { expect, it, vi } from "vitest";
 import {
   startDraftGateway,
@@ -195,6 +196,42 @@ it("expires an unused loopback capability without starting inference", async () 
     expect(generate).not.toHaveBeenCalled();
   } finally {
     vi.useRealTimers();
+    await g.close();
+  }
+});
+
+it("rejects excess headers even when Origin would fall beyond Node's parsed header limit", async () => {
+  const generate = vi.fn(async () => answer);
+  const g = await startDraftGateway(
+    input,
+    generate,
+    new AbortController().signal,
+  );
+  try {
+    const headers: Record<string, string> = {
+      Host: new URL(g.baseUrl).host,
+      Authorization: "Bearer " + g.token,
+      "Content-Type": "application/json",
+      Connection: "close",
+    };
+    for (let n = 0; n < 20; n++) headers["X-Filler-" + n] = "synthetic";
+    headers.Origin = "https://example.test";
+    const status = await new Promise<number>((resolve, reject) => {
+      const req = httpRequest(
+        g.baseUrl + "/chat/completions",
+        { method: "POST", headers },
+        (res) => {
+          res.resume();
+          res.on("end", () => resolve(res.statusCode!));
+        },
+      );
+      req.on("error", reject);
+      req.end(JSON.stringify(body));
+    });
+    expect(status).toBe(431);
+    expect(generate).not.toHaveBeenCalled();
+    expect((await request(g)).status).toBe(200);
+  } finally {
     await g.close();
   }
 });

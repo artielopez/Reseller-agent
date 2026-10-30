@@ -39,3 +39,16 @@ It is separate from ordinary CI because CI does not have this personal machine's
 Remaining gates: production process sandbox checks (including the previously deferred real home/write guards), durable job wiring, process/cleanup crash handling, selected Supabase project, real model/account/data-retention acceptance, and separately permitted channel intake. A one-request gateway is not permission to run an unrestricted personal gateway or send replies.
 
 Installed-runtime integration: **2/2 passed** through the actual OpenClaw → loopback gateway → OpenAI adapter chain with a fake upstream fetch. Normal output used one upstream request and the worker's exact frozen input. Tool-bearing upstream output was rejected; OpenClaw failed rather than obtaining a usable draft, and upstream fetch remained at one call despite runtime retry behavior. Both cases left no prompt marker or temporary runtime directory. These checks do not establish real account compatibility or crash-safe cleanup.
+
+## Independent review and final correction
+
+One fresh read-only reviewer found an Important protocol gap: `maxHeadersCount:20` silently hid later headers, so an authenticated Origin header beyond the limit was not rejected. A raw HTTP regression reproduced **200 instead of 431**. The single fix pass keeps all headers within an 8 KiB byte ceiling, then explicitly rejects more than 20 header pairs before authentication/admission. The regression now rejects without invoking the provider; valid subsequent work remains possible. Bearer authentication was not bypassed by the original defect.
+
+After the correction, lint/types, **131 standard tests** and **both installed-runtime integration tests** passed. The two runtime cases are still opt-in, not silently counted as ordinary CI. The reviewer also exercised partial-body disconnect, oversized-body disconnect and the body deadline without provider calls or uncaught errors; those were read-only exploratory checks, not newly committed test cases. No Critical findings or separate Minor findings were reported.
+
+- Final: Ruling: production OS isolation/home/write guards and process-tree cleanup after crashes remain launcher work. Diagnostic sandbox success is not admission of a real worker. Cost if ignored: personal-data access or leftover local state.
+- Final: Ruling: durable queue/result admission must be wired through the existing leases and shared daily allowance in the subsequent worker adapter. The endpoint itself does not reserve budget or verify an owner. Cost if ignored: paid requests outside the intended quota.
+- Final: Ruling: real model compatibility, billing and provider retention require selected account acceptance. All upstream calls in tests were intercepted. Cost if ignored: incompatibility, unexpected spend or a retention assumption unsupported by the account.
+- Final: Ruling: hosted Supabase, channel capture and sending remain outside this implemented boundary. No listener is started by the app and no real data or credentials are connected.
+
+Final build: the Webpack production build passed after the header correction. No browser rerun was needed because this stage changes no rendered UI, client persistence or SQL. PR #11's final head `69be6ec` also passed its standard GitHub checks; new-branch CI is separate.

@@ -110,13 +110,14 @@ export async function startDraftGateway(
     output: DraftOutput | undefined;
   let closePromise: Promise<void> | undefined;
   let authority = "";
-  const server = createServer((request, response) => {
+  const server = createServer({ maxHeaderSize: 8192 }, (request, response) => {
     void handle(request, response).catch(() => {
       if (!response.destroyed) reject(response, 502);
     });
   });
   async function handle(request: IncomingMessage, response: ServerResponse) {
     if (closed) return reject(response, 410);
+    if (request.rawHeaders.length > 40) return reject(response, 431);
     if (
       request.headers.origin !== undefined ||
       request.headers.host !== authority
@@ -200,7 +201,7 @@ export async function startDraftGateway(
   };
   let timer: ReturnType<typeof setTimeout> | undefined;
   server.maxConnections = 4;
-  server.maxHeadersCount = 20;
+  server.maxHeadersCount = 0; // Retain headers; enforce count explicitly before admission.
   server.headersTimeout = 3000;
   server.requestTimeout = 5000;
   try {
