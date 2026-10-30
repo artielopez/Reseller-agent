@@ -33,8 +33,9 @@ The banner identifies demo mode. The generation result explicitly says **no AI w
 1. Create a Supabase project and securely retain its database password.
 2. In its SQL Editor, run the full contents of [`supabase/migrations/202610280001_initial.sql`](supabase/migrations/202610280001_initial.sql) **once** on the new project. The script creates the tables, RLS policies, save/quota functions and the private `item-photos` bucket. Do not create a public photo bucket.
 3. Then run [`202610300001_buyer_inbox.sql`](supabase/migrations/202610300001_buyer_inbox.sql) once. For an existing project that already applied the initial migration, apply only this new migration. It adds revision/context safeguards and restricts buyer writes to the authenticated RPC. Existing question/reply text is retained; old Approved replies become Draft because they lack a verified context snapshot. Create a fresh draft before approving them again.
-4. Alternatively, with the Supabase CLI: run `supabase init`, `supabase link --project-ref YOUR_PROJECT_REF`, and `supabase db push` from this repository. Review the target project before pushing migrations. Generated local Supabase credentials must stay out of Git.
-5. Copy the project URL and **public anon key** from the project's API settings. Do not use the service-role or secret key. This application does not require either.
+4. Apply [`202610300002_draft_queue.sql`](supabase/migrations/202610300002_draft_queue.sql) for the draft-only worker foundation. It adds paused controls, expiring/revocable worker enrollments and leased drafting jobs. It starts no worker and grants no platform access or sending.
+5. Alternatively, with the Supabase CLI: run `supabase init`, `supabase link --project-ref YOUR_PROJECT_REF`, and `supabase db push` from this repository. Review the target project before pushing migrations. Generated local Supabase credentials must stay out of Git.
+6. Copy the project URL and **public anon key** from the project's API settings. Do not use the service-role or secret key. This application does not require either.
 
 All inventory rows and image paths are scoped to the signed-in user. The browser uses Supabase Auth and its public anon key; PostgreSQL and Storage enforce ownership. The save RPC uses the caller's privileges and saves the item, photo metadata and three channel records in one transaction.
 
@@ -87,9 +88,9 @@ Open **Open buyer inbox** from inventory, or visit `/inbox`:
 3. Save edits, approve the exact saved text, then copy it. A changed price, item status or other relevant fact invalidates approval. Reload and create a fresh draft when context changes.
 4. Paste and send through the original platform yourself. Mark **Answered** separately afterward. Copying does not send or mark a question answered.
 
-Cloud mode stores owned questions and drafts in Supabase; sign in on each device and use **Reload inbox** to refresh. There is no realtime subscription. Demo uses IndexedDB version 2, preserving existing inventory while adding local questions; it never syncs across devices. The hosted Sites inventory demo has not been republished with this feature.
+Cloud mode stores owned questions and drafts in Supabase; sign in on each device and use **Reload inbox** to refresh. There is no realtime subscription. Demo uses IndexedDB version 2, preserving existing inventory while adding local questions; it never syncs across devices. The hosted Sites demo includes the manual inbox and synthetic lab; its data remains browser-local.
 
-The inbox shows the latest 200 questions; demo storage is capped at 200 questions and 2,000 drafts. There is no inquiry edit/delete UI or connector yet. Public-comment templates omit the item description, but manually written text still needs your review. Buyer drafting never calls OpenAI, OpenClaw or Hermes in this stage. Approval authorizes copying only.
+The inbox shows the latest 200 questions; demo storage is capped at 200 questions and 2,000 drafts. There is no inquiry edit/delete UI or connector yet. The [draft worker foundation](docs/owned-draft-queue-stage.md) is available for integration; cloud-only [worker settings](docs/worker-controls-stage.md) support enrollment, pause/resume and manual queue management. No live daemon or runtime adapter is installed. Public-comment templates omit the item description, but manually written text still needs your review. The app does not start OpenAI, OpenClaw or Hermes buyer inference in this stage. A separately configured restricted worker remains necessary. Approval authorizes copying only.
 
 ## Deploy
 
@@ -145,3 +146,13 @@ After configuring your real services, follow the [live acceptance checklist](doc
 See [MVP checklist and limitations](docs/mvp-checklist.md) and [architecture notes](docs/architecture.md).
 
 Implementation references: [Next.js installation](https://nextjs.org/docs/app/getting-started/installation), [Supabase email-link sign-in](https://supabase.com/docs/reference/javascript/auth-signinwithotp), [Supabase Storage access policies](https://supabase.com/docs/guides/storage/security/access-control), and [OpenAI structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
+
+### Draft worker settings (cloud only)
+
+After all three migrations are applied, sign in and open **Buyer inbox → Worker settings**. Create a named worker key only when setting up a dedicated restricted worker. Save the one-time key securely and hide it; it expires in seven days and can be revoked. Do not use a general personal-agent chat to store it. Nothing starts automatically.
+
+Drafting begins paused. Once the restricted runtime is configured and verified, deliberately resume, choose an Open private question and queue a draft. Pausing cancels outstanding jobs; resuming does not restart them. Refresh settings for job progress and reload the inbox to review completed drafts. If an enrollment fails ambiguously, reload and revoke the unexpected worker before creating a replacement. The Sites demo intentionally has no worker settings.
+
+`npm run test:e2e:cloud` runs the cloud UI against synthetic Auth/RPC responses on port 3018. It uses fake public configuration, requires no credentials and does not replace hosted Supabase acceptance. Run it separately from another Next development server in this checkout.
+
+The [single-request drafting boundary](docs/single-request-drafting-stage.md) adds a worker-only loopback endpoint and optional bounded OpenAI provider. It holds the model key in parent code and limits each endpoint to one provider invocation, even if an agent retries. It is not started by the app; the production worker launcher, durable queue wiring and live model/cloud acceptance are still pending. Mac developers can run its synthetic installed-runtime checks with `RUN_OPENCLAW_PROBE=1 npx vitest run tests/openclaw-gateway.test.ts`.
