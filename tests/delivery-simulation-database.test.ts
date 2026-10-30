@@ -803,3 +803,50 @@ it("rejects old backlog and incomplete capture; a pause cannot recall an already
   });
   await resume();
 });
+it("cancels a lease that expires during final context evaluation, before any fake submission", async () => {
+  const e = await example("late-expiry");
+  const lease = await command<{ lease_id: string }>({ op: "claim", id: e.id });
+  await db.exec("reset role");
+  await db.exec(`alter function public.delivery_simulation_candidate(uuid,uuid,uuid) rename to simulation_original_candidate;
+ create function public.delivery_simulation_candidate(who uuid,qid uuid,rid uuid) returns jsonb language plpgsql stable security definer set search_path='' as $$
+ begin
+ perform set_config('test.simulation_timing_entered','yes',false);
+ perform pg_sleep(1.1);
+ return public.simulation_original_candidate(who,qid,rid);
+ end $$;
+ revoke all on function public.delivery_simulation_candidate(uuid,uuid,uuid) from public,anon,authenticated;`);
+  try {
+    await db.query(
+      "update public.delivery_simulation_outbox set lease_expires_at=clock_timestamp()+interval '1 second' where id=$1",
+      [e.id],
+    );
+    await asUser(db, alice);
+    const result = await command({
+      op: "start",
+      id: e.id,
+      lease_id: lease.lease_id,
+    });
+    expect(
+      (
+        await db.query<{ entered: string }>(
+          "select current_setting('test.simulation_timing_entered',true) entered",
+        )
+      ).rows[0].entered,
+    ).toBe("yes");
+    expect(result).toMatchObject({ status: "canceled", simulation: true });
+    expect(result).not.toHaveProperty("candidate");
+    const state = await command<{
+      jobs: { id: string; submitted_at: string | null; reason: string }[];
+    }>({ op: "state" });
+    expect(state.jobs.find((j) => j.id === e.id)).toMatchObject({
+      submitted_at: null,
+      reason: "claim_expired",
+    });
+  } finally {
+    await db.exec("reset role");
+    await db.exec(
+      "drop function public.delivery_simulation_candidate(uuid,uuid,uuid);alter function public.simulation_original_candidate(uuid,uuid,uuid) rename to delivery_simulation_candidate;",
+    );
+    await asUser(db, alice);
+  }
+});

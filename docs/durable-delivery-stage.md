@@ -40,3 +40,20 @@ Ruling: implement this stage as a server-persisted simulation over the existing 
 - Fake executor tests failed against stubs, then passed. The real SQL -> fake executor -> lost acknowledgment -> new caller -> explicit reconciliation path passed and leaves the inquiry Open.
 - Public success coverage exposed numeric scale formatting (`850` vs `850.00`); fixed the server's canonical public price formatter and verified both successful price-only simulation and rejected private/custom public text.
 - Focused verification: 21 tests pass. Full suite: **161 tests passed, 6 existing optional runtime tests skipped**. Lint, application types, worker compilation and Webpack production build passed. UI is unchanged; browser suites remain in CI. Fresh final review is pending. No hosted migration or real channel/model request was made.
+
+
+## Final review and fix pass
+
+A fresh read-only review (`review_durable_simulation`, GPT-6 Astra high) covered `cd67914..9e43ff2`, all focused cases and existing buyer RPC/trigger lock paths. No Critical or Minor findings. One Important finding was accepted: an initially valid lease could expire during item/inquiry/reply locking or context evaluation before the submitted update.
+
+Final: fixed late lease admission — a 1-second remaining lease plus a 1.1-second context wrapper reproduced submitted-after-expiry (RED). The actual submitted UPDATE now checks the current wall clock and fence; expiration persists canceled/claim_expired without returning a candidate (GREEN). The regression asserts that the delayed context path was actually entered, not merely that an already-expired lease was rejected. Focused suite **22/22**, full suite **162 passed / 6 existing optional runtime cases skipped**, lint/types/worker compilation passed. No second review was requested. This elapsed-time test is not evidence of real separate-session contention.
+
+Final: Ruling: hosted Auth/PostgREST and actual separate-session locking/deadlocks remain separate acceptance gates. Cost if wrong: the future hosted workflow could fail under contention despite PGlite's serial-session tests; no live delivery is enabled.
+
+Final: Ruling: process/OS crash recovery and durable external reconciliation remain outside this in-memory fake-adapter increment. SQL state survives a fresh caller in the tests, but that is not an OS crash or a real provider receipt store. Cost: production restart/reconciliation behavior still requires an actual permitted adapter and acceptance.
+
+Final: Ruling: channel access, native-response observation, authenticated external evidence and real sending remain unimplemented and unreleased. Cost: this validates control flow only and does not reduce live message-reading or sending work yet.
+
+Final: Ruling: synthetic-history deletion/retention remains a lifecycle gate before broader use. Foreign keys restrict deletion of bound items/inquiries/replies, and this lab has no cleanup RPC; the current app has no item-delete UI. Cost: an administrator must deliberately clear dependent simulation records before deleting bound source records. Do not present this optional engineering migration as a completed retention feature.
+
+Post-fix production Webpack build passed. The initial implementation head `9e43ff2` passed [GitHub Application checks](https://github.com/artielopez/Reseller-agent/actions/runs/41082346272), including both browser suites; the reviewed fix will receive its own CI run. [PR #14](https://github.com/artielopez/Reseller-agent/pull/14) remains unmerged with no auto-merge.

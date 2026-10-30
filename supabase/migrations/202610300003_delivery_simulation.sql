@@ -215,7 +215,13 @@ begin
    update public.delivery_simulation_outbox set status='claimed',lease_id=gen_random_uuid(),lease_expires_at=clock_timestamp()+interval '60 seconds',updated_at=clock_timestamp() where id=j.id and owner_id=who returning * into j;
    return jsonb_build_object('id',j.id,'lease_id',j.lease_id,'status',j.status,'candidate',j.candidate,'simulation',true);
   end if;
-  update public.delivery_simulation_outbox set status='submitted',submitted_at=clock_timestamp(),updated_at=clock_timestamp() where id=j.id and owner_id=who returning * into j;
+  -- Lock/context evaluation can outlive the earlier check: fence the actual transition.
+  update public.delivery_simulation_outbox set status='submitted',submitted_at=clock_timestamp(),updated_at=clock_timestamp()
+  where id=j.id and owner_id=who and status='claimed' and lease_id=(command->>'lease_id')::uuid and lease_expires_at>clock_timestamp() returning * into j;
+  if not found then
+   update public.delivery_simulation_outbox set status='canceled',reason='claim_expired',updated_at=clock_timestamp() where id=(command->>'id')::uuid and owner_id=who and status='claimed';
+   return jsonb_build_object('id',command->>'id','status','canceled','simulation',true);
+  end if;
   return jsonb_build_object('id',j.id,'status',j.status,'candidate',j.candidate,'simulation',true);
  end if;
  -- Enqueue a separately requested simulation, never permission for real delivery.
