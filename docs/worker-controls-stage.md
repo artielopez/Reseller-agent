@@ -21,3 +21,18 @@ Ruling: cloud browser tests use synthetic Auth/PostgREST responses, isolated in 
 - Initial browser failures were fixture issues: ambiguous Cancel selector, duplicate synthetic worker IDs, and a storage-only account change that omitted the SDK's BroadcastChannel event. Corrected the fixtures to match the installed Auth SDK. Lint also caught the render-time clock read; expiry labels now use the last refreshed timestamp.
 - Verified failed enrollment does not auto-retry or lose question text; stale settings disable mutations until reload; pause cancels queued work without revival; late enrollment after account switch does not reveal the old key. Accessibility and mobile overflow checks pass.
 - Full unit/API/database suite: **116 passed**. Cloud browser suite: **8 passed** with synthetic accounts. No Supabase connector is available yet; hosted acceptance is not claimed.
+
+## Final checks and independent review
+
+Lint and TypeScript passed. Webpack production build passed. All **36 existing production browser checks** passed alongside the **8 synthetic cloud checks** (44 total). The default local Turbopack sandbox limitation remains documented; CI retains the normal build.
+
+One independent read-only reviewer examined `22858da..f3ba8df`, including the actual SQL return contract, and found no Critical/Important defects. The reviewer checked the diff but did not independently rerun the executor's tests.
+
+- Final: minor (deferred): cloud tests preserve unsaved question text, but do not yet open an edited saved reply during worker operations. The owner panel does not remount or refresh the reply; existing inbox tests cover ordinary reply retention. Add the combined regression before hosted pilot acceptance.
+- Final: minor (deferred): add successful enrollment followed by failed list refresh. Code retains the received key, blocks mutations and requires reload, but the browser fixture currently exercises ambiguous enrollment itself. No automatic enrollment retry exists.
+- Final: Ruling: hosted Auth/PostgREST and migration acceptance remain pending the selected Supabase connection. Synthetic browser fixtures establish client behavior only; cost if wrong is a hosted compatibility defect discovered at acceptance.
+- Final: Ruling: real PostgreSQL multi-session contention remains a foundation acceptance item; no SQL changed in this stage. PGlite is not evidence of concurrent-session safety.
+- Final: Ruling: runtime isolation/provider/daemon/channel delivery remain outside this implemented UI. Enrollment is a capability, not proof of a safe agent installation. Keep real workers disconnected until isolation acceptance.
+- Final: Ruling: physical iPhone/Safari clipboard/layout behavior remains unverified. Chromium emulation is partial evidence; the read-only key field supports manual copying if clipboard access fails.
+
+Next independent work: isolated runtime feasibility harness. No personal config, credentials, memory or transcripts are to be copied into it. Supabase target/connection still gates hosted setup.
