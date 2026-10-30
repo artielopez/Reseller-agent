@@ -83,3 +83,5 @@ No Dot connection, scheduled monitor or external task assignment exists. A coord
 The owner approved merge/deploy and a continuation goal on 30 October. PR #7 is merged; the updated private demo is deployed. New [agent drafting preparation](agent-drafting-stage.md) stays on a separate feature branch. Supabase connection/target and verified restricted runtime remain pending.
 
 Continuation: [owned draft queue stage](owned-draft-queue-stage.md) implements durable draft-only worker capability and shared quota while hosted access is pending. This is part of Tasks 2/4, not completion of event ingestion, outbound delivery, runtime isolation or live acceptance. Next independent work is owner queue controls and the dedicated runtime feasibility harness.
+
+Owner [worker controls](worker-controls-stage.md) are now implemented on `codex/draft-worker-controls`, following PR #9. They expose the existing draft-only RPC without starting a runtime. Next independent work is isolated runtime feasibility; selected Supabase access still gates hosted acceptance.

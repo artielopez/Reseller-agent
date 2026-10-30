@@ -90,7 +90,7 @@ Open **Open buyer inbox** from inventory, or visit `/inbox`:
 
 Cloud mode stores owned questions and drafts in Supabase; sign in on each device and use **Reload inbox** to refresh. There is no realtime subscription. Demo uses IndexedDB version 2, preserving existing inventory while adding local questions; it never syncs across devices. The hosted Sites demo includes the manual inbox and synthetic lab; its data remains browser-local.
 
-The inbox shows the latest 200 questions; demo storage is capped at 200 questions and 2,000 drafts. There is no inquiry edit/delete UI or connector yet. The [draft worker foundation](docs/owned-draft-queue-stage.md) is available for integration; no enrollment UI or live daemon is installed. Public-comment templates omit the item description, but manually written text still needs your review. Buyer drafting never calls OpenAI, OpenClaw or Hermes in this stage. Approval authorizes copying only.
+The inbox shows the latest 200 questions; demo storage is capped at 200 questions and 2,000 drafts. There is no inquiry edit/delete UI or connector yet. The [draft worker foundation](docs/owned-draft-queue-stage.md) is available for integration; cloud-only [worker settings](docs/worker-controls-stage.md) support enrollment, pause/resume and manual queue management. No live daemon or runtime adapter is installed. Public-comment templates omit the item description, but manually written text still needs your review. The app does not start OpenAI, OpenClaw or Hermes buyer inference in this stage. A separately configured restricted worker remains necessary. Approval authorizes copying only.
 
 ## Deploy
 
@@ -146,3 +146,11 @@ After configuring your real services, follow the [live acceptance checklist](doc
 See [MVP checklist and limitations](docs/mvp-checklist.md) and [architecture notes](docs/architecture.md).
 
 Implementation references: [Next.js installation](https://nextjs.org/docs/app/getting-started/installation), [Supabase email-link sign-in](https://supabase.com/docs/reference/javascript/auth-signinwithotp), [Supabase Storage access policies](https://supabase.com/docs/guides/storage/security/access-control), and [OpenAI structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
+
+### Draft worker settings (cloud only)
+
+After all three migrations are applied, sign in and open **Buyer inbox → Worker settings**. Create a named worker key only when setting up a dedicated restricted worker. Save the one-time key securely and hide it; it expires in seven days and can be revoked. Do not use a general personal-agent chat to store it. Nothing starts automatically.
+
+Drafting begins paused. Once the restricted runtime is configured and verified, deliberately resume, choose an Open private question and queue a draft. Pausing cancels outstanding jobs; resuming does not restart them. Refresh settings for job progress and reload the inbox to review completed drafts. If an enrollment fails ambiguously, reload and revoke the unexpected worker before creating a replacement. The Sites demo intentionally has no worker settings.
+
+`npm run test:e2e:cloud` runs the cloud UI against synthetic Auth/RPC responses on port 3018. It uses fake public configuration, requires no credentials and does not replace hosted Supabase acceptance. Run it separately from another Next development server in this checkout.

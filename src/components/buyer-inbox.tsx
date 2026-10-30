@@ -1,6 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { DraftWorkerControls } from "./draft-worker-controls";
 import { AuthPanel } from "./auth-panel";
 import { demoMode, configurationError } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
@@ -95,7 +96,8 @@ export function BuyerInbox() {
             </>
           )}{" "}
           Nothing is read from Facebook or Carousell, and nothing is sent
-          automatically. Templates use saved facts; no AI service is called.
+          automatically. Templates use saved facts; worker drafts require
+          separate setup and review.
         </span>
       </div>
       {(configurationError || error) && (
@@ -355,6 +357,7 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
         </p>
       ) : (
         <>
+          {!demoMode && <DraftWorkerControls questions={questions} />}
           <section className="panel section-pad">
             <h2>Record a buyer question</h2>
             <form
