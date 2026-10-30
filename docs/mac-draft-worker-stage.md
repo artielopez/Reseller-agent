@@ -46,3 +46,10 @@ Final: Ruling: channel ingestion/sending, Hermes parity, autostart and automatic
 Final: Ruling: same-user malicious processes, compromised trusted runtime/dependency directories and OS exploits are outside this boundary's threat model. Cost: this local sandbox cannot promise isolation against those actors; trusted installation/administrator is required.
 
 Final: Ruling: physical iPhone/Safari acceptance remains pending because this stage changes no UI and local emulation is insufficient. Cost: device-specific cloud interaction problems may remain undiscovered until the live checklist.
+
+
+## Delivery
+
+[PR #13](https://github.com/artielopez/Reseller-agent/pull/13) is open against main, auto-merge disabled, reviewed implementation/fix head `b088565`. GitHub checks were running at delivery. Final post-fix verification: **140 standard tests passed (6 opt-in cases skipped by default)**; **all seven tests in the four installed-runtime files passed**; lint/app typecheck/worker compilation/Webpack production build passed. The existing private Sites demo was not changed by this backend/worker increment.
+
+This continuation made implementation and delivery progress. Remaining activation depends on owner-selected Supabase access, private hosting and real provider configuration/acceptance. No live worker is configured. Other automatic personal-channel functionality remains unavailable without separately established account permission/coverage.
