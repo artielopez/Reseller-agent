@@ -87,7 +87,7 @@ Open **Open buyer inbox** from inventory, or visit `/inbox`:
 3. Save edits, approve the exact saved text, then copy it. A changed price, item status or other relevant fact invalidates approval. Reload and create a fresh draft when context changes.
 4. Paste and send through the original platform yourself. Mark **Answered** separately afterward. Copying does not send or mark a question answered.
 
-Cloud mode stores owned questions and drafts in Supabase; sign in on each device and use **Reload inbox** to refresh. There is no realtime subscription. Demo uses IndexedDB version 2, preserving existing inventory while adding local questions; it never syncs across devices. The hosted Sites inventory demo has not been republished with this feature.
+Cloud mode stores owned questions and drafts in Supabase; sign in on each device and use **Reload inbox** to refresh. There is no realtime subscription. Demo uses IndexedDB version 2, preserving existing inventory while adding local questions; it never syncs across devices. The hosted Sites demo includes the manual inbox and synthetic lab; its data remains browser-local.
 
 The inbox shows the latest 200 questions; demo storage is capped at 200 questions and 2,000 drafts. There is no inquiry edit/delete UI or connector yet. Public-comment templates omit the item description, but manually written text still needs your review. Buyer drafting never calls OpenAI, OpenClaw or Hermes in this stage. Approval authorizes copying only.
 
