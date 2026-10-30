@@ -133,3 +133,12 @@ Planning is complete as a conditional staged proposal; access feasibility remain
 ## Execution update — 29 October 2026
 
 [Account evidence](../../research/channel-capability-evidence.md) and the [buyer lab](../../buyer-lab.md) are prepared on `codex/buyer-foundation`. Tasks 2, 4 and 5 are **partial**: browser-local validated events, narrow templates, editable private drafts, policy controls and simulated outbox only. The owner-scoped Supabase queue/migration, worker enrollment and daemon, agent isolation, external connectors and live acceptance remain unimplemented. Task 3 and live parts of Tasks 5–6 are blocked by unresolved permitted access. Existing manual buyer cloud/copy workflow is still planned. No plan checkbox claims these broader tasks complete.
+
+## Execution update — 30 October 2026
+
+PR #7 merged and the existing private Sites demo was updated after owner approval. Saved manual inquiry/draft/approval/copy workflow is implemented. [Draft preparation](../../agent-drafting-stage.md) adds a provider-neutral boundary, and [owned drafting queue](../../owned-draft-queue-stage.md) adds the draft-only portion of Tasks 2/4: hashed expiring enrollment, owner pause/revocation, exact-context leases, shared allowance and review-draft persistence. No live runtime or daemon is connected. Event ingestion, connection/thread mapping, seller policies, true outbound outbox, native-mode coordination and hosted/device acceptance remain incomplete; the draft queue is not a substitute for those requirements. Owner Supabase connection/target is pending, but local queue UI/runtime harness work can continue.
+
+
+## Execution update — durable simulation, 30 October 2026
+
+PR #13 implements the restricted foreground OpenClaw draft worker with local synthetic acceptance. PR #14 adds an owner-only server-persisted delivery simulation over saved inbox records, a fenced claim/start/outcome protocol and an in-memory fake executor. It verifies stale-context/native/takeover controls, uncertain outcomes and explicit fake reconciliation. No real capture/delivery or new worker sending capability exists. Tasks 2/5 now have this additional tested synthetic foundation, but are not complete for real channel operation. Seller policy/digest/exception UI, real event ingestion/coverage, history lifecycle, hosted concurrent-session acceptance and live release gates remain separate work; do not mark the original whole-task checkboxes complete from these narrower tests.

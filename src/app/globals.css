@@ -1387,3 +1387,38 @@ main {
 .inbox-draft-select {
   margin-top: 20px;
 }
+
+.worker-controls {
+  display: grid;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+.worker-controls form {
+  display: grid;
+  gap: 0.75rem;
+}
+.worker-key {
+  display: grid;
+  gap: 0.75rem;
+  border: 1px solid var(--line);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  min-width: 0;
+}
+.worker-list {
+  display: grid;
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.worker-list li {
+  display: grid;
+  gap: 0.4rem;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 1rem;
+}
+.worker-list .button {
+  justify-self: start;
+}

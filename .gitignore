@@ -12,3 +12,7 @@ supabase/.temp/
 supabase/.branches/
 next-env.d.ts
 .sites/
+.worker-build/
+.worker-test-*/
+.worker-state/
+!.env.worker.example
