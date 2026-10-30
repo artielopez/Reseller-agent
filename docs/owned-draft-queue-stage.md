@@ -34,3 +34,16 @@ Database locking/role tests run in PGlite, which serializes its local connection
 Worker RPCs are callable using the public project key, but require the separate high-entropy enrollment token and establish owner from its hash. They are not a public model endpoint and have no send operation. Stolen worker credentials could read claimed job facts and consume the owner's remaining daily allowance until revoked or expired. Keep the token only in protected Mac configuration; never put it in browser code, Git, URLs or logs.
 
 The previously deferred post-generation changed-context test now uses original context before generation and changed context afterward, and asserts the provider was invoked once. The regression passes.
+
+## Review and verification
+
+Independent review found two Important issues. Both were corrected before PR delivery:
+
+- Final: fixed transaction-time expiration checks — lease admission, token expiry and result-submission tests first reproduced acceptance after actual expiry, then passed with `clock_timestamp()` checks after locks and before committing admission/results. Quota admission rolls back if its wait outlasts the lease; claim lifetime starts from current wall time and is capped by token expiry.
+- Final: fixed expired-job cleanup lock inversion — a static lock-order regression first failed because a job UPDATE preceded the item lock. Cleanup now selects one candidate, locks its item and then its job, and only then changes expired state. The regression and behavioral expired-claim test pass. No real multi-session PostgreSQL service is available locally, so this is structural plus functional evidence, not an empirical deadlock reproduction.
+- Final: minor (deferred): a pass that retires one expired/stale job returns no claim even when other jobs remain. `idle` means no draft admitted on this pass, not proof that the queue is empty. A future polling daemon must continue polling or expose a separate maintenance outcome; cost is another metadata call per retired job, with no model call.
+- Final: Ruling: PGlite serializes its connection. Source-level lock-order verification and queue transition tests are sufficient for the review branch, but separate-session hosted contention acceptance remains required. Cost if wrong: transaction abort/retry behavior may remain undiscovered before hosted acceptance.
+- Final: Ruling: hosted Supabase/PostgREST and migration compatibility are not established without the selected connected project. No live migration or service credentials were used. Cost if wrong: setup may need correction before production use.
+- Final: Ruling: provider isolation/retention, live runtime behavior, enrollment UI and daemon operation are not claimed by this foundation. Keep runtime integration disabled until their later implementation and acceptance. Cost if wrong: enabling a general gateway prematurely could expose personal data or bypass resource limits.
+
+Before review fixes: 108 unit/API/database tests, lint/types, Webpack production build and all 36 desktop/iPhone-size browser checks passed. The four new review regressions are included in the final suite recorded in the project status. Default local Turbopack remains blocked by the worktree's sandbox port restriction; CI continues using the normal build command.

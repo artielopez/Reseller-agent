@@ -370,3 +370,106 @@ it("requires the current controls revision and denies helper access", async () =
   await asUser(db, null);
   await expect(db.query("select * from public.draft_jobs")).rejects.toThrow();
 });
+async function leasedPrivateJob() {
+  await asUser(db, alice);
+  const qid = randomUUID();
+  await db.query("select public.buyer_workspace($1::jsonb)", [
+    JSON.stringify({
+      op: "saveInquiry",
+      expected_revision: null,
+      input: {
+        id: qid,
+        item_id: item,
+        channel: "marketplace",
+        surface: "dm",
+        buyer_name: "",
+        message: "Review timing",
+        received_at: "2026-10-30T00:00:00Z",
+      },
+    }),
+  ]);
+  await owner({ op: "enqueue", id: randomUUID(), inquiry_id: qid });
+  await asUser(db, null);
+  return (await worker({ op: "claim" }))!;
+}
+it("rejects a lease that expires after transaction start but before admission", async () => {
+  const claim = await leasedPrivateJob();
+  await db.exec("reset role; begin");
+  try {
+    await db.query(
+      "update public.draft_jobs set lease_expires_at=now()+interval '100 milliseconds' where id=$1",
+      [claim.id],
+    );
+    await db.exec("set role anon");
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await expect(
+      worker({ op: "start", job_id: claim.id, lease_id: claim.lease_id }),
+    ).rejects.toThrow("Lease unavailable");
+  } finally {
+    await db.exec("rollback");
+  }
+  await asUser(db, alice);
+  await owner({ op: "cancel", id: claim.id });
+});
+it("rejects a worker token that expires after transaction start", async () => {
+  await asUser(db, alice);
+  const e = await owner<{ id: string; token: string }>({
+    op: "enroll",
+    label: "Timing test",
+  });
+  await db.exec("reset role; begin");
+  try {
+    await db.query(
+      "update public.draft_workers set expires_at=now()+interval '100 milliseconds' where id=$1",
+      [e.id],
+    );
+    await db.exec("set role anon");
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await expect(worker({ op: "claim" }, e.token)).rejects.toThrow(
+      "Worker unavailable",
+    );
+  } finally {
+    await db.exec("rollback");
+  }
+});
+it("rejects committing a result after actual lease expiry within a transaction", async () => {
+  const claim = await leasedPrivateJob();
+  await worker({ op: "start", job_id: claim.id, lease_id: claim.lease_id });
+  await db.exec("reset role; begin");
+  try {
+    await db.query(
+      "update public.draft_jobs set lease_expires_at=now()+interval '100 milliseconds' where id=$1",
+      [claim.id],
+    );
+    await db.exec("set role anon");
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    await expect(
+      worker({
+        op: "submit",
+        job_id: claim.id,
+        lease_id: claim.lease_id,
+        body: "Review me",
+        review_reason: "Review",
+      }),
+    ).rejects.toThrow("Lease unavailable");
+  } finally {
+    await db.exec("rollback");
+  }
+  await asUser(db, alice);
+  await owner({ op: "cancel", id: claim.id });
+});
+it("keeps the claim's item lock ahead of job mutation, including expiration cleanup", async () => {
+  // Static lock-order regression: PGlite cannot reproduce a separate-session deadlock.
+  const definition = (
+    await db.query<{ body: string }>(
+      "select pg_get_functiondef('public.draft_worker(text,jsonb)'::regprocedure) body",
+    )
+  ).rows[0].body
+    .replace(/\s+/g, " ")
+    .toLowerCase();
+  const itemLock = definition.indexOf("perform 1 from public.items");
+  expect(itemLock).toBeGreaterThan(0);
+  expect(definition.indexOf("update public.draft_jobs")).toBeGreaterThan(
+    itemLock,
+  );
+});

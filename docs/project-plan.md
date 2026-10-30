@@ -81,3 +81,5 @@ Future implementation should branch from the latest `main` (for example `codex/b
 No Dot connection, scheduled monitor or external task assignment exists. A coordinator can read these documents later; do not imply automatic synchronization. Dependency/secret CI scanning is a separate proposed hardening task, not a prerequisite for this documentation handoff or an already-running protection.
 
 The owner approved merge/deploy and a continuation goal on 30 October. PR #7 is merged; the updated private demo is deployed. New [agent drafting preparation](agent-drafting-stage.md) stays on a separate feature branch. Supabase connection/target and verified restricted runtime remain pending.
+
+Continuation: [owned draft queue stage](owned-draft-queue-stage.md) implements durable draft-only worker capability and shared quota while hosted access is pending. This is part of Tasks 2/4, not completion of event ingestion, outbound delivery, runtime isolation or live acceptance. Next independent work is owner queue controls and the dedicated runtime feasibility harness.
