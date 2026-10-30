@@ -16,3 +16,15 @@ Failing tests first for denied runtime, exhausted allowance, bounded input/outpu
 ## Owner dependencies
 
 Supabase plugin connection and target project are requested; do not collect secrets in chat. A real restricted agent needs a dedicated state directory, empty tools/plugins/channels, no personal memory, verified transcript retention and a chosen model/billing source. Do not copy credentials or enable the owner's general gateway. Native eligibility and permitted platform access remain independent gates before ingestion or sending.
+
+## Verification and review
+
+The initial focused test run failed because the module was absent. After implementation, all **13 drafting tests** passed. Full lint and TypeScript passed; all **89 unit/API/database tests** passed. The local default build again hit its sandbox port-binding restriction; the Webpack production build passed. This module has no application caller, so the already verified and deployed UI is unchanged.
+
+Independent reviewer found no Critical or Important defects and independently reran the 13 focused tests.
+
+- Final: minor (deferred): the test named “changed during generation” currently changes context at the first check. Add a distinct post-generation changed-context regression before wiring a live provider; the existing post-generation context-unavailable case does run after generation. Cost: less regression coverage for that branch, not an observed implementation defect.
+- Final: Ruling: runtime tool isolation, retention, cancellation and billing are unverified because no transport exists. Keep both runtimes disconnected; require dedicated runtime evidence before admission. Cost if wrong: integrating prematurely could expose personal data or exceed intended resource limits.
+- Final: Ruling: hosted ownership/shared quota are trusted future adapter responsibilities, not properties established by these synthetic dependencies. Do not expose this boundary as a public route before authenticated ownership and durable quota tests pass. Cost if wrong: unauthorized access or uncontrolled usage.
+- Final: Ruling: factual accuracy and prompt-injection resistance are not established by schema validation. Every output remains a review draft, with public comments excluded. Cost if wrong: seller review may miss inaccurate text; no automated sending is provided.
+- Final: Ruling: the reviewer did not rerun deployment or the full suite. Executor evidence above and the separate static deployment record cover those checks; no live runtime/cloud acceptance is implied. Cost if wrong: environment-specific issues remain until hosted/device acceptance.
