@@ -24,6 +24,11 @@ LAUNCHERS = ["openclaw.mjs", "node-runtime-recovery.mjs", "node-compile-cache.mj
              "gateway-run-argv.mjs", "gateway-shutdown-budget.mjs", "node-sqlite.mjs", "package.json"]
 
 
+def require(condition, message):
+    if not condition:
+        raise RuntimeError(message)
+
+
 def literal(path):
     return json.dumps(str(path))
 
@@ -160,13 +165,13 @@ def run_case(root, runtime, node, mode, blocked_file):
             return process.returncode, stdout, stderr
 
         read_code = "try {require('fs').readFileSync(" + literal(blocked_file) + ");process.exit(1)} catch(e) {process.exit(e.code==='EPERM'?0:2)}"
-        assert invoke(["-e", read_code])[0] == 0, "File read guard was not established"
+        require(invoke(['-e', read_code])[0] == 0, 'File read guard was not established')
         positive = f"fetch('http://127.0.0.1:{port}/probe').then(r=>r.text()).then(t=>process.exit(t==='synthetic-loopback-control'?0:1)).catch(()=>process.exit(2))"
-        assert invoke(["-e", positive])[0] == 0, "Allowed loopback control failed"
+        require(invoke(['-e', positive])[0] == 0, 'Allowed loopback control failed')
         negative = f"fetch('http://127.0.0.1:{blocked_server.server_address[1]}/probe').then(()=>process.exit(1)).catch(e=>process.exit(e.cause?.code==='EPERM'?0:2))"
-        assert invoke(["-e", negative])[0] == 0, "Other-port network guard was not established"
+        require(invoke(['-e', negative])[0] == 0, 'Other-port network guard was not established')
         code, stdout, _stderr = invoke([str(runtime / "openclaw.mjs"), "config", "validate", "--json"])
-        assert code == 0 and json.loads(stdout).get("valid") is True, "Installed runtime rejected config"
+        require(code == 0 and json.loads(stdout).get('valid') is True, 'Installed runtime rejected config')
         code, stdout, stderr = invoke([
             str(runtime / "openclaw.mjs"), "agent", "exec", "--config", str(root / "openclaw.json"),
             "--cwd", str(root / "workspace"), "--message-file", "-", "--json",
@@ -192,14 +197,14 @@ def run_case(root, runtime, node, mode, blocked_file):
             "file_read_guard": True, "other_port_network_guard": True,
             "cleanup_diagnostic_warning": "reclamation Worker failed" in stderr,
         }
-        assert not unexpected and requests, "Expected only the synthetic model endpoint"
-        assert not observed["tool_executed"] and not observed["workspace_context_leaked"], "Isolation violation"
-        assert not any(observed["offered_tools"]), "Unexpected model tool surface"
-        assert not retained and observed["temporary_run_dirs_remaining"] == 0, "Runtime state cleanup incomplete"
+        require(not unexpected and requests, 'Expected only the synthetic model endpoint')
+        require(not observed['tool_executed'] and (not observed['workspace_context_leaked']), 'Isolation violation')
+        require(not any(observed['offered_tools']), 'Unexpected model tool surface')
+        require(not retained and observed['temporary_run_dirs_remaining'] == 0, 'Runtime state cleanup incomplete')
         if mode == "success":
-            assert code == 0 and len(requests) == 1 and json.loads(envelope["final"]) == json.loads(reply), "Synthetic completion failed"
+            require(code == 0 and len(requests) == 1 and (json.loads(envelope['final']) == json.loads(reply)), 'Synthetic completion failed')
         if mode == "timeout":
-            assert code == 2 and envelope.get("status") == "timeout", "Expected explicit timeout"
+            require(code == 2 and envelope.get('status') == 'timeout', 'Expected explicit timeout')
         return observed
     finally:
         server.shutdown()

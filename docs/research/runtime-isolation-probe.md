@@ -16,7 +16,7 @@ python3 scripts/probe-openclaw-isolation.py
 
 This is a synthetic experiment, not a setup command or a `verifyRuntime` implementation. It starts no gateway, daemon or channel. It uses only a fake local OpenAI-compatible model and fixed synthetic text/key; no real model inference or billing occurs. It fails rather than falling back to an unsandboxed run on unsupported systems.
 
-The script creates/removes its own temporary directory. macOS `sandbox-exec` denies personal-home file access and all writes outside the experiment. Read-only exceptions cover the installed public launcher/runtime/dependency modules, because this installation is a symlink into a source checkout. It permits networking only to the fake model's loopback port. A synthetic denied-file check and positive/negative loopback tests verify the guards. No personal agent configuration, memory, browser sessions or credentials are copied. The script is diagnostic code; its output must never enable a production worker.
+The script creates/removes its own temporary directory. macOS `sandbox-exec` denies personal-home file access and all writes outside the experiment. Read-only exceptions cover the installed public launcher/runtime/dependency modules, because this installation is a symlink into a source checkout. It permits networking only to the fake model's loopback port. A synthetic denied-file check and positive/negative loopback tests exercise those specific rules. The denied file has its own exact-path rule; it does not verify the entire home-directory restriction, and no negative write probe is included. No personal agent configuration, memory, browser sessions or credentials are copied. The script is diagnostic code; its output must never enable a production worker.
 
 ## Evidence
 
@@ -54,3 +54,21 @@ Ruling: perform a throwaway synthetic experiment before writing a live adapter. 
 Ruling: keep OpenClaw and Hermes disconnected from real buyer data until provider credentials/retention and a bounded wrapper are verified. Supabase project access remains pending, but does not block implementing the local request gate.
 
 No application runtime, SQL, dependencies or deployed feature changed in this research stage. The script itself was executed across all three cases; app regression checks from PR #10 remain the relevant unchanged-application evidence.
+
+## Independent review and correction
+
+One fresh read-only reviewer found an Important optimization bypass: Python `assert` removed both preflight guard invocations and result validation under `python3 -O`/`PYTHONOPTIMIZE`. The optimized regression reproduced **zero** guard subprocesses while the report claimed success. Explicit `require` checks replace all safety assertions. The regression now requires all nine guard subprocesses and checks that a failed condition raises. Run from the repository root:
+
+```bash
+python3 -O scripts/check-openclaw-probe-guards.py
+```
+
+Final: minor (deferred): add synthetic coverage for the actual home-directory denial and outside-root write restriction before promoting this policy into a real worker. The current exact-path denied-file probe does not establish those broader rules; the evidence wording above is narrowed accordingly.
+
+Final: Ruling: live admission/request enforcement, Hermes parity, real provider retention, hosted database acceptance and physical devices are excluded from this diagnostic. The result always sets live admission false. Their separate verification is still required; cost if ignored is overstating a synthetic test as a working integration.
+
+Final: Ruling: crash/SIGKILL cleanup and complete log-path coverage remain unverified. A future wrapper must handle its own orphaned state and fail closed after uncertain cleanup. Cost if ignored is possible local data retention despite successful graceful-path tests.
+
+Final: Ruling: PR #10 app code is unchanged; its passing CI is relevant baseline evidence, not a new verification of runtime admission. No full application rerun is needed for these Python/research changes.
+
+Final correction verification: `python3 -O scripts/check-openclaw-probe-guards.py` passed with **9 guard invocations**, explicit failed-condition propagation and all **3 synthetic cases**; live admission remains false. Python syntax and `git diff --check` passed. This was the single review fix pass; the minor broader-guard coverage item remains documented.
