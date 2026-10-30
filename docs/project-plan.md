@@ -87,3 +87,5 @@ Continuation: [owned draft queue stage](owned-draft-queue-stage.md) implements d
 Owner [worker controls](worker-controls-stage.md) are now implemented on `codex/draft-worker-controls`, following PR #9. They expose the existing draft-only RPC without starting a runtime. Next independent work is isolated runtime feasibility; selected Supabase access still gates hosted acceptance.
 
 The [runtime experiment](research/runtime-isolation-probe.md) establishes a synthetic OpenClaw path, but found an internal second model request after a rejected tool. Require a single-use model connection before connecting the restricted runtime; do not treat a successful CLI exit or tool-deny configuration as quota enforcement.
+
+The [single-request drafting stage](single-request-drafting-stage.md) implements the local connection limit and bounded optional OpenAI provider. Next is the production worker process adapter and owned queue wiring, including cancellation/cleanup and validated runtime policy; live inference still requires cloud/model setup.

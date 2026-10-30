@@ -5,7 +5,7 @@ import {
   type ReplyContext,
 } from "../buyer/domain";
 
-const outputSchema = z
+export const draftOutputSchema = z
   .object({
     body: z.string().trim().min(1).max(2000),
     reviewReason: z.string().trim().min(1).max(500),
@@ -16,6 +16,19 @@ export type DraftInput = {
   data: string;
   maxOutputTokens: 1800;
 };
+
+export const draftInputSchema = z
+  .object({
+    instructions: z.string().min(1),
+    data: z.string().min(1),
+    maxOutputTokens: z.literal(1800),
+  })
+  .strict()
+  .refine(
+    (value) => new TextEncoder().encode(JSON.stringify(value)).length <= 16384,
+    "Draft input too large.",
+  );
+export type DraftOutput = z.infer<typeof draftOutputSchema>;
 // Trusted server/worker dependencies, never browser-supplied assertions. No real
 // transport is installed here. The future adapter must verify tools, memory,
 // retention and endpoint isolation and use the existing durable daily quota.
@@ -102,9 +115,9 @@ export async function prepareAgentDraft(
       () => deps.generate(input, controller.signal),
       "Draft generation could not finish. Your saved work is unchanged.",
     );
-    let output: z.infer<typeof outputSchema>;
+    let output: z.infer<typeof draftOutputSchema>;
     try {
-      output = outputSchema.parse(raw);
+      output = draftOutputSchema.parse(raw);
     } catch {
       throw new Error("The provider did not return a usable draft.");
     }
