@@ -1,5 +1,6 @@
 import { it, expect } from "vitest";
 import {
+  replySchema,
   parseCommand,
   templateReply,
   contextMatches,
@@ -70,6 +71,33 @@ it("rejects invalid identity, blank content, forged fields and oversized UTF8 co
     parseCommand({
       ...base,
       input: { ...base.input, message: "😀".repeat(5000) },
+    }),
+  ).toThrow();
+});
+
+it("reads agent review drafts without admitting agent provenance through manual draft commands", () => {
+  const base = {
+    id: "55555555-5555-4555-8555-555555555555",
+    inquiry_id: context.inquiry_id,
+    body: "Draft reply",
+    source: "agent",
+    status: "Draft",
+    revision: "1",
+    context,
+    created_at: "2026-10-30",
+    updated_at: "2026-10-30",
+    approved_at: null,
+    review_note: "Check details.",
+  };
+  expect(replySchema.parse(base).source).toBe("agent");
+  expect(() =>
+    parseCommand({
+      op: "draft",
+      id: base.id,
+      inquiry_id: base.inquiry_id,
+      body: base.body,
+      source: "agent",
+      context,
     }),
   ).toThrow();
 });
