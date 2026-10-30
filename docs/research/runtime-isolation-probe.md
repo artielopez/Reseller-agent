@@ -72,3 +72,5 @@ Final: Ruling: crash/SIGKILL cleanup and complete log-path coverage remain unver
 Final: Ruling: PR #10 app code is unchanged; its passing CI is relevant baseline evidence, not a new verification of runtime admission. No full application rerun is needed for these Python/research changes.
 
 Final correction verification: `python3 -O scripts/check-openclaw-probe-guards.py` passed with **9 guard invocations**, explicit failed-condition propagation and all **3 synthetic cases**; live admission remains false. Python syntax and `git diff --check` passed. This was the single review fix pass; the minor broader-guard coverage item remains documented.
+
+Delivery: [PR #11](https://github.com/artielopez/Reseller-agent/pull/11) is open against main, auto-merge disabled. Review-fix head `a5ddcb9` had [GitHub checks in progress](https://github.com/artielopez/Reseller-agent/actions/runs/41067154224) at delivery. No additional merge or deployment occurred.
