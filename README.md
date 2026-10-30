@@ -156,3 +156,5 @@ Drafting begins paused. Once the restricted runtime is configured and verified, 
 `npm run test:e2e:cloud` runs the cloud UI against synthetic Auth/RPC responses on port 3018. It uses fake public configuration, requires no credentials and does not replace hosted Supabase acceptance. Run it separately from another Next development server in this checkout.
 
 The [single-request drafting boundary](docs/single-request-drafting-stage.md) adds a worker-only loopback endpoint and optional bounded OpenAI provider. It holds the model key in parent code and limits each endpoint to one provider invocation, even if an agent retries. It is not started by the app; the production worker launcher, durable queue wiring and live model/cloud acceptance are still pending. Mac developers can run its synthetic installed-runtime checks with `RUN_OPENCLAW_PROBE=1 npx vitest run tests/openclaw-gateway.test.ts`.
+
+The optional foreground [Mac draft worker](docs/mac-draft-worker.md) processes explicitly queued saved private questions into review drafts. It requires private cloud setup and separate acceptance; it does not connect personal buyer channels or send messages.

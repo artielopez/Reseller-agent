@@ -12,7 +12,11 @@
     "test:e2e": "playwright test",
     "check": "npm run lint && npm run typecheck && npm test && npm run build",
     "format": "prettier --write .",
-    "test:e2e:cloud": "playwright test --config playwright.cloud.config.ts"
+    "test:e2e:cloud": "playwright test --config playwright.cloud.config.ts",
+    "worker:build": "tsc -p tsconfig.worker.json",
+    "worker:check": "npm run worker:build && node .worker-build/worker/main.js check",
+    "worker:once": "npm run worker:build && node --env-file=.env.worker .worker-build/worker/main.js once",
+    "worker:watch": "npm run worker:build && node --env-file=.env.worker .worker-build/worker/main.js watch"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.118.0",
