@@ -52,3 +52,9 @@ After the correction, lint/types, **131 standard tests** and **both installed-ru
 - Final: Ruling: hosted Supabase, channel capture and sending remain outside this implemented boundary. No listener is started by the app and no real data or credentials are connected.
 
 Final build: the Webpack production build passed after the header correction. No browser rerun was needed because this stage changes no rendered UI, client persistence or SQL. PR #11's final head `69be6ec` also passed its standard GitHub checks; new-branch CI is separate.
+
+## Delivery state
+
+The verified branch is published as [`codex/single-request-drafting`](https://github.com/artielopez/Reseller-agent/tree/codex/single-request-drafting), implementation/review-fix head `45c187d`. PR creation is pending a GitHub service error: two GraphQL attempts returned internal errors at 14:21/14:22 UTC; the REST fallback returned an empty/invalid JSON response. Read-back after each ambiguous attempt found no PR for this branch. The remote branch/commit is confirmed. Do not blindly duplicate creation; recheck by head before retrying. The prepared body is in `/tmp/reseller-single-request-pr.md` for this workstation session.
+
+No merge, auto-merge or deployment occurred. This external delivery issue does not block the next local worker-adapter work. Supabase connection and project selection are still awaiting the owner.
