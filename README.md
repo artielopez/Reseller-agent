@@ -6,7 +6,7 @@ Built with Next.js App Router, TypeScript, Tailwind CSS, Supabase and the server
 
 ## Project continuity
 
-See the [current status](docs/project-status.md), [project plan](docs/project-plan.md), and [buyer reply implementation plan](docs/superpowers/plans/2026-10-28-buyer-replies.md). The [imported handoff](docs/project-handoff.md) is a historical reference. Buyer inquiry/reply tables exist; their user-facing workflow is planned, not implemented. Pull requests remain unmerged until the owner approves.
+See the [current status](docs/project-status.md), [project plan](docs/project-plan.md), and [buyer reply implementation plan](docs/superpowers/plans/2026-10-28-buyer-replies.md). The [imported handoff](docs/project-handoff.md) is a historical reference. The browser-local [buyer reply lab](docs/buyer-lab.md) now tests sample questions, review rules and simulated delivery at `/buyer-lab`. The [saved buyer inbox](docs/shared-inbox-stage.md) at `/inbox` supports manually entered questions and reviewed clipboard replies in demo or Supabase mode. Live capture, a delivery queue and agent/messaging integrations are not implemented. Pull requests remain unmerged until the owner approves.
 
 ## Try it in demo mode
 
@@ -28,12 +28,13 @@ The banner identifies demo mode. The generation result explicitly says **no AI w
 
 ## Set up your private cloud workspace
 
-### 1. Create Supabase and apply the migration
+### 1. Create Supabase and apply the migrations
 
 1. Create a Supabase project and securely retain its database password.
 2. In its SQL Editor, run the full contents of [`supabase/migrations/202610280001_initial.sql`](supabase/migrations/202610280001_initial.sql) **once** on the new project. The script creates the tables, RLS policies, save/quota functions and the private `item-photos` bucket. Do not create a public photo bucket.
-3. Alternatively, with the Supabase CLI: run `supabase init`, `supabase link --project-ref YOUR_PROJECT_REF`, and `supabase db push` from this repository. Review the target project before pushing migrations. Generated local Supabase credentials must stay out of Git.
-4. Copy the project URL and **public anon key** from the project's API settings. Do not use the service-role or secret key. This application does not require either.
+3. Then run [`202610300001_buyer_inbox.sql`](supabase/migrations/202610300001_buyer_inbox.sql) once. For an existing project that already applied the initial migration, apply only this new migration. It adds revision/context safeguards and restricts buyer writes to the authenticated RPC. Existing question/reply text is retained; old Approved replies become Draft because they lack a verified context snapshot. Create a fresh draft before approving them again.
+4. Alternatively, with the Supabase CLI: run `supabase init`, `supabase link --project-ref YOUR_PROJECT_REF`, and `supabase db push` from this repository. Review the target project before pushing migrations. Generated local Supabase credentials must stay out of Git.
+5. Copy the project URL and **public anon key** from the project's API settings. Do not use the service-role or secret key. This application does not require either.
 
 All inventory rows and image paths are scoped to the signed-in user. The browser uses Supabase Auth and its public anon key; PostgreSQL and Storage enforce ownership. The save RPC uses the caller's privileges and saves the item, photo metadata and three channel records in one transaction.
 
@@ -77,6 +78,19 @@ Publication status and overall inventory status are separate. A published channe
 
 Photos are resized to a maximum 1,600-pixel edge and re-encoded as JPEG before storage, reducing size and removing camera metadata. The input limit is 10 MB per photo; stored files are limited to 2 MB. For iPhone HEIC files, export JPEG first or use a compatible capture/export format. Cloud images use private signed URLs valid for 24 hours; reload a long-open page if they expire.
 
+## Buyer questions and replies
+
+Open **Open buyer inbox** from inventory, or visit `/inbox`:
+
+1. Select a saved item, channel and private message or public Group comment. Paste the question, optionally add a buyer name, and save it. Received time is recorded as now.
+2. Review the saved item facts. Prepare a labeled template or write your own draft. Templates are deterministic, not AI responses to the question; review and tailor the text.
+3. Save edits, approve the exact saved text, then copy it. A changed price, item status or other relevant fact invalidates approval. Reload and create a fresh draft when context changes.
+4. Paste and send through the original platform yourself. Mark **Answered** separately afterward. Copying does not send or mark a question answered.
+
+Cloud mode stores owned questions and drafts in Supabase; sign in on each device and use **Reload inbox** to refresh. There is no realtime subscription. Demo uses IndexedDB version 2, preserving existing inventory while adding local questions; it never syncs across devices. The hosted Sites inventory demo has not been republished with this feature.
+
+The inbox shows the latest 200 questions; demo storage is capped at 200 questions and 2,000 drafts. There is no inquiry edit/delete UI or connector yet. Public-comment templates omit the item description, but manually written text still needs your review. Buyer drafting never calls OpenAI, OpenClaw or Hermes in this stage. Approval authorizes copying only.
+
 ## Deploy
 
 ### ChatGPT Sites demo
@@ -111,7 +125,7 @@ npx playwright install chromium
 npm run test:e2e       # desktop and iPhone-size Chromium workflows
 ```
 
-Tests never use paid AI or cloud credentials. Database tests execute the real migration in PGlite (PostgreSQL in WASM) with local stand-ins for Supabase's `auth` and `storage` schemas. They cover cross-user isolation, atomic saves, invalid input, private storage policy and the daily quota. This does not replace a real Supabase Auth/Storage integration test. Browser tests run demo mode, including photo upload, generation, editing, publication tracking and reload persistence. GitHub Actions runs the checks on PRs and main.
+Tests never use paid AI or cloud credentials. Database tests execute the real migrations in PGlite (PostgreSQL in WASM) with local stand-ins for Supabase's `auth` and `storage` schemas. They cover cross-user isolation, atomic saves, invalid input, private storage policy and the daily quota. This does not replace a real Supabase Auth/Storage integration test. Browser tests run demo mode, including photo upload, generation, editing, publication tracking and reload persistence. GitHub Actions runs the checks on PRs and main.
 
 After configuring your real services, follow the [live acceptance checklist](docs/mvp-checklist.md#live-acceptance-checklist). No real Supabase or OpenAI credentials were supplied during initial implementation, so email delivery, hosted storage and paid generation require that final check.
 
@@ -120,6 +134,8 @@ After configuring your real services, follow the [live acceptance checklist](doc
 - `src/components/` — responsive workspace, item editor and sign-in UI.
 - `src/lib/domain.ts` — shared types, validation and deterministic template generation.
 - `src/lib/repository.ts` — IndexedDB demo persistence and Supabase photo/save operations.
+- `src/lib/buyer/` — validated inbox commands, demo/cloud adapters, exact context checks and templates.
+- `src/components/buyer-inbox.tsx` — manual inquiry, saved draft, approval and copy UI.
 - `src/lib/photos.ts` — client-side resizing and JPEG re-encoding.
 - `src/lib/generation.ts` — bounded request parsing, authentication gate, quota and safe API responses.
 - `src/app/api/generate/route.ts` — server-only OpenAI integration and verified Supabase identity.

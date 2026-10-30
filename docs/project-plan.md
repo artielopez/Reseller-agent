@@ -1,8 +1,14 @@
 # Reseller Agent project plan
 
-Updated 28 October 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Buyer reply implementation plan](superpowers/plans/2026-10-28-buyer-replies.md)
+Updated 30 October 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
 ## Current assignment
+
+The owner confirmed use of a personal Facebook profile and wants both Group comments and private messages captured, processed and answered promptly with minimal engagement. OpenClaw and Hermes on the Mac mini are available resources. The owner subsequently said **“Go ahead and work on it”**, authorizing implementation and account feasibility checks. The [new design](superpowers/specs/2026-10-29-sales-assistant-design.md), [research update](research/personal-account-automation-update.md) and [conditional staged plan](superpowers/plans/2026-10-29-sales-assistant.md) are the current roadmap. The [synthetic buyer lab](buyer-lab.md) is implemented on a review branch. Live sending remains disabled and needs a permitted channel and release decision. Native Marketplace replies and a Beeper personal-Messenger bridge are candidates to investigate, not verified integrations for this account. Group comments and Carousell have separate unresolved access gates.
+
+The manual inquiry/review milestone below is retained as a foundation and fallback. Its no-sending boundary applies to that milestone; it does not redefine the owner's newer objective. No existing runtime restriction is relaxed by planning. [Account-specific evidence](research/channel-capability-evidence.md) records the completed desktop check and unresolved mobile/native and integration questions. The [shared manual inbox stage](shared-inbox-stage.md) now implements saved questions, draft editing, approval and clipboard copy on `codex/shared-buyer-inbox`. Its Supabase adapter/migration and local demo are implemented; hosted acceptance is pending. Next: resolve access gates before custom connector investment; cloud outbox and restricted-agent work remain separate milestones. Native replies and custom sending use separate modes; the app cannot promise to pause external native features.
+
+### Earlier assignment and completed delivery
 
 Take over the existing repository, make the local demo available, maintain this plan and the status tracker, and prepare the buyer reply implementation plan. Do not merge without the owner's explicit approval.
 
@@ -12,20 +18,20 @@ The existing inventory/listing MVP is in PR 1. Its original buyer requirement wa
 
 ## Delivery sequence
 
-| Stage                                          | Deliverable                                                                                 | Completion evidence                                                    |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| 1. Workspace and planning (current assignment) | Current checkout, credential-free demo, baseline checks, shared status, concrete buyer plan | Recorded commands/results, working local URL, reviewable documentation |
-| 2. Manual inquiries (proposed implementation)  | Enter and reopen buyer questions for saved items, with demo/cloud persistence               | Reload persistence, validation, owner-isolation tests                  |
-| 3. Reviewed replies (proposed implementation)  | Generate or write, edit, approve, copy, manually mark answered                              | Approval invalidation and copy/status separation tests                 |
-| 4. Verification                                | Full regression suite and documented limitations                                            | Passing checks for actual implementation commit                        |
-| 5. Hosted acceptance                           | Selected Supabase/hosting setup and optional paid OpenAI verification                       | Desktop + physical iPhone acceptance with actual services              |
-| 6. Owner review                                | Reviewable PRs, setup steps and evidence                                                    | Explicit owner merge decision; deployment is a separate action         |
+| Stage                                              | Deliverable                                                                                 | Completion evidence                                                    |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| 1. Workspace and planning (current assignment)     | Current checkout, credential-free demo, baseline checks, shared status, concrete buyer plan | Recorded commands/results, working local URL, reviewable documentation |
+| 2. Manual inquiries (implemented locally)          | Enter and reopen buyer questions for saved items, with demo/cloud persistence               | Reload persistence, validation, owner-isolation tests                  |
+| 3. Reviewed replies (templates/manual implemented) | Generate or write, edit, approve, copy, manually mark answered                              | Approval invalidation and copy/status separation tests                 |
+| 4. Verification                                    | Full regression suite and documented limitations                                            | Passing checks for actual implementation commit                        |
+| 5. Hosted acceptance                               | Selected Supabase/hosting setup and optional paid OpenAI verification                       | Desktop + physical iPhone acceptance with actual services              |
+| 6. Owner review                                    | Reviewable PRs, setup steps and evidence                                                    | Explicit owner merge decision; deployment is a separate action         |
 
-Stages 2–6 are future work, not completion claims. Hosted credentials are not a blocker for planning or demo development. Do not request secrets in chat or put them in tracked files.
+Stages 2–4 now have a template/manual implementation with local verification; hosted acceptance and owner merge review remain pending. Hosted credentials are not a blocker for planning or demo development. Do not request secrets in chat or put them in tracked files.
 
 ## Next milestone: buyer replies
 
-These are planning defaults, grounded in the handoff. They are not implemented yet.
+The following is the broader target from the handoff. The current [execution slice](shared-inbox-stage.md) implements manual questions and template/manual draft review. Paid AI replies, editable received time, inquiry edit UI and dismiss controls remain deferred; their presence below is a plan, not a completion claim.
 
 ### Seller workflow
 

@@ -1,5 +1,7 @@
 # Buyer Replies Implementation Plan
 
+**Scope update, 29 October:** the owner now requests research/planning toward automatic intake and routine replies with minimal engagement. The [sales-assistant plan](2026-10-29-sales-assistant.md) is the current roadmap. This manual workflow remains a proposed fallback/foundation, not the full target or permission to implement. Reconcile both schema plans before coding; do not implement them independently.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task when implementation is requested. Steps use checkbox (`- [ ]`) syntax for tracking. This document prepares future implementation; it does not authorize a merge or deployment.
 
 **Goal:** Let the seller manually record a buyer question, prepare and review a reply, approve the saved text, and copy it for manual sending.

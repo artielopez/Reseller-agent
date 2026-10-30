@@ -1,23 +1,16 @@
+import { openDemoDb } from "./demo-db";
 import { demoMode } from "./config";
 import { demoItems } from "./demo";
-import { validateItem, type Item, type Listing, type Photo } from "./domain";
+import {
+  itemInputSchema,
+  validateItem,
+  type Item,
+  type Listing,
+  type Photo,
+} from "./domain";
 import { getSupabase } from "./supabase";
 
 const BUCKET = "item-photos";
-function openDemoDb(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("reseller-agent-demo", 1);
-    request.onupgradeneeded = () =>
-      request.result.createObjectStore("inventory");
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () =>
-      reject(
-        new Error(
-          "Browser storage is unavailable. Allow site storage to save demo items.",
-        ),
-      );
-  });
-}
 async function demoRead(): Promise<Item[] | undefined> {
   const db = await openDemoDb();
   try {
@@ -121,6 +114,16 @@ export async function saveItem(item: Item, previous?: Item): Promise<Item> {
   const saved = { ...item, updatedAt: new Date().toISOString() };
   if (demoMode) {
     const items = await listItems();
+    const stored = items.find((i) => i.id === item.id);
+    saved.replyContextRevision = stored
+      ? (
+          BigInt(stored.replyContextRevision || "1") +
+          (JSON.stringify(itemInputSchema.parse(stored)) ===
+          JSON.stringify(itemInputSchema.parse(saved))
+            ? BigInt(0)
+            : BigInt(1))
+        ).toString()
+      : "1";
     await demoWrite([saved, ...items.filter((entry) => entry.id !== item.id)]);
     return saved;
   }

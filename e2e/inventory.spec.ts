@@ -170,6 +170,9 @@ test("inventory navigation preserves edits until discard is confirmed", async ({
   await page.goto("/");
   await page.getByRole("button", { name: "Edit Oak bedside table" }).click();
   await page.getByLabel("Item title").fill("Unsaved title");
+  await expect(
+    page.getByRole("link", { name: "Try buyer replies" }),
+  ).toHaveCount(0);
   const back = isMobile
     ? page.getByRole("button", { name: "Inventory", exact: true })
     : page.getByRole("link", { name: /^Inventory/ });

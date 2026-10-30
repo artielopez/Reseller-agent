@@ -89,6 +89,7 @@ export const listingSchema = z
 export type Listing = z.infer<typeof listingSchema>;
 export type Photo = { id: string; url: string; path?: string };
 export type Item = ItemInput & {
+  replyContextRevision?: string;
   id: string;
   photos: Photo[];
   listings: Listing[];
