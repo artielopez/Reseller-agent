@@ -50,6 +50,28 @@ async function fixture(page: Page) {
     if (url.pathname === "/auth/v1/logout") return respond({});
     if (url.pathname === "/auth/v1/user") return respond(session().user);
     if (url.pathname === "/rest/v1/items") return respond([]);
+    if (url.pathname === "/rest/v1/rpc/seller_workspace")
+      return respond({
+        preferences: {
+          revision: "0",
+          terms_revision: "0",
+          pickup_area: "",
+          delivery_notes: "",
+          payment_notes: "",
+          digest_enabled: false,
+          digest_time: "09:00",
+          last_reviewed_at: null,
+        },
+        summary: {
+          total: 0,
+          open: 0,
+          ready: 0,
+          needs_review: 0,
+          received: 0,
+          since: timestamp,
+          as_of: timestamp,
+        },
+      });
     if (url.pathname === "/rest/v1/rpc/buyer_workspace")
       return respond([
         {
@@ -322,4 +344,63 @@ test("late enrollment cannot reveal a previous account's key", async ({
     .click();
   await expect(page.getByText("No workers enrolled.")).toBeVisible();
   await expect(page.getByLabel("One-time worker key")).toHaveCount(0);
+});
+
+test("preference edits protect sign-out and late saves cannot enter the next account", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page.getByText("Seller terms and reminder", { exact: true }).click();
+  await page.getByLabel("General pickup area").fill("Private old account term");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page.getByLabel("General pickup area")).toHaveValue(
+    "Private old account term",
+  );
+  let release!: () => void, entered!: () => void;
+  const wait = new Promise<void>((resolve) => (release = resolve)),
+    requested = new Promise<void>((resolve) => (entered = resolve));
+  await page.route("**/rest/v1/rpc/seller_workspace", async (route) => {
+    const command = route.request().postDataJSON().command;
+    if (command.op !== "save") return route.fallback();
+    entered();
+    await wait;
+    await route.fulfill({
+      json: {
+        preferences: {
+          ...command.input,
+          revision: "1",
+          terms_revision: "1",
+          last_reviewed_at: null,
+        },
+        summary: {
+          total: 0,
+          open: 0,
+          ready: 0,
+          needs_review: 0,
+          received: 0,
+          since: timestamp,
+          as_of: timestamp,
+        },
+      },
+    });
+  });
+  await page
+    .getByRole("button", { name: "Save preferences", exact: true })
+    .click();
+  await requested;
+  await page.evaluate((saved) => {
+    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
+    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
+    channel.postMessage({ event: "SIGNED_IN", session: saved });
+    channel.close();
+  }, session("66666666-6666-4666-8666-666666666666"));
+  await expect(page.getByLabel("General pickup area")).toHaveCount(0);
+  await page.getByText("Seller terms and reminder", { exact: true }).click();
+  await expect(page.getByLabel("General pickup area")).toHaveValue("");
+  const response = page.waitForResponse("**/rest/v1/rpc/seller_workspace");
+  release();
+  await response;
+  await expect(page.getByLabel("General pickup area")).toHaveValue("");
+  await expect(page.getByText(/Preferences saved/)).toHaveCount(0);
 });

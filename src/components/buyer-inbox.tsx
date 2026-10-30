@@ -1,6 +1,8 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { User } from "@supabase/supabase-js";
+import { SellerPreferencesPanel } from "./seller-preferences";
+import { termsContext, type Preferences } from "@/lib/seller/preferences";
 import { DraftWorkerControls } from "./draft-worker-controls";
 import { AuthPanel } from "./auth-panel";
 import { demoMode, configurationError } from "@/lib/config";
@@ -28,10 +30,13 @@ import {
   type Thread,
 } from "@/lib/buyer/domain";
 import { signOutWithDraftProtection } from "@/lib/buyer/session";
-type ReportUnsaved = (part: "form" | "reply", dirty: boolean) => void;
+type ReportUnsaved = (
+  part: "form" | "reply" | "preferences",
+  dirty: boolean,
+) => void;
 type Mutation = Parameters<typeof mutateThread>[0];
 export function BuyerInbox() {
-  const unsaved = useRef({ form: false, reply: false });
+  const unsaved = useRef({ form: false, reply: false, preferences: false });
   const reportUnsaved = useCallback<ReportUnsaved>((part, dirty) => {
     unsaved.current[part] = dirty;
   }, []);
@@ -119,10 +124,12 @@ export function BuyerInbox() {
               onClick={async () => {
                 try {
                   await signOutWithDraftProtection(
-                    unsaved.current.form || unsaved.current.reply,
+                    unsaved.current.form ||
+                      unsaved.current.reply ||
+                      unsaved.current.preferences,
                     () =>
                       window.confirm(
-                        "Sign out and discard unsaved question or reply text?",
+                        "Sign out and discard unsaved question, reply or preference edits?",
                       ),
                     () => getSupabase().auth.signOut(),
                   );
@@ -181,6 +188,20 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     return () => {
       alive.current = false;
     };
+  }, []);
+  const reportPreferencesDirty = useCallback(
+    (dirty: boolean) => reportUnsaved("preferences", dirty),
+    [reportUnsaved],
+  );
+  const onPreferences = useCallback((p: Preferences) => {
+    setThread((current) =>
+      current
+        ? {
+            ...current,
+            context: { ...current.context, seller_terms: termsContext(p) },
+          }
+        : current,
+    );
   }, []);
   const editedDirty = useRef(false);
   const reportReplyDirty = useCallback(
@@ -357,6 +378,11 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
         </p>
       ) : (
         <>
+          <SellerPreferencesPanel
+            refresh={questions}
+            onPreferences={onPreferences}
+            reportDirty={reportPreferencesDirty}
+          />
           {!demoMode && <DraftWorkerControls questions={questions} />}
           <section className="panel section-pad">
             <h2>Record a buyer question</h2>

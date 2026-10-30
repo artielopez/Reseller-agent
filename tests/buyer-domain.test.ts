@@ -101,3 +101,34 @@ it("reads agent review drafts without admitting agent provenance through manual 
     }),
   ).toThrow();
 });
+it("includes explicit saved seller terms only in private templates and binds their revision to review", () => {
+  const seller_terms = {
+    revision: "9007199254740993",
+    pickup_area: "Quezon City",
+    delivery_notes: "Courier quote needs review",
+    payment_notes: "Cash on pickup",
+  };
+  const privateContext = { ...context, seller_terms };
+  expect(templateReply(privateContext)).toContain("Quezon City");
+  expect(templateReply(privateContext)).toContain("Cash on pickup");
+  expect(
+    templateReply({
+      ...privateContext,
+      channel: "groups",
+      surface: "group_comment",
+    }),
+  ).not.toContain("Quezon City");
+  expect(
+    templateReply({
+      ...privateContext,
+      channel: "groups",
+      surface: "group_comment",
+    }),
+  ).not.toContain("Cash on pickup");
+  expect(
+    contextMatches(privateContext, {
+      ...privateContext,
+      seller_terms: { ...seller_terms, revision: "9007199254740994" },
+    }),
+  ).toBe(false);
+});

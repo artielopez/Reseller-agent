@@ -169,3 +169,32 @@ it("does not admit a draft when context rechecking fails", async () => {
   );
   expect(d.generate).toHaveBeenCalledTimes(1);
 });
+it("passes explicit saved private terms as untrusted data without preference metadata and rechecks them", async () => {
+  const seller_terms = {
+    revision: "9007199254740993",
+    pickup_area: "Quezon City",
+    delivery_notes: "Confirm courier quote",
+    payment_notes: "Cash on pickup",
+  };
+  const current = { ...context, seller_terms };
+  const d = dependencies();
+  d.reloadContext.mockResolvedValue(current);
+  await prepareAgentDraft(current, d);
+  const data = JSON.parse(d.generate.mock.calls[0][0].data);
+  expect(data.seller_terms).toEqual({
+    pickup_area: seller_terms.pickup_area,
+    delivery_notes: seller_terms.delivery_notes,
+    payment_notes: seller_terms.payment_notes,
+  });
+  expect(JSON.stringify(data)).not.toContain(seller_terms.revision);
+  const changed = dependencies();
+  changed.reloadContext.mockResolvedValue(current);
+  changed.generate.mockImplementation(async () => {
+    changed.reloadContext.mockResolvedValue({
+      ...current,
+      seller_terms: { ...seller_terms, revision: "9007199254740994" },
+    });
+    return { body: "Draft", reviewReason: "Review" };
+  });
+  await expect(prepareAgentDraft(current, changed)).rejects.toThrow("changed");
+});

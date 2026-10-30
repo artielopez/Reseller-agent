@@ -40,6 +40,8 @@ The banner identifies demo mode. The generation result explicitly says **no AI w
 
 All inventory rows and image paths are scoped to the signed-in user. The browser uses Supabase Auth and its public anon key; PostgreSQL and Storage enforce ownership. The save RPC uses the caller's privileges and saves the item, photo metadata and three channel records in one transaction.
 
+Apply [`202610310001_seller_preferences.sql`](supabase/migrations/202610310001_seller_preferences.sql) after the draft queue migration for owner-supplied private reply terms and the optional in-app review reminder. It does not depend on the optional delivery simulation. See [seller preferences and review](docs/seller-preferences.md); these branch features are not yet deployed to the shared demo.
+
 ### 2. Configure sign-in for your account
 
 1. In Supabase Authentication, enable the email provider.
