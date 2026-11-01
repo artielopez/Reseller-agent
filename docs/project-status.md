@@ -1,5 +1,17 @@
 # Reseller Agent status
 
+## Cloud workspace setup — 1 November 2026
+
+The owner-requested **Artie's Projects** organization is created on the Free plan. After explicit reauthorization, the Supabase connector can access it. Its current authorization lists only this organization; SoleVault was not changed. Supabase's hosted OAuth connector currently scopes authorization to one organization; reconnecting replaced the previous organization scope.
+
+**Reseller Agent is provisioned in Singapore** (`ap-southeast-1`), project `ecusonvqyjnuwjhvcivb`, status `ACTIVE_HEALTHY`. [Project dashboard](https://supabase.com/dashboard/project/ecusonvqyjnuwjhvcivb). The four application migrations are applied; the optional delivery-simulation migration is intentionally absent. All ten public tables have RLS enabled, and the JPEG photo bucket is private. Public and anonymous signups are disabled; email sign-in is enabled. No app user exists yet.
+
+Hosted verification passed: rollback-only PostgreSQL checks for owned inventory/inbox/preferences, cross-owner rejection, stale approved-copy rejection after term changes, default paused worker, anonymous/token rejection and private storage configuration. Follow-up counts confirmed no test users, items, inquiries, replies, workers or preferences remain. Real HTTP requests with the project's publishable key rejected anonymous inventory/inbox access and an invalid worker token with HTTP 401 / PostgreSQL `42501`. Auth settings confirmed signups disabled. The local cloud preview on port 3023 renders the private sign-in screen without demo data.
+
+Branch `codex/cloud-workspace-setup`, based on PR #15 delivery head `847ad18`, records [the setup, exact migration history and remaining acceptance](cloud-workspace-setup.md), plus the executable hosted SQL check. An ignored, mode-600 `.env.cloud.local` contains the public configuration; no service-role/secret key or model key was fetched. Security Advisor flags six intentionally exposed SECURITY DEFINER functions; their ownership/capability guards were checked, but this is not a finding-free scan.
+
+**Next:** prepare the cloud app's shared URL and exact Auth redirects, then invite the owner at the confirmed email and verify email login, authenticated Storage/HTTP persistence and cross-device use. The owner also requested Janyl's independent inventory; the existing owner-scoped schema supports separate app accounts. Janyl's email is still needed, and neither invitation has been sent. The Sites demo remains credential-free and browser-local. Real agent/model setup and permitted channel access remain separate gates. No newer PR was merged, worker started, message sent or paid model request made. Earlier entries below are historical; their pending connection statements are superseded by this section.
+
 Updated after the owner-approved integration of PRs **#1, #2 and #3**. GitHub merge timestamps below are recorded in UTC. This is the shared status record; the imported handoff is a historical snapshot.
 
 **Merged and deployed — 30 October:** [PR #7](https://github.com/artielopez/Reseller-agent/pull/7) merged after the owner's explicit instruction. The [existing private Sites demo](https://reseller-agent-demo.pandabur.chatgpt.site) now includes inventory, the saved manual buyer inbox and the synthetic reply lab. Data still stays in each browser. Real cloud synchronization and buyer message automation are not enabled.

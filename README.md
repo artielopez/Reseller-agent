@@ -28,6 +28,8 @@ The banner identifies demo mode. The generation result explicitly says **no AI w
 
 ## Set up your private cloud workspace
 
+The owner's project is now provisioned; see the [cloud setup record](docs/cloud-workspace-setup.md) before applying any migrations there. The following steps describe a fresh project.
+
 ### 1. Create Supabase and apply the migrations
 
 1. Create a Supabase project and securely retain its database password.
@@ -35,10 +37,10 @@ The banner identifies demo mode. The generation result explicitly says **no AI w
 3. Then run [`202610300001_buyer_inbox.sql`](supabase/migrations/202610300001_buyer_inbox.sql) once. For an existing project that already applied the initial migration, apply only this new migration. It adds revision/context safeguards and restricts buyer writes to the authenticated RPC. Existing question/reply text is retained; old Approved replies become Draft because they lack a verified context snapshot. Create a fresh draft before approving them again.
 4. Apply [`202610300002_draft_queue.sql`](supabase/migrations/202610300002_draft_queue.sql) for the draft-only worker foundation. It adds paused controls, expiring/revocable worker enrollments and leased drafting jobs. It starts no worker and grants no platform access or sending.
 5. Optional engineering lab: [`202610300003_delivery_simulation.sql`](supabase/migrations/202610300003_delivery_simulation.sql) adds the owner-only [durable fake-delivery simulation](docs/durable-delivery-simulation.md). It grants no worker sending capability or platform access and is not used by the app UI.
-6. Alternatively, with the Supabase CLI: run `supabase init`, `supabase link --project-ref YOUR_PROJECT_REF`, and `supabase db push` from this repository. Review the target project before pushing migrations. Generated local Supabase credentials must stay out of Git.
-6. Copy the project URL and **public anon key** from the project's API settings. Do not use the service-role or secret key. This application does not require either.
+6. On a fresh, CLI-managed project, alternatively: run `supabase init`, `supabase link --project-ref YOUR_PROJECT_REF`, and `supabase db push` from this repository. Review the target and migration history before pushing. Do not run this blindly against the existing owner project: its connector-assigned migration versions differ from the filenames (see the setup record). Generated local Supabase credentials must stay out of Git.
+7. Copy the project URL and **public publishable key** (or legacy public anon key) from the project's API settings. Do not use the service-role or secret key. This application does not require either.
 
-All inventory rows and image paths are scoped to the signed-in user. The browser uses Supabase Auth and its public anon key; PostgreSQL and Storage enforce ownership. The save RPC uses the caller's privileges and saves the item, photo metadata and three channel records in one transaction.
+All inventory rows and image paths are scoped to the signed-in user. The browser uses Supabase Auth and its public publishable key; PostgreSQL and Storage enforce ownership. The save RPC uses the caller's privileges and saves the item, photo metadata and three channel records in one transaction.
 
 Apply [`202610310001_seller_preferences.sql`](supabase/migrations/202610310001_seller_preferences.sql) after the draft queue migration for owner-supplied private reply terms and the optional in-app review reminder. It does not depend on the optional delivery simulation. See [seller preferences and review](docs/seller-preferences.md); these branch features are not yet deployed to the shared demo.
 
@@ -59,7 +61,7 @@ Edit `.env.local` (ignored by Git):
 ```dotenv
 NEXT_PUBLIC_DEMO_MODE=false
 NEXT_PUBLIC_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PUBLIC_ANON_KEY
+NEXT_PUBLIC_SUPABASE_ANON_KEY=YOUR_PUBLIC_PUBLISHABLE_KEY
 OPENAI_API_KEY=YOUR_SERVER_ONLY_KEY
 OPENAI_MODEL=gpt-6-luna
 ```

@@ -1,12 +1,16 @@
 # Reseller Agent project plan
 
-Updated 30 October 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
+Updated 1 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
 ## Current assignment
 
 The owner confirmed use of a personal Facebook profile and wants both Group comments and private messages captured, processed and answered promptly with minimal engagement. OpenClaw and Hermes on the Mac mini are available resources. The owner subsequently said **“Go ahead and work on it”**, authorizing implementation and account feasibility checks. The [new design](superpowers/specs/2026-10-29-sales-assistant-design.md), [research update](research/personal-account-automation-update.md) and [conditional staged plan](superpowers/plans/2026-10-29-sales-assistant.md) are the current roadmap. The [synthetic buyer lab](buyer-lab.md) and manual inbox were merged and deployed to the private Sites demo on 30 October. Live sending remains disabled and needs a permitted channel and release decision. Native Marketplace replies and a Beeper personal-Messenger bridge are candidates to investigate, not verified integrations for this account. Group comments and Carousell have separate unresolved access gates.
 
 The manual inquiry/review milestone below is retained as a foundation and fallback. Its no-sending boundary applies to that milestone; it does not redefine the owner's newer objective. No existing runtime restriction is relaxed by planning. [Account-specific evidence](research/channel-capability-evidence.md) records the completed desktop check and unresolved mobile/native and integration questions. The [shared manual inbox stage](shared-inbox-stage.md) implements saved questions, draft editing, approval and clipboard copy, merged through PR #7. Its Supabase adapter/migration and local demo are implemented; hosted acceptance is pending. Next: resolve access gates before custom connector investment; cloud outbox and restricted-agent work remain separate milestones. Native replies and custom sending use separate modes; the app cannot promise to pause external native features.
+
+### Hosted setup now in progress
+
+The owner selected a dedicated Free organization, **Artie's Projects**, and its new Singapore **Reseller Agent** project is provisioned. Four application migrations and hosted database/anonymous HTTP checks passed; see the [cloud setup record](cloud-workspace-setup.md). The owner also requested Janyl's separate inventory: keep invitations restricted and use existing per-user ownership, with no shared household view or dashboard access implied. Next work is the app accounts, a shared cloud URL with exact Auth redirects, authenticated photo/persistence checks and physical-device acceptance. The existing private Sites link remains a separate browser-local demo. No automatic buyer reader/sender or real drafting worker has been activated.
 
 ### Earlier assignment and completed delivery
 
