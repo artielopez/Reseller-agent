@@ -65,14 +65,14 @@ This loads environment variables before starting Next. Directly launching Next w
 
 The owner confirmed their email for their app account and requested Janyl's separate inventory. The existing per-user schema supports this without a second Supabase project: each signed-in user owns their items, photos, listing records, buyer inquiries, reply drafts and preferences. There is no shared-household inventory or owner impersonation UI. Administrative dashboard access is different from app access and should not be given to an app user merely to sign in.
 
-Keep registration invitation-only. The owner account has not yet been invited; wait until a working cloud URL and matching Auth redirects are available. Janyl's email is still required. No invitation has been sent to either person.
+Keep registration invitation-only. The owner account has not yet been invited; wait until a working cloud URL and matching Auth redirects are available. The owner has now supplied Janyl's email in the conversation for her invitation; keep personal contact details out of the repository. No invitation has been sent to either person.
 
 Read-only Sites verification confirms the existing owner-private demo supports external visitor invitations, currently with none. Granting Janyl access to that demo would only share the demo interface: it would not connect her data to Supabase. A cloud publication needs its own tested configuration and supported identity flow. Preserve the demo's audience until an actual sharing change is authorized with a recipient.
 
 ## Remaining release work
 
 1. Publish a tested cloud-capable app URL; preserve the separate credential-free demo. The current Sites export explicitly disables Supabase and server API routes. Evaluate the supported Sites server/identity path before changing that contract; do not simply rename the demo or claim it syncs.
-2. Configure exact Auth Site/redirect URLs, provision the authorized app users and verify email-link login. Obtain Janyl's email before inviting her. No passwords or API keys in chat.
+2. Configure exact Auth Site/redirect URLs, provision the authorized app users and verify email-link login. Use the owner-confirmed email addresses for the invitations. No passwords or API keys in chat.
 3. Complete authenticated inventory, photo, inbox and preference checks from separate browser/device accounts, including cross-account photo rejection and sign-out/state clearing.
 4. Obtain review/release approval for unmerged application branches. This operational setup PR is based on PR #15, and includes that unmerged stack when compared with main.
 5. Configure a dedicated restricted worker and optional model key only after hosted user acceptance; then verify live quota, cancellation and revocation. Keep workers paused until then. No platform reading/sending is enabled by any of this setup.
