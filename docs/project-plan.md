@@ -12,6 +12,10 @@ The manual inquiry/review milestone below is retained as a foundation and fallba
 
 The owner selected a dedicated Free organization, **Artie's Projects**, and its new Singapore **Reseller Agent** project is provisioned. Four application migrations and hosted database/anonymous HTTP checks passed; see the [cloud setup record](cloud-workspace-setup.md). The owner also requested Janyl's separate inventory: keep invitations restricted and use existing per-user ownership, with no shared household view or dashboard access implied. Next work is the app accounts, a shared cloud URL with exact Auth redirects, authenticated photo/persistence checks and physical-device acceptance. The existing private Sites link remains a separate browser-local demo. No automatic buyer reader/sender or real drafting worker has been activated.
 
+### Shared cloud continuation — 1 November
+
+The owner explicitly authorized finishing the shared cloud app and sign-in flow, sending app invitations to Artie and Janyl, and checking multi-organization MCP access. The [cloud app is published](shared-cloud-release.md); Auth redirects are configured and Artie's invitation was sent. Janyl remains an ordinary private app user. The owner chose custom email delivery over Supabase team membership. Complete sender-domain/provider setup and authenticated user acceptance next; do not bypass the email restriction by granting dashboard privileges. Multi-organization MCP needs a separately scoped credential and verification, while the existing Artie's Projects connector remains working.
+
 ### Earlier assignment and completed delivery
 
 Take over the existing repository, make the local demo available, maintain this plan and the status tracker, and prepare the buyer reply implementation plan. Do not merge without the owner's explicit approval.

@@ -28,6 +28,8 @@ The banner identifies demo mode. The generation result explicitly says **no AI w
 
 ## Set up your private cloud workspace
 
+The [shared cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) is published separately from the demo. See [its current sign-in/invitation status](docs/shared-cloud-release.md); email onboarding and authenticated acceptance are still in progress.
+
 The owner's project is now provisioned; see the [cloud setup record](docs/cloud-workspace-setup.md) before applying any migrations there. The following steps describe a fresh project.
 
 ### 1. Create Supabase and apply the migrations

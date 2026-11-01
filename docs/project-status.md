@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Shared cloud publication — 1 November 2026
+
+The [cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) is published separately from the demo, with real Supabase configuration and its server endpoint. Exact Auth redirects are saved. Artie's app invitation was sent; completed email login is awaiting the owner's check. Janyl's invitation is pending custom email delivery. The owner explicitly chose private app access for her, not Supabase organization membership; a sender-domain/DNS question is pending.
+
+[Release evidence and setup](shared-cloud-release.md): 171 standard tests, lint/types, main Webpack build, Sites types/Worker build, signed-out browser checks and unauthorized API rejection passed. Six optional runtime tests were skipped. The [MCP check](supabase-mcp-access.md) confirms the ChatGPT connector still has only Artie's Projects and documents a separate scoped-token connection for multiple organizations; no new credential or working multi-org connection exists yet. Changes are on `codex/shared-cloud-app`; nothing was merged. Previous setup entries below are historical.
+
 ## Cloud workspace setup — 1 November 2026
 
 The owner-requested **Artie's Projects** organization is created on the Free plan. After explicit reauthorization, the Supabase connector can access it. Its current authorization lists only this organization; SoleVault was not changed. Supabase's hosted OAuth connector currently scopes authorization to one organization; reconnecting replaced the previous organization scope.
