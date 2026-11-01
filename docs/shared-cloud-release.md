@@ -1,0 +1,47 @@
+# Shared cloud app — 1 November 2026
+
+## Deployment
+
+[Open Reseller Agent cloud](https://reseller-agent-cloud.pandabur.chatgpt.site).
+
+The new cloud Site is separate from the existing credential-free browser-local demo. The owner explicitly authorized finishing the cloud app/sign-in flow and sending invitations to the two named app users. This authorizes this cloud publication; no GitHub PR was merged.
+
+- Sites project: `appgprj_6ae71d6a9ff48191bf09daf78d72ca92`.
+- Source checkout: `.sites/reseller-agent-cloud` (ignored in the GitHub repository; independently versioned in Sites).
+- GitHub source base: `344c928` plus the response-validation/preparation changes now on this feature branch; the initial generated README did not label the local changes. The preparation script now records dirty source explicitly. The exact independently published Sites commit below is authoritative.
+- Published source: `a56253240f1719fcac14bed2046b7fe9714a9c67`.
+- Saved version: `appgprj_6ae71d6a9ff48191bf09daf78d72ca92~appgver_73b15f99b5648191b9f0a2b43f3c857b`.
+- Deployment: `appgdep_6ae71f1c1d8c8191b1dec884a022c8a0`, native status **succeeded**.
+- Environment revision 1: cloud mode, Supabase URL and publishable key. No service-role or OpenAI key configured. The public key is bundled for the browser as required, but excluded from source files and masked in hosted environment tools.
+- Supabase project: `ecusonvqyjnuwjhvcivb` in Artie's Projects.
+
+The repository remains a Next.js App Router app. Sites hosts the same source through its supported Vinext/Cloudflare Worker adapter, retaining the server-side `/api/generate` endpoint. The preparation script copies only application source/public files into an initialized Sites starter, retains hosting identity/integration helpers, and never copies credentials or browser data. The dedicated source repository owns its locked adapter dependencies.
+
+## Sign-in and invitations
+
+Supabase Site URL and its sole exact Redirect URL are now `https://reseller-agent-cloud.pandabur.chatgpt.site`. Public signup remains disabled. Sites currently adds an owner-only ChatGPT access gate; Supabase provides the separate application session and data ownership. No identity claim from Sites is used to bypass Supabase RLS.
+
+**Artie's application invitation was sent.** The dashboard lists the owner app user and a read-only Auth count confirmed one invited user, zero confirmed users immediately after sending. Inbox delivery and completed login still require the owner's check. The owner was asked to open the cloud Site and complete ChatGPT access before following the Supabase email on the same device, so the outer access gate does not interrupt the email-link return flow.
+
+**Janyl has not yet been invited.** The project has no custom SMTP sender, and Supabase's default sender is restricted to organization team addresses. The owner explicitly chose private app access for Janyl and proper email delivery, rather than Supabase organization membership. Do not add her to the database/admin team as an email workaround. Her email is confirmed in the conversation, not stored in the repository. Her Sites viewer grant should be added when the app invitation can be completed; adding it may itself send a Sites email.
+
+A domain/DNS provider question is pending for the email service. Resend's [Supabase SMTP integration](https://resend.com/docs/send-with-supabase-smtp) requires a verified domain and a provider credential entered securely. No provider account, paid subscription, DNS change or SMTP credential was created. Do not claim both invitations were delivered or that authenticated user acceptance is complete.
+
+## Verification
+
+- Main app lint and type checks passed.
+- **171 standard tests passed; six optional installed-runtime tests skipped.** An initial sandbox run could not bind the local drafting gateway; the authorized loopback-enabled run passed.
+- Main Next.js Webpack production build passed.
+- Isolated Sites TypeScript check and Worker production build passed.
+- Browser inspection of the built cloud inventory and inbox confirmed private sign-in screens, without demo data. Live Sites owner sign-in completed and the deployed app screen rendered successfully.
+- Requests to the built `/api/generate` endpoint with no token and an invalid token both returned HTTP 401 with the intended sign-in error.
+- A stricter Worker type definition exposed untyped generation JSON. The app now validates the response envelope and source label with Zod before using the existing copy schema. Error bodies are checked before displaying their message.
+- Full authenticated save/photo/inbox flows, physical iPhone acceptance and two-user HTTP/Storage isolation remain pending until app sign-in is available. Earlier hosted database isolation checks remain recorded in `cloud-workspace-setup.md`; they do not replace these checks.
+
+The optional fake-delivery lab migration is still absent. No real worker, paid model, buyer reader or sender was activated.
+
+## Reproduction and next work
+
+Initialize the supported Sites starter in the dedicated checkout only once, preserve `.openai/hosting.json`, then run `node scripts/prepare-sites-cloud.mjs` from the application root. Refresh the dedicated lockfile when copied dependency versions change, install with the Sites helper, inject public build configuration from ignored environment files, and use the source workflow helper for checks/build/commit/push/package. Publish the exact returned artifact and source commit. Do not run the static demo preparation script against the cloud checkout.
+
+Next: finish email-service/domain setup, confirm the owner's real login, add Janyl's Sites viewer access and Supabase app invitation, then verify both accounts' own-data workflows. [Multi-organization MCP findings](supabase-mcp-access.md) are separate from app sign-in.
