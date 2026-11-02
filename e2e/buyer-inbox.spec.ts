@@ -241,3 +241,26 @@ test("labels persisted agent drafts and keeps copying gated on explicit review",
     page.getByRole("button", { name: "Copy approved reply" }),
   ).toBeEnabled();
 });
+
+test("restores manual copy when browser clipboard never answers", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: () => new Promise<void>(() => {}) },
+    }),
+  );
+  await question(page);
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await page.getByRole("button", { name: "Copy approved reply" }).click();
+  await expect(page.getByLabel("Approved text to copy manually")).toHaveValue(
+    /6,500.00/,
+  );
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeEnabled();
+  await expect(
+    page.getByText("Question status: Open", { exact: true }),
+  ).toBeVisible();
+});

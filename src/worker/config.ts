@@ -24,7 +24,8 @@ export function readWorkerConfig(env: Record<string, string | undefined>) {
     publicKey = env.RESELLER_SUPABASE_PUBLIC_KEY ?? "",
     token = env.RESELLER_WORKER_TOKEN ?? "",
     apiKey = env.OPENAI_API_KEY ?? "",
-    model = env.OPENAI_MODEL ?? "";
+    model = env.OPENAI_MODEL ?? "",
+    provider = env.RESELLER_DRAFT_PROVIDER ?? "api";
   try {
     const url = new URL(projectUrl);
     if (
@@ -34,10 +35,7 @@ export function readWorkerConfig(env: Record<string, string | undefined>) {
       url.pathname !== "/" ||
       url.search ||
       url.hash ||
-      !/^[a-f0-9]{64}$/.test(token) ||
-      !apiKey.trim() ||
-      /[\r\n]/.test(apiKey) ||
-      !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/.test(model)
+      !/^[a-f0-9]{64}$/.test(token)
     )
       throw failure();
     const isPublishable = /^sb_publishable_[A-Za-z0-9_-]+$/.test(publicKey);
@@ -51,7 +49,40 @@ export function readWorkerConfig(env: Record<string, string | undefined>) {
       )
         throw failure();
     }
-    return { projectUrl: url.origin, publicKey, token, apiKey, model };
+    const cloud = { projectUrl: url.origin, publicKey, token };
+    if (provider === "subscription") {
+      const profileId = env.RESELLER_SUBSCRIPTION_PROFILE ?? "";
+      const inputSha256 = env.RESELLER_SUBSCRIPTION_INPUT_SHA256 ?? "";
+      const verifiedUntil = Date.parse(
+        env.RESELLER_SUBSCRIPTION_VERIFIED_UNTIL ?? "",
+      );
+      if (
+        apiKey ||
+        env.CODEX_API_KEY ||
+        model ||
+        !/^[A-Za-z0-9][A-Za-z0-9._:@-]{0,199}$/.test(profileId) ||
+        !/^[a-f0-9]{64}$/.test(inputSha256) ||
+        !Number.isFinite(verifiedUntil) ||
+        verifiedUntil <= Date.now() ||
+        verifiedUntil > Date.now() + 3600000
+      )
+        throw failure();
+      return {
+        ...cloud,
+        provider: "subscription" as const,
+        profileId,
+        inputSha256,
+        verifiedUntil,
+      };
+    }
+    if (
+      provider !== "api" ||
+      !apiKey.trim() ||
+      /[\r\n]/.test(apiKey) ||
+      !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,99}$/.test(model)
+    )
+      throw failure();
+    return { ...cloud, provider: "api" as const, apiKey, model };
   } catch {
     throw failure();
   }

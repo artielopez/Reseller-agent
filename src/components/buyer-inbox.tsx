@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import type { User } from "@supabase/supabase-js";
+import { writeClipboard } from "@/lib/clipboard";
 import { SellerPreferencesPanel } from "./seller-preferences";
 import { termsContext, type Preferences } from "@/lib/seller/preferences";
 import { DraftWorkerControls } from "./draft-worker-controls";
@@ -753,7 +754,7 @@ function ReplyReview({
       const current = await approvedText(reply.id, reply.revision);
       if (!stillEligible()) return;
       try {
-        await navigator.clipboard.writeText(current.body);
+        await writeClipboard(current.body);
         if (stillEligible())
           setNotice("Copied. Send it yourself on the original platform.");
       } catch {

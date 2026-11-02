@@ -55,3 +55,34 @@ it("uses an exclusive owner-private lock, retaining ambiguous existing locks", a
     await rm(state, { recursive: true, force: true });
   }
 });
+it("supports an explicit short-lived subscription trial without API credentials", () => {
+  const cloud = { ...env, OPENAI_API_KEY: "", OPENAI_MODEL: "" };
+  const subscription = {
+    ...cloud,
+    RESELLER_DRAFT_PROVIDER: "subscription",
+    RESELLER_SUBSCRIPTION_PROFILE: "openai:owner",
+    RESELLER_SUBSCRIPTION_INPUT_SHA256: "a".repeat(64),
+    RESELLER_SUBSCRIPTION_VERIFIED_UNTIL: new Date(
+      Date.now() + 60000,
+    ).toISOString(),
+  };
+  expect(readWorkerConfig(subscription)).toMatchObject({
+    provider: "subscription",
+    profileId: "openai:owner",
+  });
+  expect(() =>
+    readWorkerConfig({ ...subscription, OPENAI_API_KEY: "accidental-key" }),
+  ).toThrow();
+  expect(() =>
+    readWorkerConfig({
+      ...subscription,
+      RESELLER_SUBSCRIPTION_VERIFIED_UNTIL: "2020-01-01T00:00:00Z",
+    }),
+  ).toThrow();
+  expect(() =>
+    readWorkerConfig({ ...subscription, RESELLER_SUBSCRIPTION_PROFILE: "" }),
+  ).toThrow();
+  expect(() =>
+    readWorkerConfig({ ...env, RESELLER_DRAFT_PROVIDER: "typo" }),
+  ).toThrow();
+});

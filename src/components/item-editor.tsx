@@ -1,4 +1,5 @@
 "use client";
+import { writeClipboard } from "@/lib/clipboard";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
 import {
@@ -175,7 +176,7 @@ export function ItemEditor({
         kind === "post"
           ? `${listing.title}\n\n${listing.description}`
           : listing[kind];
-      await navigator.clipboard.writeText(text);
+      await writeClipboard(text);
       setCopied(kind);
       setNotice(
         "Copied. Paste into your listing, then save its URL here after posting.",

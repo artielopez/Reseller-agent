@@ -1,4 +1,5 @@
 import { setTimeout as delay } from "node:timers/promises";
+import { resolve } from "node:path";
 import {
   createWorkerTransport,
   runDraftJob,
@@ -7,6 +8,7 @@ import { createOpenAIDraftProvider } from "../lib/automation/draft-provider";
 import { createOpenClawRuntime } from "./openclaw";
 import { acquireWorkerLock, readWorkerConfig, runtimeOptions } from "./config";
 import { runWorkerLoop } from "./runner";
+import { createSubscriptionBroker } from "./subscription-broker";
 async function main() {
   const mode = process.argv[2];
   if (process.argv.length !== 3 || !["check", "once", "watch"].includes(mode))
@@ -14,12 +16,17 @@ async function main() {
   const options = runtimeOptions(process.env);
   // Validate service settings before taking a lock, without logging any values.
   const config = mode === "check" ? undefined : readWorkerConfig(process.env);
+  // Subscription trials are deliberately foreground, one queue pass only.
+  if (config?.provider === "subscription" && mode !== "once")
+    throw new Error("Subscription trial requires once mode");
   const release = await acquireWorkerLock(options.stateDir);
   const stop = new AbortController();
   let current: ReturnType<typeof createOpenClawRuntime> | undefined;
+  let broker: ReturnType<typeof createSubscriptionBroker> | undefined;
   const shutdown = () => {
     stop.abort();
     void current?.close().catch(() => {});
+    void broker?.close().catch(() => {});
   };
   process.on("SIGINT", shutdown);
   process.on("SIGTERM", shutdown);
@@ -39,7 +46,22 @@ async function main() {
       config!.publicKey,
       config!.token,
     );
-    const provider = createOpenAIDraftProvider(config!.apiKey, config!.model);
+    let provider;
+    if (config!.provider === "subscription") {
+      broker = createSubscriptionBroker({
+        installRoot: options.installRoot,
+        nodePath: options.nodePath,
+        pluginPath: resolve(__dirname, "../../integrations/openclaw-reseller"),
+        profileId: config!.profileId,
+        inputSha256: config!.inputSha256,
+        verifiedUntil: config!.verifiedUntil,
+      });
+      if (!(await broker.verify()) || stop.signal.aborted)
+        throw new Error("Subscription preflight failed");
+      provider = broker.generate;
+    } else {
+      provider = createOpenAIDraftProvider(config!.apiKey, config!.model);
+    }
     const status = await runWorkerLoop({
       watch: mode === "watch",
       signal: stop.signal,
@@ -82,6 +104,7 @@ async function main() {
     try {
       await current?.close();
     } finally {
+      await broker?.close();
       process.off("SIGINT", shutdown);
       process.off("SIGTERM", shutdown);
       await release();

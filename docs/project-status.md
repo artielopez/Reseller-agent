@@ -1,5 +1,19 @@
 # Reseller Agent status
 
+## End-to-end readiness continuation — 2 November 2026
+
+Work in progress on `codex/end-to-end-readiness`, based on PR #19 delivery head `fc5117f`. Artie successfully signed into the live cloud app and ChatGPT in Mac Chrome. The first **actual synthetic subscription draft succeeded** through installed OpenClaw 2026.9.6, pinned `openai/gpt-6-sol` and `requiredAuthMode: oauth`. No API key was inherited, no general agent tools were enabled, and no message was sent. The asking-price answer correctly stated PHP 850. One real app allowance attempt was reserved and retained. Temporary trial configuration was removed.
+
+ChatGPT's Usage screen showed 59% weekly allowance remaining, zero credits and automatic reload off before that trial. This is observed account state, not an enforceable provider-side spending cap or proof of OAuth identity matching by email. The adapter makes one host completion call with no application retries; SDK transport recovery/request count and retention remain separate verification gaps. Synthetic trials only until those gaps are resolved.
+
+A local provider/plugin and short-lived foreground subscription broker are being connected to the existing sandboxed draft worker. The normal OpenClaw configuration and credentials remain framework-owned. The existing API route is explicit and has no automatic fallback from the subscription route. Subscription watch mode is disabled. These changes are not deployed or merged; full review and tests remain in progress.
+
+Authenticated inventory acceptance: the clearly labelled **TEST — Reseller acceptance lamp (not for sale)** saved at PHP 850 with labelled listing templates and survived a full browser reload. Photo upload did not complete: extension file-upload permission is unavailable, and the native chooser stopped responding to remote input. The owner dismissed it. No photo-persistence pass is claimed. The inbox link did not navigate when clicked; direct navigation to `/inbox` succeeded. A synthetic saved-question test is underway.
+
+Mac slowness check: 16 GB RAM, roughly 20.6 GB swap in use, 19 GiB disk space available and an 18-day uptime; CPU was mostly idle. FAST.com showed 240 Mbps. Memory/storage pressure is a plausible contributor, but current sustained paging was not established. No service was killed, remote desktop disconnected or browser/security setting changed.
+
+Janyl's app activation, physical-device checks, multi-organization MCP authorization and permitted platform intake/sending remain outstanding. No automatic marketplace reader/sender was enabled.
+
 ## Buyer draft acceptance and subscription route — 2 November 2026
 
 The existing queue passed [hosted rollback-only acceptance](hosted-draft-acceptance.md): owner isolation, scoped lease, single admission, shared daily allowance, draft-only/idempotent submission, stale seller-term rejection, pause and revocation. Before/after counts were unchanged (two real Auth users and no inventory/inbox/worker/usage fixtures). The exact SQL has a passing local rollback regression. Four existing installed-runtime/database test files also passed, **20 tests**, without live model calls. Real authenticated HTTP, concurrent-session, physical-device and full worker/model acceptance remain incomplete.

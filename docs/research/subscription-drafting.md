@@ -6,10 +6,10 @@ The owner asked to reuse OpenClaw or Hermes to avoid additional model costs. Use
 
 Read-only local inspection found:
 
-| Installation | Safe metadata observed | What this establishes |
-| --- | --- | --- |
+| Installation      | Safe metadata observed                                        | What this establishes                                                                                          |
+| ----------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
 | OpenClaw 2026.9.6 | Default/resolved `openai/gpt-6-sol`; OpenAI OAuth status `ok` | A configured subscription-capable route and locally valid login metadata; no inference or account billing test |
-| Hermes | `model.provider: openai-codex`, `model.default: gpt-6-sol` | Subscription provider selected; Hermes login validity was not checked |
+| Hermes            | `model.provider: openai-codex`, `model.default: gpt-6-sol`    | Subscription provider selected; Hermes login validity was not checked                                          |
 
 Only provider/model/type/status fields were retained. No credential values or personal agent history were read or copied. The general OpenClaw configuration has additional model/provider fallbacks, including providers with API-key/token authentication. It is unsuitable to inherit unchanged for a no-additional-cost trial. Neither installation was reconfigured.
 
@@ -35,4 +35,8 @@ Template/manual replies already work without model charges. They remain availabl
 
 ## Release state
 
-Research and local configuration checks are complete for this initial route choice. The subscription adapter, actual model trial and account-level no-overage enforcement are **not implemented or verified**. No paid call, credential purchase, general agent configuration change, live worker enrollment or buyer message access/send occurred. The API-key instructions in the older worker guide describe existing code, not the owner's selected next step.
+The first adapter and one real synthetic OAuth-only trial now work locally (2 November). Installed OpenClaw 2026.9.6 returned a valid PHP 850 draft using `api.runtime.llm.complete`, `requiredAuthMode: oauth`, pinned `openai/gpt-6-sol` and strict structured output. The framework resolves its own existing login; no token was extracted, and the subprocess inherited no API key. One app attempt was reserved before inference. The owner signed into ChatGPT; its Usage screen showed 59% weekly allowance, zero credits and automatic reload off. No settings or purchases were changed.
+
+The adapter invokes the host completion capability once, with a 20-second deadline, no tools, no retry and no model/auth fallback. This does **not** prove a single underlying network request: the installed transport has recovery paths. Provider retention and ongoing quota/credit enforcement are not yet certified. Do not process real buyer data or enable unattended operation on this evidence alone.
+
+`src/worker/subscription-broker.ts` constructs private temporary configuration, permits one OAuth profile, strips inherited environment, validates host version, and cleans/drains owned processes. It is a trusted authentication broker, not the model's tool environment. The existing sandboxed runtime remains the model-facing boundary. `RESELLER_DRAFT_PROVIDER=subscription` is a foreground `once` trial only, requiring an operator-observed allowance attestation expiring within one hour. This timestamp is a local operational gate, **not a monetary cap**, and must never be refreshed automatically. The default plugin remains inference-disabled. No cloud queue/model round trip, release or live buyer sending is yet claimed.

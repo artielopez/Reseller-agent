@@ -2,6 +2,7 @@ import {
   cpSync,
   existsSync,
   readFileSync,
+  readdirSync,
   rmSync,
   writeFileSync,
 } from "node:fs";
@@ -24,6 +25,26 @@ for (const name of ["app", "components"]) {
     recursive: true,
   });
 }
+// The deployed Vinext Link adapter fails before navigation. Keep the main
+// Next.js application unchanged; Sites uses ordinary browser navigation.
+function replaceLinks(directory) {
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    const file = path.join(directory, entry.name);
+    if (entry.isDirectory()) replaceLinks(file);
+    else if (entry.name.endsWith(".tsx")) {
+      const source = readFileSync(file, "utf8");
+      writeFileSync(
+        file,
+        source.replaceAll('from "next/link"', 'from "@/components/sites-link"'),
+      );
+    }
+  }
+}
+for (const name of ["app", "components"]) replaceLinks(path.join(target, name));
+cpSync(
+  path.join(root, "scripts/sites-link.tsx"),
+  path.join(target, "components/sites-link.tsx"),
+);
 // Retain the starter's request-scoped Sites integration helpers.
 cpSync(path.join(root, "src/lib"), path.join(target, "lib"), {
   recursive: true,

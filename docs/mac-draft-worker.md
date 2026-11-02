@@ -1,5 +1,7 @@
 # Mac draft worker
 
+For the owner-selected subscription route, see [the supervised synthetic trial](subscription-worker-trial.md). The API configuration below is the separate legacy route and is not a fallback.
+
 This foreground worker processes explicitly queued private buyer questions from your saved Reseller Agent inbox. It saves **Draft** replies for your review. It does not read Facebook or Carousell, post, approve, copy, send, or install a background service. The shared Sites demo cannot enroll a worker; it has browser-local data only.
 
 ## Prerequisites
