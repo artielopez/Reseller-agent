@@ -51,4 +51,6 @@ These cases validate the stated orderings, not every possible race or cancellati
 
 ## Release follow-up
 
-Database fix is live. Client publication and exact source/version evidence are pending at this checkpoint. No GitHub merge is authorized by these checks.
+Database and matching client fix are live. Sites version **7** was published successfully from pushed source `83965a590f3e1a1e5a3d50f0a2bea2f0af999dfc`, built from GitHub implementation `4ee55f0`. Deployment `appgdep_6ae8f502f74c819189ae2ac72a13031e` succeeded at 20:39 UTC on 2 November (3 November Manila). Read-back confirms version 7 and the unchanged custom audience: Artie owner, Janyl viewer.
+
+Two local desktop/mobile stale-pause browser checks passed, alongside the hosted database checks above; this publication does not imply a new authenticated production browser session or full device acceptance. [PR #25](https://github.com/artielopez/Reseller-agent/pull/25) contains the reviewable implementation and evidence. No GitHub merge or auto-merge was performed.

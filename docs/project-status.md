@@ -4,7 +4,7 @@
 
 Hosted owner-control races uncovered a real defect: custom stale-data `40001` errors were repeatedly retried by PostgREST 14.18. The [tested incremental migration and adapter fix](non-retryable-conflicts.md) use explicit `PT409` conflicts while preserving guards and permissions. The database migration is applied and verified. Pause/revoke, stale-price submission and shared-last-slot quota races now have the stated hosted evidence; all synthetic fixtures were removed. Post-fix logs show one conflict and no repeated serialization errors in the verification window. No model calls or buyer sending occurred.
 
-Full lint/type checks, 236 tests and a production build passed; independent review found no Critical/Important defects. Client publication and exact review/release metadata are being finalized. No GitHub merge.
+Full lint/type checks, 236 tests, a production build and two desktop/mobile conflict-message browser checks passed; independent review found no Critical/Important defects. Matching client changes are live in Sites version **7**, source `83965a590f3e1a1e5a3d50f0a2bea2f0af999dfc`, deployment `appgdep_6ae8f502f74c819189ae2ac72a13031e` succeeded. Audience read-back remains Artie owner/Janyl viewer. [PR #25](https://github.com/artielopez/Reseller-agent/pull/25) contains implementation `4ee55f0` and release evidence. No GitHub merge.
 
 ## End-to-end release audit — 3 November 2026
 

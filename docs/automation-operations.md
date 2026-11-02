@@ -45,9 +45,9 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **6**, published from source `1cebfd836f55a133236c68ac649cc3ede443fe15`, with its audience limited to Artie and Janyl. GitHub and the separate Sites source repository have different release histories. The six hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
+The live cloud app is Sites version **7**, published from source `83965a590f3e1a1e5a3d50f0a2bea2f0af999dfc`, with its audience limited to Artie and Janyl. The [conflict fix release](non-retryable-conflicts.md#release-follow-up) records the successful deployment. GitHub and the separate Sites source repository have different release histories. The six hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
 
-[PR #24](https://github.com/artielopez/Reseller-agent/pull/24) contains the unmerged implementation stack plus current reliability evidence. Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
+[PR #25](https://github.com/artielopez/Reseller-agent/pull/25) contains the unmerged implementation stack plus current reliability fix/evidence. Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
 
 For a regression, first pause/revoke the affected worker capability and preserve the manual workflow. Prepare and verify a compatible prior app source before an authorized rollback. Do not blindly revert to an older six-photo client after ten-photo data exists, reapply initial migrations, weaken RLS, or delete data to make an older build work. Disabling drafting is safer than guessing a migration downgrade.
 
