@@ -1,5 +1,7 @@
 "use client";
+import { writeClipboard } from "@/lib/clipboard";
 import { useEffect, useState, type FormEvent } from "react";
+import { z } from "zod";
 import {
   ArrowLeft,
   Check,
@@ -121,7 +123,7 @@ export function ItemEditor({
     setBusy("generate");
     try {
       const facts = currentItem();
-      let result;
+      let result: unknown;
       if (demoMode) {
         result = { source: "template", copy: generateTemplate(facts) };
       } else {
@@ -136,12 +138,21 @@ export function ItemEditor({
           body: JSON.stringify(itemInputSchema.parse(facts)),
         });
         result = await response.json();
-        if (!response.ok)
+        if (!response.ok) {
+          const failure = z.object({ error: z.string() }).safeParse(result);
           throw new Error(
-            result.error || "Generation failed. Please try again.",
+            failure.success
+              ? failure.data.error
+              : "Generation failed. Please try again.",
           );
+        }
       }
-      const copy = generatedCopySchema.parse(result.copy);
+      const { copy, source } = z
+        .object({
+          source: z.enum(["ai", "template"]),
+          copy: generatedCopySchema,
+        })
+        .parse(result);
       update({
         listings: item.listings.map((entry) => ({
           ...entry,
@@ -149,7 +160,7 @@ export function ItemEditor({
         })),
       });
       setNotice(
-        result.source === "ai"
+        source === "ai"
           ? "AI drafts are ready. Check all details before posting, then save your changes."
           : "Template drafts are ready — no AI was used. Review the copy and save your changes.",
       );
@@ -165,7 +176,7 @@ export function ItemEditor({
         kind === "post"
           ? `${listing.title}\n\n${listing.description}`
           : listing[kind];
-      await navigator.clipboard.writeText(text);
+      await writeClipboard(text);
       setCopied(kind);
       setNotice(
         "Copied. Paste into your listing, then save its URL here after posting.",
