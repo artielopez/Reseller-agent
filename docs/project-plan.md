@@ -4,7 +4,7 @@ Updated 3 November 2026. [Status and evidence](project-status.md) · [Imported h
 
 ## Current assignment
 
-Latest requested increment: expand each item to ten photos in the app and database, verify persistence/boundaries, and publish to the existing private cloud workspace. Buyer questions are entered manually through **Open buyer inbox** and linked to a saved item.
+Latest completed increment: ten photos per item are deployed in cloud version 6, with matching database limits and passing local browser/hosted database checks. Actual ten-image cloud upload remains pending because of Mac picker automation trouble. Buyer questions are entered manually through **Open buyer inbox** and linked to a saved item.
 
 Latest acceptance: Mac Chrome saved and reloaded two synthetic photos in private cloud storage; the old-price warning is deployed in cloud version 5. The existing OpenClaw account and no-inference broker preflight are verified, and the owner-approved model-training opt-out is saved. Next: one real owner-selected item/question for the [supervised existing-login trial](subscription-worker-trial.md), Janyl's activation, physical-device/two-user acceptance, and permitted marketplace intake/sending. A separate SIWC connection is optional hardening for future unattended use, not a blocker for the bounded supervised trial. Earlier zero-photo and blanket synthetic-only entries are historical.
 
