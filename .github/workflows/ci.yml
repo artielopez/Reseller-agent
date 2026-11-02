@@ -19,9 +19,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run worker:build
       - run: npm run check
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
+      - run: npm run test:e2e:cloud
       - uses: actions/upload-artifact@v4
         if: failure()
         with:

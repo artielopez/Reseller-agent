@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  defaultPreferences,
+  preferencesSchema,
+  termsContext,
+} from "../seller/preferences";
 import { demoMode } from "../config";
 import { openDemoDb } from "../demo-db";
 import { getSupabase } from "../supabase";
@@ -43,17 +48,24 @@ async function execute(input: Command): Promise<unknown> {
     return await new Promise((resolve, reject) => {
       const tx = db.transaction(["inventory", "buyer"], "readwrite");
       const inventory = tx.objectStore("inventory").get("items"),
-        saved = tx.objectStore("buyer").get("state");
+        saved = tx.objectStore("buyer").get("state"),
+        preferences = tx.objectStore("buyer").get("preferences");
       let count = 0,
         result: unknown,
         failure: unknown;
       const loaded = () => {
-        if (++count !== 2) return;
+        if (++count !== 3) return;
         try {
           const output = localCommand(
             saved.result,
             inventory.result as Item[],
             command,
+            undefined,
+            termsContext(
+              preferencesSchema.parse(
+                preferences.result ?? defaultPreferences(),
+              ),
+            ),
           );
           result = output.result;
           tx.objectStore("buyer").put(output.state, "state");
@@ -64,6 +76,7 @@ async function execute(input: Command): Promise<unknown> {
       };
       inventory.onsuccess = loaded;
       saved.onsuccess = loaded;
+      preferences.onsuccess = loaded;
       tx.oncomplete = () => resolve(result);
       tx.onerror = tx.onabort = () =>
         reject(
