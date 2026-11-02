@@ -1,4 +1,9 @@
 import { z } from "zod";
+import {
+  defaultPreferences,
+  preferencesSchema,
+  termsContext,
+} from "../seller/preferences";
 import { demoMode } from "../config";
 import { openDemoDb } from "../demo-db";
 import { getSupabase } from "../supabase";
@@ -12,14 +17,17 @@ import {
 } from "./domain";
 import { localCommand } from "./local";
 
-async function execute(input: Command): Promise<unknown> {
+async function execute(input: Command, signal?: AbortSignal): Promise<unknown> {
   const command = parseCommand(input);
   if (!demoMode) {
-    const { data, error } = await getSupabase().rpc("buyer_workspace", {
+    const request = getSupabase().rpc("buyer_workspace", {
       command,
     });
+    const { data, error } = await (signal
+      ? request.abortSignal(signal)
+      : request);
     if (error) {
-      if (error.code === "40001")
+      if (["40001", "PT409"].includes(error.code))
         throw new Error(
           "This question, draft or item changed. Reload the inbox and prepare a fresh draft.",
         );
@@ -43,17 +51,24 @@ async function execute(input: Command): Promise<unknown> {
     return await new Promise((resolve, reject) => {
       const tx = db.transaction(["inventory", "buyer"], "readwrite");
       const inventory = tx.objectStore("inventory").get("items"),
-        saved = tx.objectStore("buyer").get("state");
+        saved = tx.objectStore("buyer").get("state"),
+        preferences = tx.objectStore("buyer").get("preferences");
       let count = 0,
         result: unknown,
         failure: unknown;
       const loaded = () => {
-        if (++count !== 2) return;
+        if (++count !== 3) return;
         try {
           const output = localCommand(
             saved.result,
             inventory.result as Item[],
             command,
+            undefined,
+            termsContext(
+              preferencesSchema.parse(
+                preferences.result ?? defaultPreferences(),
+              ),
+            ),
           );
           result = output.result;
           tx.objectStore("buyer").put(output.state, "state");
@@ -64,6 +79,7 @@ async function execute(input: Command): Promise<unknown> {
       };
       inventory.onsuccess = loaded;
       saved.onsuccess = loaded;
+      preferences.onsuccess = loaded;
       tx.oncomplete = () => resolve(result);
       tx.onerror = tx.onabort = () =>
         reject(
@@ -88,7 +104,25 @@ export async function mutateThread(
   return threadSchema.parse(await execute(command));
 }
 export async function approvedText(id: string, expected_revision: string) {
-  return z
-    .object({ body: z.string(), revision: z.string() })
-    .parse(await execute({ op: "copy", id, expected_revision }));
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const value = await Promise.race([
+      execute({ op: "copy", id, expected_revision }, controller.signal),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(
+            new Error(
+              "Could not recheck approval. Reload the inbox before trying again.",
+            ),
+          );
+          controller.abort();
+        }, 10000);
+      }),
+    ]);
+    return z.object({ body: z.string(), revision: z.string() }).parse(value);
+  } finally {
+    clearTimeout(timer);
+    controller.abort();
+  }
 }
