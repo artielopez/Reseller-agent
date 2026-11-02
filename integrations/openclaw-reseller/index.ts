@@ -19,7 +19,13 @@ type Api = {
   ) => void;
 };
 const configSchema = z
-  .object({ liveEnabled: z.boolean().default(false) })
+  .object({
+    liveEnabled: z.boolean().default(false),
+    profileId: z
+      .string()
+      .regex(/^[A-Za-z0-9][A-Za-z0-9._:@-]{0,199}$/)
+      .optional(),
+  })
   .strict();
 
 const plugin = {
@@ -76,7 +82,8 @@ const plugin = {
             try {
               // Intentionally off in the supplied configuration. OAuth alone does
               // not prove included quota, transport request bounds or no overage.
-              if (!settings().liveEnabled)
+              const config = settings();
+              if (!config.liveEnabled || !config.profileId)
                 throw new Error("Live setup disabled");
               inputTimer = setTimeout(
                 () => process.stdin.destroy(new Error("Input timeout")),
@@ -99,8 +106,9 @@ const plugin = {
                   ),
                 ),
               );
-              const draft = await createSubscriptionDraftProvider((request) =>
-                api.runtime.llm.complete(request),
+              const draft = await createSubscriptionDraftProvider(
+                (request) => api.runtime.llm.complete(request),
+                config.profileId,
               )(input, controller.signal);
               console.log(JSON.stringify({ ok: true, draft }));
             } catch {

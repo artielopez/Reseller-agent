@@ -33,6 +33,9 @@ it("pins OAuth, strips ambient credentials, passes bounded data only on stdin an
       ].sort(),
     );
     expect(config.auth.order).toEqual({ openai: ["openai:test-oauth"] });
+    expect(config.plugins.entries["reseller-draft"].config.profileId).toBe(
+      "openai:test-oauth",
+    );
     expect(config.agents.defaults.model.fallbacks).toEqual([]);
     expect(config.tools.deny).toEqual(["*"]);
     expect(config.plugins.allow).toEqual(["reseller-draft", "openai"]);

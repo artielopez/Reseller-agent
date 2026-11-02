@@ -7,7 +7,7 @@ import {
 } from "../lib/automation/drafting";
 
 export type SubscriptionRequest = {
-  model: "openai/gpt-6-sol";
+  model: `openai/gpt-6-sol@${string}`;
   requiredAuthMode: "oauth";
   systemPrompt: string;
   messages: { role: "user"; content: string }[];
@@ -38,6 +38,7 @@ const resultSchema = z.object({
 /** Receives the trusted OpenClaw host capability, never a buyer-provided function. */
 export function createSubscriptionDraftProvider(
   complete: SubscriptionCompletion,
+  profileId: string,
 ) {
   return async (
     raw: DraftInput,
@@ -49,13 +50,15 @@ export function createSubscriptionDraftProvider(
     let onAbort: (() => void) | undefined;
     try {
       signal.throwIfAborted();
+      if (!/^[A-Za-z0-9][A-Za-z0-9._:@-]{0,199}$/.test(profileId))
+        throw new Error("Missing trusted OAuth profile");
       const input = draftInputSchema.parse(raw);
       const canceled = new Promise<never>((_, reject) => {
         onAbort = () => reject(new Error("Canceled"));
         signal.addEventListener("abort", onAbort, { once: true });
       });
       const request: SubscriptionRequest = {
-        model: "openai/gpt-6-sol",
+        model: `openai/gpt-6-sol@${profileId}`,
         requiredAuthMode: "oauth",
         systemPrompt: input.instructions,
         messages: [{ role: "user", content: input.data }],

@@ -110,7 +110,7 @@ export function createSubscriptionBroker(
           entries: {
             "reseller-draft": {
               enabled: true,
-              config: { liveEnabled: live },
+              config: { liveEnabled: live, profileId: options.profileId },
               llm: {
                 allowModelOverride: true,
                 allowedCompletionModels: ["openai/gpt-6-sol"],

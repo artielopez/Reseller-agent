@@ -17,12 +17,15 @@ import {
 } from "./domain";
 import { localCommand } from "./local";
 
-async function execute(input: Command): Promise<unknown> {
+async function execute(input: Command, signal?: AbortSignal): Promise<unknown> {
   const command = parseCommand(input);
   if (!demoMode) {
-    const { data, error } = await getSupabase().rpc("buyer_workspace", {
+    const request = getSupabase().rpc("buyer_workspace", {
       command,
     });
+    const { data, error } = await (signal
+      ? request.abortSignal(signal)
+      : request);
     if (error) {
       if (error.code === "40001")
         throw new Error(
@@ -101,7 +104,25 @@ export async function mutateThread(
   return threadSchema.parse(await execute(command));
 }
 export async function approvedText(id: string, expected_revision: string) {
-  return z
-    .object({ body: z.string(), revision: z.string() })
-    .parse(await execute({ op: "copy", id, expected_revision }));
+  const controller = new AbortController();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const value = await Promise.race([
+      execute({ op: "copy", id, expected_revision }, controller.signal),
+      new Promise<never>((_, reject) => {
+        timer = setTimeout(() => {
+          reject(
+            new Error(
+              "Could not recheck approval. Reload the inbox before trying again.",
+            ),
+          );
+          controller.abort();
+        }, 10000);
+      }),
+    ]);
+    return z.object({ body: z.string(), revision: z.string() }).parse(value);
+  } finally {
+    clearTimeout(timer);
+    controller.abort();
+  }
 }

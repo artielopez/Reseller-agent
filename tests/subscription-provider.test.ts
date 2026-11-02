@@ -27,12 +27,15 @@ afterEach(() => vi.useRealTimers());
 
 it("uses the host OAuth-only completion API once with frozen facts and no tools or auth material", async () => {
   const complete = vi.fn<SubscriptionCompletion>(async () => response());
-  const provider = createSubscriptionDraftProvider(complete);
+  const provider = createSubscriptionDraftProvider(
+    complete,
+    "openai:trial-owner",
+  );
   expect(await provider(input, new AbortController().signal)).toEqual(output);
   expect(complete).toHaveBeenCalledTimes(1);
   const request = complete.mock.calls[0][0];
   expect(request).toMatchObject({
-    model: "openai/gpt-6-sol",
+    model: "openai/gpt-6-sol@openai:trial-owner",
     requiredAuthMode: "oauth",
     maxTokens: 1800,
     systemPrompt: input.instructions,
@@ -81,7 +84,7 @@ it.each([
       ...patch,
     }));
     await expect(
-      createSubscriptionDraftProvider(complete)(
+      createSubscriptionDraftProvider(complete, "openai:trial-owner")(
         input,
         new AbortController().signal,
       ),
@@ -95,7 +98,7 @@ it("never retries or reveals provider errors containing credentials or buyer tex
     throw new Error("SECRET buyer private message");
   });
   await expect(
-    createSubscriptionDraftProvider(complete)(
+    createSubscriptionDraftProvider(complete, "openai:trial-owner")(
       input,
       new AbortController().signal,
     ),
@@ -108,7 +111,7 @@ it("never retries or reveals provider errors containing credentials or buyer tex
 it("rejects invalid input and cancellation before any host call", async () => {
   const complete = vi.fn<SubscriptionCompletion>(async () => response());
   await expect(
-    createSubscriptionDraftProvider(complete)(
+    createSubscriptionDraftProvider(complete, "openai:trial-owner")(
       { ...input, model: "other" } as typeof input,
       new AbortController().signal,
     ),
@@ -116,7 +119,10 @@ it("rejects invalid input and cancellation before any host call", async () => {
   const controller = new AbortController();
   controller.abort();
   await expect(
-    createSubscriptionDraftProvider(complete)(input, controller.signal),
+    createSubscriptionDraftProvider(complete, "openai:trial-owner")(
+      input,
+      controller.signal,
+    ),
   ).rejects.toThrow();
   expect(complete).not.toHaveBeenCalled();
 });
@@ -128,10 +134,10 @@ it("times out and aborts the host call without waiting for an uncooperative comp
     signal = request.signal;
     return await new Promise(() => {});
   });
-  const pending = createSubscriptionDraftProvider(complete)(
-    input,
-    new AbortController().signal,
-  );
+  const pending = createSubscriptionDraftProvider(
+    complete,
+    "openai:trial-owner",
+  )(input, new AbortController().signal);
   const rejected = expect(pending).rejects.toThrow(
     "Subscription drafting could not finish",
   );
@@ -149,7 +155,7 @@ it("rejects a late result after parent cancellation without retry", async () => 
       }),
   );
   const controller = new AbortController();
-  const task = createSubscriptionDraftProvider(complete)(
+  const task = createSubscriptionDraftProvider(complete, "openai:trial-owner")(
     input,
     controller.signal,
   );
@@ -158,5 +164,30 @@ it("rejects a late result after parent cancellation without retry", async () => 
   controller.abort();
   await rejected;
   finish(response());
+  expect(complete).toHaveBeenCalledTimes(1);
+});
+it("refuses a missing or malformed trusted OAuth profile before host dispatch", async () => {
+  const complete = vi.fn<SubscriptionCompletion>(async () => response());
+  for (const profile of ["", "openai:owner\n", "x".repeat(201)]) {
+    await expect(
+      createSubscriptionDraftProvider(complete, profile)(
+        input,
+        new AbortController().signal,
+      ),
+    ).rejects.toThrow();
+  }
+  expect(complete).not.toHaveBeenCalled();
+});
+it("does not retry when the host rejects an alternate or unavailable OAuth profile", async () => {
+  const complete = vi.fn<SubscriptionCompletion>(async (request) => {
+    expect(request.model).toBe("openai/gpt-6-sol@openai:expected");
+    throw new Error("Host rejected mismatched OAuth auth owner");
+  });
+  await expect(
+    createSubscriptionDraftProvider(complete, "openai:expected")(
+      input,
+      new AbortController().signal,
+    ),
+  ).rejects.toThrow("No fallback");
   expect(complete).toHaveBeenCalledTimes(1);
 });
