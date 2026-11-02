@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Subscription approval received; consent timed out — 2 November 2026
+
+The owner explicitly approved the separate **Reseller Agent — OpenClaw** connection. Submitted the exact identity/ChatGPT-plan consent in Chrome, then retried once with a fresh official named-profile sign-in after the first attempt failed. Both fresh submissions returned **“Operation timed out”** on OpenAI's consent page. The connection is not active: a refreshed ChatGPT login-connections list still has no Reseller Agent entry, and neither CLI attempt received a successful callback. Both owned sign-in processes were stopped; no listener remained on port 8080. No model calls, credit purchases, normal-profile changes or training-preference changes were made.
+
+ChatGPT Usage still showed zero credits, automatic reload off and no App limits section (51% weekly allowance remaining at inspection). No per-app spending control is verified. The same connection approval persists for a later retry; do not ask for it again unless its scope changes. The separate training-preference decision remains pending. The timeout is a provider consent-flow failure, not evidence that the owner declined. No application code changed and no application tests were rerun.
+
 ## Subscription consent prepared — 2 November 2026
 
 Installed OpenClaw app-specific subscription boundary checks passed **19 tests**, using fake credentials/transports and no model calls. This route enforces SSE and `store: false` for simple completions, but also strips the upstream output-token cap. [Evidence and exact next gate](research/subscription-drafting.md#app-specific-route-follow-up). A separate named-profile login reached **Reseller Agent — OpenClaw** consent; approval is pending. The existing worker remains synthetic-only and paused. The account-wide training preference is also awaiting the owner's decision.
