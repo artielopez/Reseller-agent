@@ -1,4 +1,46 @@
 import { test, expect } from "@playwright/test";
+test("ten photos survive saving and reload; oversized selections preserve existing photos", async ({
+  page,
+}) => {
+  const files = Array.from({ length: 11 }, (_, index) => ({
+    name: `photo-${index}.png`,
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  }));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Add item", exact: true }).click();
+  await page.getByLabel("Item title").fill("Ten-photo test item");
+  await page.getByLabel("Price (PHP)").fill("850");
+  await page.getByLabel("Upload photos").setInputFiles(files);
+  await expect(
+    page.getByRole("alert").filter({ hasText: "up to 10 photos" }),
+  ).toBeVisible();
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(0);
+  await page.getByLabel("Upload photos").setInputFiles(files.slice(0, 9));
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(9);
+  await page.getByLabel("Upload photos").setInputFiles(files.slice(9));
+  await expect(
+    page.getByRole("alert").filter({ hasText: "up to 10 photos" }),
+  ).toBeVisible();
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(9);
+  await page.getByLabel("Upload photos").setInputFiles(files.slice(9, 10));
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(10);
+  await expect(page.getByLabel("Upload photos")).toHaveCount(0);
+  await page.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Your inventory" }),
+  ).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "Edit Ten-photo test item" }).click();
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(10);
+  await page
+    .getByRole("button", { name: "Remove photo 10", exact: true })
+    .click();
+  await expect(page.getByLabel("Upload photos")).toBeVisible();
+});
 test("demo generation works without a backend or paid API", async ({
   page,
 }) => {
