@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Supervised buyer-draft acceptance — 3 November 2026
+
+One owner-selected real question completed the existing OpenClaw subscription workflow: private cloud queue → restricted Mac worker → unapproved Agent Draft in the private app. The exact minimal input was reviewed and hash-pinned; account identity and allowance were checked before one foreground pass. No buyer name, contact details or photos were included in the model input. Question text, inventory facts, reply text, payload hashes, production record identifiers and credentials are intentionally omitted from this repository record.
+
+Read-back confirmed completion, Draft status and no approval timestamp. The queue was paused and temporary enrollment revoked afterward; the worker exited successfully, released its lock and its private helper was removed. No retry, API-key fallback, background process, copy, approval or sending occurred. This proves one supervised draft, not unattended automation. Human review, Janyl/two-user and physical-device acceptance, and permitted platform intake/sending remain outstanding.
+
 ## Ten-photo update — 3 November 2026
 
 The owner requested ten photos per item and instructions for saving a buyer question. Branch `codex/ten-item-photos` builds on `f0d35f0` (existing OpenClaw investigation) and the unmerged PR #21 stack. The app limit and helper text now use ten; the incremental migration expands both the atomic-save guard and database positions to 0–9. Ownership, private paths, image formats and file-size limits are preserved. Historical initial migrations are unchanged.
@@ -8,7 +14,7 @@ The new database regression first failed against the six-photo limit. It now sav
 
 Delivery: [PR #23](https://github.com/artielopez/Reseller-agent/pull/23) contains the photo update; [PR #22](https://github.com/artielopez/Reseller-agent/pull/22) records the OpenClaw investigation. Both were verified OPEN with auto-merge disabled; GitHub checks were still running at read-back. Implementation commit `9156a88`; no GitHub merge.
 
-Actual ten-image cloud upload remains unverified: extension file selection required a permission change that was not made, and the native picker kept Open disabled after selecting the eight additional synthetic fixtures. Browser state returned to the unchanged two-photo acceptance item; no save was submitted. Local desktop/mobile ten-image persistence and hosted database limits passed as above. Primus Rower is now visible as a saved real item; no real buyer question has been selected for the trial. Pre-existing security-advisor warnings concern intentional definer RPC entry points and leaked-password protection, not the changed invoker photo function; no permissions were expanded.
+Actual ten-image cloud upload remains unverified: extension file selection required a permission change that was not made, and the native picker kept Open disabled after selecting the eight additional synthetic fixtures. Browser state returned to the unchanged two-photo acceptance item; no save was submitted. Local desktop/mobile ten-image persistence and hosted database limits passed as above. The separate supervised draft acceptance above supersedes the earlier pending real-question gate. Pre-existing security-advisor warnings concern intentional definer RPC entry points and leaked-password protection, not the changed invoker photo function; no permissions were expanded.
 
 Buyer question steps: save the item first; choose **Open buyer inbox → Saved item → Channel → Question location**, paste **Buyer question**, then **Save question**. Buyer name is optional. No real question was provided and no model call or buyer message was sent for this update.
 

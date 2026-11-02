@@ -1,6 +1,6 @@
 # Subscription-backed draft trial
 
-This is a supervised **one-question** trial, not unattended buyer automation. Synthetic direct and cloud queue-to-Mac-to-Agent-Draft acceptance have passed. The owner explicitly requested reuse of the existing Mac mini OpenClaw codebase/setup. The next trial may use one owner-selected real question under the conditions below; no real question has been processed yet.
+This is a supervised **one-question** trial, not unattended buyer automation. Synthetic direct and cloud queue-to-Mac-to-Agent-Draft acceptance have passed. The owner explicitly requested reuse of the existing Mac mini OpenClaw codebase/setup. One owner-selected real question completed under the conditions below on 3 November; its Agent Draft remains unapproved.
 
 ## Existing connection decision — 3 November
 
@@ -38,3 +38,9 @@ Afterward the queue was paused, acceptance enrollment `91e428af-1704-4b03-8df4-1
 On 2 November the ChatGPT usage UI showed 59% weekly allowance remaining, zero credits and automatic reload off. One real synthetic direct completion produced the expected PHP 850 draft, with one real app attempt reserved beforehand. No buyer message was transmitted or sent. This is an observation of that account at that time, not a durable budget guarantee. A later secret-free `models auth list --provider openai --json` check reported the sole OAuth profile email as the owner's Gmail address, matching the signed-in ChatGPT account.
 
 The adapter makes one host call and has no retry loop. The host transport has recovery paths, so an exact network-request count has not been established. Provider retention is not zero. The 1,800-token host setting is advisory, with a separate strict application output-size limit; do not infer a universal upstream token guarantee. These gaps keep unattended operation disabled; a real supervised trial requires the conditions above. Hermes is not a configured fallback.
+
+## Real-question acceptance — 3 November
+
+One supervised cloud-to-Mac-to-Draft pass completed using the existing OpenClaw subscription connection, after exact minimal-input review/hash pinning and fresh account/allowance checks. The private app retains the question, facts, answer and audit records; none of that content or its production identifiers is reproduced here. The reply remains an unapproved Agent Draft for human review.
+
+After completion, read-back confirmed the queue paused and temporary enrollment revoked. The worker exited, its lock was released and its private helper removed. No API-key fallback, retry, background process, copy or outgoing buyer message occurred. This establishes one supervised real draft, not automatic marketplace access, sending or a permanent spending guarantee.

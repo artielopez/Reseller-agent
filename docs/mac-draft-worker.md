@@ -1,12 +1,12 @@
 # Mac draft worker
 
-For the owner-selected subscription route, see [the supervised synthetic trial](subscription-worker-trial.md). The API configuration below is the separate legacy route and is not a fallback.
+For the owner-selected subscription route, see [the supervised subscription trial](subscription-worker-trial.md). The API configuration below is the separate legacy route and is not a fallback.
 
 This foreground worker processes explicitly queued private buyer questions from your saved Reseller Agent inbox. It saves **Draft** replies for your review. It does not read Facebook or Carousell, post, approve, copy, send, or install a background service. The shared Sites demo cannot enroll a worker; it has browser-local data only.
 
 ## Prerequisites
 
-**Current route decision (2 November):** the owner wants existing subscription access, not a new paid API key. The implementation below still uses an API-key parent provider and must not be activated for that trial. Follow the [subscription adapter work](research/subscription-drafting.md); login metadata is verified, but that adapter is not built. The [hosted draft queue checks](hosted-draft-acceptance.md) passed separately and do not establish live model readiness.
+**Current route decision (3 November):** use the existing OpenClaw subscription for supervised, hash-pinned `once` trials. Synthetic trials and one real-question cloud-to-Mac-to-Draft pass have completed; the worker is paused and the temporary enrollment revoked. The instructions below describe the separate API-key route unless explicitly marked otherwise. API billing is not an automatic fallback, and subscription mode rejects `watch`. See [the trial record](subscription-worker-trial.md) for current controls and evidence.
 
 - A private cloud instance of the app, Supabase Auth and all four application migrations, including `202610310001_seller_preferences.sql`, applied in order. `202610300003_delivery_simulation.sql` is a separate optional engineering lab and is not applied in the hosted project. Hosted database acceptance passed; authenticated HTTP and live worker/model acceptance remain pending. Do not use a service-role or secret Supabase key.
 - Parent application Node 22 and `npm ci`. The worker compiles with the existing TypeScript dependency; there is no additional package.
