@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Photo persistence verified; listing price warning — 2 November 2026
+
+Resumed acceptance now verifies **two synthetic photos** on the labelled acceptance lamp: the native Chrome picker completed upload, the app confirmed save, both images decoded after a full reload, and a read-only database/Storage join confirms two photo rows and two private JPEG objects. The fixtures are 1×1 test PNGs converted by the app, not personal photos. This closes the Mac Chrome photo-save/reload check; physical iPhone/Windows and two-user isolation acceptance remain separate. No extension permission or browser-security setting was changed.
+
+The lamp's asking price was PHP 900 while existing channel copy still said PHP 850. The [price-review fix](listing-price-review.md) shows the current asking price and an advisory when explicit peso amounts differ, including after reload. Seller wording and publication records are preserved; this is not a guarantee of semantic correctness. Branch `codex/listing-price-review` starts at PR #20 head `0881796`. Browser regression failed before the fix; fresh review found a punctuation-comma edge case, reproduced by three failing tests and fixed. Final checks: **220 tests passed**, six optional tests skipped; **14 desktop/mobile inventory browser checks passed**; lint, types and Webpack production build passed. Cloud publication is being prepared; no GitHub merge.
+
+One fresh attempt at the already-approved app-specific OpenClaw connection again returned **Operation timed out**. The owned login process was stopped and no port-8080 listener remained. No model call or normal-profile change occurred. Do not repeat consent attempts in this session. Janyl's activation, provider consent/app-limit availability, the separate training-preference decision, permitted platform access and physical-device checks remain open; the draft worker stays paused.
+
 ## Subscription approval received; consent timed out — 2 November 2026
 
 The owner explicitly approved the separate **Reseller Agent — OpenClaw** connection. Submitted the exact identity/ChatGPT-plan consent in Chrome, then retried once with a fresh official named-profile sign-in after the first attempt failed. Both fresh submissions returned **“Operation timed out”** on OpenAI's consent page. The connection is not active: a refreshed ChatGPT login-connections list still has no Reseller Agent entry, and neither CLI attempt received a successful callback. Both owned sign-in processes were stopped; no listener remained on port 8080. No model calls, credit purchases, normal-profile changes or training-preference changes were made.

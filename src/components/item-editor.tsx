@@ -1,5 +1,6 @@
 "use client";
 import { writeClipboard } from "@/lib/clipboard";
+import { listingPriceReview } from "@/lib/listing-price-review";
 import { useEffect, useState, type FormEvent } from "react";
 import { z } from "zod";
 import {
@@ -20,6 +21,7 @@ import {
   channels,
   conditions,
   errorMessage,
+  formatPHP,
   generateTemplate,
   generatedCopySchema,
   itemInputSchema,
@@ -52,6 +54,7 @@ export function ItemEditor({
   const [copied, setCopied] = useState("");
   const [dirty, setDirty] = useState(false);
   const listing = item.listings.find((entry) => entry.channel === channel)!;
+  const priceReview = listingPriceReview(listing, price);
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
       if (dirty) event.preventDefault();
@@ -485,6 +488,27 @@ export function ItemEditor({
                 placeholder="Your editable listing copy will appear here."
               />
             </label>
+            <div
+              role="status"
+              aria-label="Listing price review"
+              className={
+                priceReview.hasDifferentAmount ? "error" : "posting-note"
+              }
+            >
+              <strong>
+                {priceReview.price === null
+                  ? "Enter a valid asking price before posting."
+                  : `Current asking price: ${formatPHP(priceReview.price)}`}
+              </strong>
+              <p>
+                {priceReview.hasDifferentAmount
+                  ? "Check the amounts in this copy: at least one peso amount differs from your asking price. It may be an old price, shipping fee or discount. Edit the copy if needed. "
+                  : ""}
+                Listing copy does not update automatically when item details
+                change. Review all details before copying or updating a
+                published post.
+              </p>
+            </div>
             <div className="copy-actions">
               {(["title", "description", "post"] as const).map((kind) => (
                 <button
