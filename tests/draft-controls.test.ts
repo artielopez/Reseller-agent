@@ -51,12 +51,14 @@ describe("owner draft controls boundary", () => {
     }
   });
   it("reports stale controls distinctly and validates returned enrollment", async () => {
-    await expect(
-      createQueueClient(async () => ({
-        data: null,
-        error: { code: "40001" },
-      })).pause(false, "1"),
-    ).rejects.toThrow("changed");
+    for (const code of ["40001", "PT409"]) {
+      await expect(
+        createQueueClient(async () => ({ data: null, error: { code } })).pause(
+          false,
+          "1",
+        ),
+      ).rejects.toThrow("changed");
+    }
     const rpc = vi.fn(async () => ({
       data: { id, token: "a".repeat(64), expires_at: "2099-01-01T00:00:00Z" },
       error: null,

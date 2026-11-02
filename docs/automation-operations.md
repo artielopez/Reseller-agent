@@ -45,7 +45,7 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **6**, published from source `1cebfd836f55a133236c68ac649cc3ede443fe15`, with its audience limited to Artie and Janyl. GitHub and the separate Sites source repository have different release histories. The five hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
+The live cloud app is Sites version **6**, published from source `1cebfd836f55a133236c68ac649cc3ede443fe15`, with its audience limited to Artie and Janyl. GitHub and the separate Sites source repository have different release histories. The six hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
 
 [PR #24](https://github.com/artielopez/Reseller-agent/pull/24) contains the unmerged implementation stack plus current reliability evidence. Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
 

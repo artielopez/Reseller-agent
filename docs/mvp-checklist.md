@@ -46,7 +46,7 @@ Implementation below describes the reviewable repository; [current release statu
 
 Complete after setting up Supabase and optional OpenAI credentials:
 
-1. Confirm the five required application migrations (initial, buyer inbox, draft queue, seller preferences and ten-item photos) completed and the `item-photos` bucket is **private**.
+1. Confirm the six required application migrations (initial, buyer inbox, draft queue, seller preferences, ten-item photos and non-retryable conflicts) completed and the `item-photos` bucket is **private**.
 2. Disable public signups, create/invite your account, and verify email-link sign-in and sign-out on desktop and iPhone.
 3. Add an item with two photos, reload, and sign in on the other device; confirm fields and photos sync.
 4. Use a second test account to verify the first account's inventory and images are inaccessible.

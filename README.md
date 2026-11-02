@@ -48,6 +48,8 @@ Apply [`202610310001_seller_preferences.sql`](supabase/migrations/202610310001_s
 
 Apply [`20261102183945_ten_item_photos.sql`](supabase/migrations/20261102183945_ten_item_photos.sql) after the migrations above. It raises both database photo limits to ten, matching the editor. Without this migration, an older database still rejects more than six photos. The private cloud app has this migration; do not reapply it there.
 
+Apply [`20261102202606_non_retryable_conflicts.sql`](supabase/migrations/20261102202606_non_retryable_conflicts.sql) last. It prevents stale business conflicts from triggering PostgREST transaction retry loops. The existing cloud project already has it; see [fix evidence](docs/non-retryable-conflicts.md).
+
 ### 2. Configure sign-in for your account
 
 1. In Supabase Authentication, enable the email provider.

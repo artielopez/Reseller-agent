@@ -26,6 +26,8 @@ The connected Supabase tool applied exact repository SQL, assigning its own remo
 | `202610310001_seller_preferences.sql` | `20261101105034` | `reseller_seller_preferences` |
 | `20261102183945_ten_item_photos.sql`  | `20261102184444` | `ten_item_photos`             |
 
+Additional mapping verified 3 November: local `20261102202606_non_retryable_conflicts.sql` → remote `20261102203123`, name `non_retryable_conflicts`. This is the sixth required migration; existing function permissions are preserved.
+
 The optional `202610300003_delivery_simulation.sql` is not applied: no app screen or drafting worker uses that engineering lab.
 
 **Do not blindly run `supabase db push` on this project.** Local filenames and remote history identifiers differ. Use this mapping to inspect what already exists; reconcile history deliberately before adopting CLI-managed pushes. Do not reapply the initial migration, rename applied files, or assume the optional simulation is deployed. No migration-history repair was performed.

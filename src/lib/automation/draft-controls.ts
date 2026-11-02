@@ -74,7 +74,7 @@ export function createQueueClient(rpc: Rpc = defaultRpc) {
     } catch {
       throw new Error(uncertain);
     }
-    if (response.error?.code === "40001")
+    if (["40001", "PT409"].includes(response.error?.code ?? ""))
       throw new Error(
         "These settings or question facts changed. Reload worker settings before trying again.",
       );

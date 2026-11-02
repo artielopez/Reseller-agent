@@ -26,7 +26,7 @@ begin
  perform public.buyer_workspace(jsonb_build_object('op','copy','id',reply_id,'expected_revision',approved_revision));
  prefs:=public.seller_workspace(jsonb_build_object('op','save','expected_revision',prefs#>>'{preferences,revision}','input',jsonb_build_object('pickup_area','Synthetic area','delivery_notes','','payment_notes','','digest_enabled',true,'digest_time','09:00')));
  rejected:=false;
- begin perform public.buyer_workspace(jsonb_build_object('op','copy','id',reply_id,'expected_revision',approved_revision));exception when sqlstate '40001' then rejected:=true;end;
+ begin perform public.buyer_workspace(jsonb_build_object('op','copy','id',reply_id,'expected_revision',approved_revision));exception when sqlstate 'PT409' then rejected:=true;end;
  if not rejected then raise exception 'Stale approval remained copyable';end if;
  thread:=public.buyer_workspace(jsonb_build_object('op','get','id',question_id));
  if thread#>>'{replies,0,status}'<>'Draft' or thread#>>'{context,seller_terms,pickup_area}'<>'Synthetic area' or thread#>>'{inquiry,status}'<>'Open' then raise exception 'Term invalidation or copy/status separation failed';end if;

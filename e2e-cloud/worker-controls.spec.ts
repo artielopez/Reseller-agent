@@ -131,7 +131,7 @@ async function fixture(page: Page) {
       if (stalePause || c.expected_revision !== String(revision)) {
         stalePause = false;
         revision++;
-        return respond({ code: "40001" }, 409);
+        return respond({ code: "PT409" }, 409);
       }
       paused = c.paused;
       revision++;

@@ -27,7 +27,7 @@ async function execute(input: Command, signal?: AbortSignal): Promise<unknown> {
       ? request.abortSignal(signal)
       : request);
     if (error) {
-      if (error.code === "40001")
+      if (["40001", "PT409"].includes(error.code))
         throw new Error(
           "This question, draft or item changed. Reload the inbox and prepare a fresh draft.",
         );

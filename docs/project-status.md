@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Stale-conflict retry-loop fix — 3 November 2026
+
+Hosted owner-control races uncovered a real defect: custom stale-data `40001` errors were repeatedly retried by PostgREST 14.18. The [tested incremental migration and adapter fix](non-retryable-conflicts.md) use explicit `PT409` conflicts while preserving guards and permissions. The database migration is applied and verified. Pause/revoke, stale-price submission and shared-last-slot quota races now have the stated hosted evidence; all synthetic fixtures were removed. Post-fix logs show one conflict and no repeated serialization errors in the verification window. No model calls or buyer sending occurred.
+
+Full lint/type checks, 236 tests and a production build passed; independent review found no Critical/Important defects. Client publication and exact review/release metadata are being finalized. No GitHub merge.
+
 ## End-to-end release audit — 3 November 2026
 
 The plan’s [acceptance register](automation-acceptance.md) and [operating guide](automation-operations.md) now map the full objective to actual evidence, remaining implementation and participant/external dependencies. This audit does not mark the project complete: automatic capture/sending, channel pilots, unattended operation and several actual-device/account checks remain incomplete. The broader objective is preserved; the passing manual trial and synthetic tests are not substituted for it.

@@ -63,7 +63,7 @@ begin
   if public.draft_worker(token_a,'{"op":"claim"}') is not null then raise exception 'Duplicate claim'; end if;
   command := jsonb_build_object('job_id',claim->>'id','lease_id',claim->>'lease_id');
   rejected := false;
-  begin perform public.draft_worker(token_other,command||'{"op":"context"}'); exception when serialization_failure then rejected := true; end;
+  begin perform public.draft_worker(token_other,command||'{"op":"context"}'); exception when sqlstate 'PT409' then rejected := true; end;
   if not rejected then raise exception 'Other worker acquired lease'; end if;
   if public.draft_worker(token_a,command||'{"op":"start"}') is distinct from '{"admitted":true}'::jsonb then raise exception 'No admission'; end if;
   if public.draft_worker(token_a,command||'{"op":"start"}') is distinct from '{"admitted":false}'::jsonb then raise exception 'Duplicate admission'; end if;
@@ -71,7 +71,7 @@ begin
   result := public.draft_worker(token_a,command);
   if public.draft_worker(token_a,command) is distinct from result then raise exception 'Result retry not idempotent'; end if;
   rejected := false;
-  begin perform public.draft_worker(token_a,command||'{"body":"Different result"}'); exception when serialization_failure then rejected := true; end;
+  begin perform public.draft_worker(token_a,command||'{"body":"Different result"}'); exception when sqlstate 'PT409' then rejected := true; end;
   if not rejected then raise exception 'Conflicting result accepted'; end if;
 
   reset role;
@@ -102,7 +102,7 @@ begin
   perform set_config('request.jwt.claims','{"role":"anon"}',true);
   set local role anon;
   rejected := false;
-  begin perform public.draft_worker(token_a,command||'{"op":"submit","body":"Stale answer","review_reason":"Synthetic"}'); exception when serialization_failure then rejected := true; end;
+  begin perform public.draft_worker(token_a,command||'{"op":"submit","body":"Stale answer","review_reason":"Synthetic"}'); exception when sqlstate 'PT409' then rejected := true; end;
   if not rejected then raise exception 'Changed seller terms accepted stale result'; end if;
 
   reset role;

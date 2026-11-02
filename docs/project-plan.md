@@ -4,6 +4,8 @@ Updated 3 November 2026. [Status and evidence](project-status.md) · [Imported h
 
 ## Current assignment
 
+Latest reliability fix: [non-retryable business conflicts](non-retryable-conflicts.md). Hosted control races uncovered PostgREST looping on custom `40001`; the tested incremental database fix uses `PT409`, and client adapters preserve actionable reload guidance. Guards/permissions remain unchanged. This advances real recovery acceptance without enabling channel intake/sending.
+
 Current Task 6 artifacts: [acceptance register](automation-acceptance.md) and [operating guide](automation-operations.md). The register tracks the full original scope and explicitly separates implemented manual assistance, tested synthetic boundaries and unresolved live automation gates. No whole-task completion or automatic release is inferred from these documents.
 
 Reliability continuation, 3 November: Task 6 now includes four passing real-local-HTTP fault cases around committed queue operations, with no inference replay or duplicate drafts. See [recovery acceptance](worker-recovery-acceptance.md). Three hosted concurrent claim/start/identical-submit cases now also passed with observed lock contention; see [hosted concurrency acceptance](hosted-concurrency-acceptance.md). Local compiled-CLI signal/lock recovery and active process-group cancellation now also have [acceptance evidence](worker-recovery-acceptance.md#local-process-lifecycle-acceptance--3-november-2026). Physical restart/provider expiry, interrupted real inference and other hosted races remain separate gates. The owner-approved [Beeper support inquiry](channel-access-support-draft.md) has been sent; connector implementation still depends on supported access and coverage.

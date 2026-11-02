@@ -28,7 +28,7 @@ This is an operator procedure, not a migration, CI job or app feature. It tempor
 
 Files: [`scripts/acceptance/hosted-concurrency/`](../scripts/acceptance/hosted-concurrency/).
 
-1. Verify the exact project and its five required migrations. Create a fresh UUID and substitute `__OWNER_ID__` in `setup.sql`. Execute the whole file. Keep the returned fixture, two worker tokens and record IDs in private operator memory. Setup commits; it is not rollback-only.
+1. Verify the exact project and its six required migrations. Create a fresh UUID and substitute `__OWNER_ID__` in `setup.sql`. Execute the whole file. Keep the returned fixture, two worker tokens and record IDs in private operator memory. Setup commits; it is not rollback-only.
 2. For **claim**, use worker A for `held-session.sql` and worker B for the peer. Command: `{"op":"claim"}`.
 3. Write `{ "worker_token": "<peer token>", "command": <command> }` to the ignored `.worker-state/hosted-concurrency.json`, creating it exclusively with mode 600. Use the public project URL/key from ignored `.env.cloud.local`; do not use a service-role key.
 4. Launch `node scripts/acceptance/hosted-concurrency/http-peer.mjs --delayed` as a retained background command. Confirm the process is live and has emitted `ready: true`, then immediately execute the whole held-session SQL with worker A's token and the exact JSON command substituted. The six-second delay exists solely to coordinate this test. SQL observes blocking and finishes within its 20-second timeout; HTTP has its own 20-second timeout.
@@ -51,3 +51,7 @@ Also outstanding: physical Mac sleep/restart, actual provider expiry, two-user/d
 ## Verification and review
 
 The three hosted cases and scoped cleanup above passed. `npm run lint`, `node --check scripts/acceptance/hosted-concurrency/http-peer.mjs` and `git diff --check` passed. A fresh read-only review found no Critical/Important defects in these scripts or evidence claims. The reviewer did not rerun hosted operations. The inherited application suite/CI was green at `b4e4cd5`; no app build or browser rerun was needed for this operator-test/documentation increment.
+
+## Owner-control race follow-up
+
+The later [conflict-loop investigation](non-retryable-conflicts.md) records real pause/revoke/edit/quota races, the discovered PostgREST error-code defect and its regression fix. Use `held-owner.sql` for those scoped cases; do not treat a timed-out HTTP response as a successful conflict assertion.

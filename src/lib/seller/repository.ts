@@ -19,7 +19,7 @@ export async function sellerWorkspace(
     });
     if (error)
       throw new Error(
-        error.code === "40001"
+        ["40001", "PT409"].includes(error.code)
           ? "Preferences changed elsewhere. Reload settings; your edits are kept."
           : "Could not load or save preferences. Check your connection and seller preferences migration. Your edits are kept.",
       );
