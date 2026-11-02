@@ -8,6 +8,8 @@ The owner selected existing OpenClaw/Hermes access to avoid additional API costs
 
 Work is on `codex/hosted-buyer-draft-acceptance`, based on PR #18 delivery head `6be4847`; no merge or production deployment is part of this acceptance/research change.
 
+Final standard suite: **176 passed**, six optional runtime tests skipped by default and covered by the separate opt-in run above. The first restricted full run failed to bind loopback; the permitted rerun passed without code changes. Targeted lint and whitespace checks passed.
+
 ## Shared sign-in and invitations — 2 November 2026
 
 Custom SMTP is saved and working. The owner created and entered the Resend credential directly; the agent did not read or store it. The sender is `login@auth.artielopez.com`, with the verified subdomain and the three approved DNS records; existing root Google mail records are unchanged.

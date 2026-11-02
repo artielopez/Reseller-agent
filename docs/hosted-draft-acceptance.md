@@ -25,6 +25,8 @@ RUN_OPENCLAW_PROBE=1 npx vitest run tests/mac-runtime.test.ts tests/mac-worker-i
 
 Result: four files, 20 tests passed. Runtime: OpenClaw 2026.9.6, child Node 24.21.0, parent Node 22.23.1. These tests use synthetic provider responses and local database fixtures, not live inference. Worker compilation and targeted ESLint passed. An initial standalone check with `/private/tmp` as the state directory was rejected as designed; the successful tests use home-scoped state so denied home reads can be verified. No guard was relaxed.
 
+The final standard suite passed: **176 tests**, six optional installed-runtime tests skipped by the default command (their separate opt-in run is recorded above). The first sandboxed full run could not bind localhost (`EPERM`); rerunning with loopback permission passed without code changes. A fresh app build was not rerun for this SQL/test/documentation-only increment; this is not a new production deployment.
+
 ## What remains
 
 The SQL run uses actual `authenticated` and `anon` roles with synthetic JWT claims in one maintenance session. It does not test real signed-in HTTP requests, independent concurrent sessions, Storage access, physical devices, sleep/restart or a live model. Janyl's sign-in and two-user app acceptance remain separate checks.
