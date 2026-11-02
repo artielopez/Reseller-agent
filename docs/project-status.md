@@ -6,7 +6,7 @@ The existing queue passed [hosted rollback-only acceptance](hosted-draft-accepta
 
 The owner selected existing OpenClaw/Hermes access to avoid additional API costs. OpenClaw reports OpenAI OAuth `ok` with `openai/gpt-6-sol`; Hermes selects `openai-codex` / `gpt-6-sol`. [The route investigation](research/subscription-drafting.md) records why ambient fallbacks must not be inherited and how to prove subscription-only operation. No API key is requested for this route. The current worker is still API-key-based; a safe subscription adapter and verified no-overage behavior are next, not completed features. No live worker, model call, automatic inbox reader or sender was enabled. Janyl's delivered invitation is still awaiting her sign-in acceptance.
 
-Work is on `codex/hosted-buyer-draft-acceptance`, based on PR #18 delivery head `6be4847`; no merge or production deployment is part of this acceptance/research change.
+Work is in [PR #19](https://github.com/artielopez/Reseller-agent/pull/19), on `codex/hosted-buyer-draft-acceptance`, based on PR #18 delivery head `6be4847`. The PR targets main and inherits earlier unmerged work; the new increment starts after that base. Fresh review found no required fixes. No merge or production deployment is part of this acceptance/research change.
 
 Final standard suite: **176 passed**, six optional runtime tests skipped by default and covered by the separate opt-in run above. The first restricted full run failed to bind loopback; the permitted rerun passed without code changes. Targeted lint and whitespace checks passed.
 
