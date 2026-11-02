@@ -285,8 +285,8 @@ export function ItemEditor({
               )}
             </div>
             <p className="field-hint">
-              Up to 6 photos · JPEG, PNG or WebP · 10 MB each. Photos are
-              resized before saving. Export iPhone HEIC photos as JPEG.
+              Up to {MAX_PHOTOS} photos · JPEG, PNG or WebP · 10 MB each. Photos
+              are resized before saving. Export iPhone HEIC photos as JPEG.
             </p>
             <div className="space-y-5 mt-6">
               <label className="field">

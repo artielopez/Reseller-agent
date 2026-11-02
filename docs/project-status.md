@@ -1,8 +1,16 @@
 # Reseller Agent status
 
+## Ten-photo update — 3 November 2026
+
+The owner requested ten photos per item and instructions for saving a buyer question. Branch `codex/ten-item-photos` builds on `f0d35f0` (existing OpenClaw investigation) and the unmerged PR #21 stack. The app limit and helper text now use ten; the incremental migration expands both the atomic-save guard and database positions to 0–9. Ownership, private paths, image formats and file-size limits are preserved. Historical initial migrations are unchanged.
+
+The new database regression first failed against the six-photo limit. It now saves ten ordered photos, rejects eleven without changing the item/photos, rejects a direct out-of-range insert, and verifies cross-user isolation. Final local checks: lint, types, **221 tests passed** (six optional skips), production Webpack build, and **16 desktop/mobile browser checks passed**, including oversized selections, ten-photo save/reload and removing a photo. Initial loopback-test failures were sandbox restrictions; the same tests passed with loopback access. An initially ambiguous browser alert selector was corrected without changing product behavior. Cloud deployment and hosted read-back are pending at this commit.
+
+Buyer question steps: save the item first; choose **Open buyer inbox → Saved item → Channel → Question location**, paste **Buyer question**, then **Save question**. Buyer name is optional. No real question was provided and no model call or buyer message was sent for this update.
+
 ## Existing OpenClaw route resumed — 3 November 2026
 
-The owner asked to work directly with the Mac mini OpenClaw codebase/setup. `/opt/homebrew/lib/node_modules/openclaw` resolves to `/Users/artielopez/openclaw-src`, package 2026.9.6, HEAD `28226d9`; its checkout is clean and contains two local commits, which are preserved. An isolated source worktree is preparing the canonical SIWC fix; the normal installation and gateway are untouched.
+The owner asked to work directly with the Mac mini OpenClaw codebase/setup. `/opt/homebrew/lib/node_modules/openclaw` resolves to `/Users/artielopez/openclaw-src`, package 2026.9.6, HEAD `28226d9`; its checkout is clean and contains two local commits, which are preserved. The isolated source worktree contains canonical SIWC fix commit `dd329c14454`; 72 focused tests and independent review passed. It is retained locally for review, not installed or merged; the normal installation and gateway are untouched.
 
 The existing normal OpenAI OAuth profile is present, belongs to Artie and expires on 4 November. Current ChatGPT Usage shows **46% remaining, zero credits, automatic reload off**. The owner explicitly approved turning off **Improve the model for everyone**, and the live Data controls UI now shows it off. The current Reseller worker built successfully and its real no-inference broker preflight against this existing OpenClaw setup returned compatible. No model call, real buyer processing or new cloud job occurred.
 

@@ -32,7 +32,7 @@ Implementation below describes the reviewable repository; [current release statu
 - There is no direct platform posting, scraping, platform synchronization, automatic channel capture or message sending. An optional separately configured worker generates review drafts only for explicitly queued saved private questions.
 - Generation uses written facts only. It does not infer brand, condition or price from photos, research market prices, or verify model claims.
 - Item facts and listing copy are separate. Regenerate or edit channel copy after changing price, condition or description. All three variants must be reviewed.
-- Up to six photos per item. HEIC is unsupported; export as JPEG first. There is no drag-to-reorder; the first photo is the cover. Removing the cover promotes the next photo.
+- Up to ten photos per item. HEIC is unsupported; export as JPEG first. There is no drag-to-reorder; the first photo is the cover. Removing the cover promotes the next photo.
 - Demo data stays on one browser and can be removed by browser storage cleanup. There is no demo-to-cloud import, export/backup UI or item-delete UI yet.
 - Inventory saves use last-write-wins; buyer saves/approvals use revision checks. Avoid editing the same item on two devices at the same time. Database saves are atomic, but Storage operations are separate; interrupted uploads/cleanup can leave unused objects. Periodically compare bucket paths against `item_photos.path` before manually removing any orphan files.
 - Saved photo URLs expire after 24 hours. Refresh the page to request new signed URLs.
