@@ -34,6 +34,8 @@ A killed caller cannot remove its private run directories or release `worker.loc
 
 No cloud schema/UI deployment is needed for this Mac worker change. No ordinary OpenClaw installation, profile, gateway, service or startup configuration is modified. GitHub changes remain reviewable and unmerged.
 
+Delivery: [PR #26](https://github.com/artielopez/Reseller-agent/pull/26), implementation `bf1fbc9` and review fix `6d2f189`. The worker was compiled during acceptance, with no live queue run. GitHub CI is separate from the local verification recorded above.
+
 ## Execution ruling
 
 Continue the existing Task 6 recovery work with a failing synthetic OS-process regression before changing the launcher. An independent supervisor is necessary because SIGKILL cannot run caller cleanup. The cost is one short-lived Node process per invocation; simultaneous supervisor/OS failure still requires manual recovery. Keep that limit explicit rather than claiming provider cancellation or unattended readiness.

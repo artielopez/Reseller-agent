@@ -2,6 +2,8 @@
 
 ## Active subprocess crash recovery — 3 November 2026
 
+Reviewable delivery: [PR #26](https://github.com/artielopez/Reseller-agent/pull/26), implementation `bf1fbc9` plus review fix `6d2f189`. The production build also passed. No GitHub merge or new cloud deployment; the compiled Mac worker contains the fix for future supervised runs. The previous PR #25's GitHub Application checks passed. Beeper's inquiry thread still has no response at the latest read-only check.
+
 An actual OS-signal regression found that killing the worker caller left its detached target and descendant running. The [parent-crash fix](worker-parent-crash-recovery.md) adds a short-lived supervisor and a process group known to both processes before target startup. Review found a second failure order: supervisor loss could leave its target running. A failing regression reproduced that issue, then both failure orders and startup loss passed after the ownership fix. Final lint/types, **242 tests** (six optional skips) and five separately enabled installed-runtime checks passed. Those checks use synthetic data and fake model responses. No real model calls, cloud schema changes or normal OpenClaw service changes. The queue remains paused; physical/provider recovery and unattended release remain incomplete.
 
 ## Stale-conflict retry-loop fix — 3 November 2026
