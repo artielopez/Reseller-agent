@@ -99,6 +99,41 @@ it("preserves UTF-8 characters split across output chunks", async () => {
   expect(r.stdout).toBe("₱");
 });
 
+it("fails closed and reaps descendants that retain a completed target's output pipes", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "reseller-held-pipes-"));
+  const ready = join(directory, "ready.json");
+  try {
+    await expect(
+      runProcess(
+        process.execPath,
+        [
+          "-e",
+          `
+      const {spawn}=require('node:child_process');
+      const child=spawn(process.execPath,['-e',
+        "process.on('SIGTERM',()=>{});process.send('ready');setInterval(()=>{},1000)"
+      ],{stdio:['ignore','inherit','inherit','ipc']});
+      child.once('message',()=>{
+        require('node:fs').writeFileSync(${JSON.stringify(ready)},JSON.stringify({child:child.pid,group:process.ppid}));
+        process.exit(0);
+      });
+    `,
+        ],
+        options(),
+      ),
+    ).rejects.toThrow("Worker process could not finish safely.");
+    const pids = JSON.parse(await readFile(ready, "utf8"));
+    expect(() => process.kill(pids.child, 0)).toThrowError(
+      expect.objectContaining({ code: "ESRCH" }),
+    );
+    expect(() => process.kill(-pids.group, 0)).toThrowError(
+      expect.objectContaining({ code: "ESRCH" }),
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 it("abort kills an active leader and descendant even when both ignore SIGTERM", async () => {
   const directory = await mkdtemp(join(tmpdir(), "reseller-process-abort-"));
   const ready = join(directory, "ready.json");

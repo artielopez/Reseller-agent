@@ -4,91 +4,63 @@
 export const processSupervisorSource = String.raw`
 const {spawn} = require('node:child_process');
 const {StringDecoder} = require('node:string_decoder');
-const {setTimeout: delay} = require('node:timers/promises');
-const lifetime = new AbortController();
-let started = false;
+let started = false, closing = false;
+// This process anchors the group before it can receive a run command. Targets
+// inherit this group. The caller knows its ID even if we crash during spawn.
+const signalGroup = signal => {
+  try { process.kill(-process.pid, signal); }
+  catch { process.exit(1); }
+};
 const stop = () => {
-  lifetime.abort();
-  if (!started) process.exit(1);
+  if (closing) return;
+  closing = true;
+  signalGroup('SIGTERM');
+  setTimeout(() => signalGroup('SIGKILL'), 200);
 };
 process.once('disconnect', stop);
-process.once('SIGTERM', stop);
-process.once('SIGINT', stop);
+process.on('SIGTERM', stop);
+process.on('SIGINT', stop);
 process.on('message', message => {
   if (message?.type === 'abort') { stop(); return; }
-  if (started || message?.type !== 'run' || !process.connected) { stop(); return; }
+  if (started || closing || message?.type !== 'run' || !process.connected) { stop(); return; }
   started = true;
-  execute(message).then(result => {
-    if (!process.connected) { process.exitCode = 1; return; }
-    process.send(result, error => {
-      process.exitCode = error ? 1 : 0;
-      if (process.connected) process.disconnect();
-    });
-  }, () => {
-    process.exitCode = 1;
-    if (process.connected) process.disconnect();
-  });
+  execute(message);
 });
 if (!process.connected) stop();
 
-async function execute(options) {
-  if (lifetime.signal.aborted) throw Error('Stopped');
-  const child = spawn(options.executable, options.args, {
-    cwd: options.cwd, env: options.env, detached: true,
-    stdio: ['pipe', 'pipe', 'pipe'],
-  });
-  let failed = false, stdout = '', stderr = '', size = 0, killTimer;
+function execute(options) {
+  let child;
+  try {
+    child = spawn(options.executable, options.args, {
+      cwd: options.cwd, env: options.env, detached: false,
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+  } catch { stop(); return; }
+  let stdout = '', stderr = '', size = 0, drainTimer;
   const outDecoder = new StringDecoder('utf8'), errDecoder = new StringDecoder('utf8');
-  const signalGroup = signal => {
-    if (!child.pid) return;
-    try { process.kill(-child.pid, signal); }
-    // macOS can report EPERM during group teardown. Only the later ESRCH
-    // observation proves absence; a surviving/inaccessible group still fails.
-    catch (error) { if (!['ESRCH', 'EPERM'].includes(error.code)) failed = true; }
-  };
-  const terminate = () => {
-    signalGroup('SIGTERM');
-    killTimer ??= setTimeout(() => signalGroup('SIGKILL'), 200);
-  };
-  const abort = () => { failed = true; terminate(); };
-  const timer = setTimeout(abort, options.timeoutMs);
-  lifetime.signal.addEventListener('abort', abort, {once:true});
+  const timer = setTimeout(stop, options.timeoutMs);
   child.stdout.on('data', chunk => {
     size += chunk.length;
-    if (size > 262144) abort(); else stdout += outDecoder.write(chunk);
+    if (size > 262144) stop(); else stdout += outDecoder.write(chunk);
   });
   child.stderr.on('data', chunk => {
     size += chunk.length;
-    if (size > 262144) abort(); else stderr += errDecoder.write(chunk);
+    if (size > 262144) stop(); else stderr += errDecoder.write(chunk);
   });
-  child.stdin.on('error', abort);
-  child.once('exit', terminate);
-  try {
-    const code = await new Promise(resolve => {
-      child.once('error', () => { failed = true; resolve(null); });
-      child.once('close', resolve);
-      if (lifetime.signal.aborted) abort();
-      child.stdin.end(options.input);
-    });
-    signalGroup('SIGKILL');
-    if (child.pid) {
-      let alive = true;
-      for (let attempt = 0; attempt < 10; attempt++) {
-        try { process.kill(-child.pid, 0); }
-        catch (error) {
-          if (error.code === 'ESRCH') { alive = false; break; }
-          if (error.code !== 'EPERM') break;
-        }
-        await delay(50);
-      }
-      if (alive) failed = true;
-    }
-    if (failed || code === null) throw Error('Stopped');
-    return {code, stdout:stdout + outDecoder.end(), stderr:stderr + errDecoder.end()};
-  } finally {
+  child.stdin.on('error', stop);
+  child.once('error', stop);
+  // A descendant retaining the pipes must not keep a completed target alive.
+  // If output cannot drain promptly, fail closed instead of returning partial output.
+  child.once('exit', () => { drainTimer = setTimeout(stop, 200); });
+  child.once('close', code => {
     clearTimeout(timer);
-    if (killTimer) clearTimeout(killTimer);
-    lifetime.signal.removeEventListener('abort', abort);
-  }
+    clearTimeout(drainTimer);
+    if (closing || code === null || !process.connected) { stop(); return; }
+    process.send({code, stdout:stdout + outDecoder.end(), stderr:stderr + errDecoder.end()},
+      error => { if (error) stop(); });
+    // Stay as group anchor until the caller kills/verifies the whole group.
+    // IPC loss also calls stop if the caller dies before receiving the result.
+  });
+  child.stdin.end(options.input);
 }
 `;

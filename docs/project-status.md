@@ -2,7 +2,7 @@
 
 ## Active subprocess crash recovery — 3 November 2026
 
-An actual OS-signal regression found that killing the worker caller left its detached target and descendant running. The [parent-crash fix](worker-parent-crash-recovery.md) moves process-group deadlines and cleanup into a short-lived independent supervisor that aborts on loss of the caller's IPC pipe. The failing regression now passes; lint/types and 239 tests passed (six optional skips). Installed-runtime checks and independent review are in progress. No model calls, cloud schema changes or normal OpenClaw service changes. The queue remains paused; physical/provider recovery and unattended release remain incomplete.
+An actual OS-signal regression found that killing the worker caller left its detached target and descendant running. The [parent-crash fix](worker-parent-crash-recovery.md) adds a short-lived supervisor and a process group known to both processes before target startup. Review found a second failure order: supervisor loss could leave its target running. A failing regression reproduced that issue, then both failure orders and startup loss passed after the ownership fix. Final lint/types, **242 tests** (six optional skips) and five separately enabled installed-runtime checks passed. Those checks use synthetic data and fake model responses. No real model calls, cloud schema changes or normal OpenClaw service changes. The queue remains paused; physical/provider recovery and unattended release remain incomplete.
 
 ## Stale-conflict retry-loop fix — 3 November 2026
 

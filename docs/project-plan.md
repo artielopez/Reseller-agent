@@ -4,7 +4,7 @@ Updated 3 November 2026. [Status and evidence](project-status.md) · [Imported h
 
 ## Current assignment
 
-Current recovery increment: [worker parent-crash handling](worker-parent-crash-recovery.md). An actual synthetic SIGKILL test exposed surviving subprocesses; a separate supervisor now stops their group after caller loss. Full tests and installed isolated-runtime checks passed. Review remains pending; no unattended activation or provider-cancellation claim follows from local process cleanup.
+Current recovery increment: [worker parent-crash handling](worker-parent-crash-recovery.md). Actual synthetic SIGKILL tests exposed surviving subprocesses after caller or supervisor loss. A group known before target startup now lets either surviving process stop it. Review's Important finding was reproduced and fixed; final full tests and installed isolated-runtime checks passed. No unattended activation or provider-cancellation claim follows from local process cleanup.
 
 Latest reliability fix: [non-retryable business conflicts](non-retryable-conflicts.md), deployed in Sites version 7 with the matching database migration. Hosted control races uncovered PostgREST looping on custom `40001`; the tested incremental database fix uses `PT409`, and client adapters preserve actionable reload guidance. Guards/permissions remain unchanged. PR #25 is open for review. This advances real recovery acceptance without enabling channel intake/sending.
 

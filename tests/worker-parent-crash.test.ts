@@ -16,11 +16,15 @@ describe.skipIf(process.platform === "win32")(
       );
     }, 35000);
 
-    it("reaps the owned subprocess group after the worker is killed during active work", async () => {
-      const directory = await mkdtemp(join(tmpdir(), "reseller-parent-loss-"));
-      const ready = join(directory, "ready.json");
-      const parentFile = join(directory, "parent.cjs");
-      const target = `
+    it.each(["caller", "supervisor"])(
+      "reaps the owned group after %s is killed during active work",
+      async (victim) => {
+        const directory = await mkdtemp(
+          join(tmpdir(), "reseller-parent-loss-"),
+        );
+        const ready = join(directory, "ready.json");
+        const parentFile = join(directory, "parent.cjs");
+        const target = `
       const {spawn}=require('node:child_process');
       const fs=require('node:fs');
       process.on('SIGTERM',()=>{});
@@ -31,75 +35,132 @@ describe.skipIf(process.platform === "win32")(
         JSON.stringify({leader:process.pid,descendant:child.pid,supervisor:process.ppid}),{mode:0o600}));
       setInterval(()=>{},1000);
     `;
-      await writeFile(
-        parentFile,
-        `
+        await writeFile(
+          parentFile,
+          `
       const {runProcess}=require(${JSON.stringify(resolve(".worker-build/worker/process.js"))});
       runProcess(process.execPath,['-e',${JSON.stringify(target)}],{
         cwd:${JSON.stringify(directory)},env:{},
         signal:new AbortController().signal,timeoutMs:30000
       }).catch(()=>{process.exitCode=1});
     `,
-        { mode: 0o600 },
-      );
-      const parent = spawn(process.execPath, [parentFile], {
-        env: { NODE_ENV: "test" },
-        stdio: "ignore",
-      });
-      const exited = new Promise<void>((done, reject) => {
-        parent.once("error", reject);
-        parent.once("close", () => done());
-      });
-      void exited.catch(() => {});
-      let pids:
-        { leader: number; descendant: number; supervisor: number } | undefined;
-      const alive = (pid: number) => {
-        try {
-          process.kill(pid, 0);
-          return true;
-        } catch (error) {
-          if ((error as NodeJS.ErrnoException).code === "ESRCH") return false;
-          throw error;
-        }
-      };
-      try {
-        await expect
-          .poll(async () => {
-            try {
-              pids = JSON.parse(await readFile(ready, "utf8"));
-              return true;
-            } catch {
-              return false;
-            }
-          })
-          .toBe(true);
-        expect(alive(pids!.leader)).toBe(true);
-        expect(alive(pids!.descendant)).toBe(true);
-        expect(parent.kill("SIGKILL")).toBe(true);
-        await exited;
-        await expect
-          .poll(() => [alive(pids!.leader), alive(pids!.descendant)], {
-            timeout: 3000,
-          })
-          .toEqual([false, false]);
-        expect(pids!.supervisor).not.toBe(parent.pid);
-        await expect.poll(() => alive(pids!.supervisor)).toBe(false);
-      } finally {
-        if (parent.exitCode === null && parent.signalCode === null)
-          parent.kill("SIGKILL");
-        await exited;
-        // Only this test's detached process group, never the owner's services.
-        if (pids && (alive(pids.leader) || alive(pids.descendant))) {
+          { mode: 0o600 },
+        );
+        const parent = spawn(process.execPath, [parentFile], {
+          env: { NODE_ENV: "test" },
+          stdio: "ignore",
+        });
+        const exited = new Promise<void>((done, reject) => {
+          parent.once("error", reject);
+          parent.once("close", () => done());
+        });
+        void exited.catch(() => {});
+        let pids:
+          | { leader: number; descendant: number; supervisor: number }
+          | undefined;
+        const alive = (pid: number) => {
           try {
-            process.kill(-pids.leader, "SIGKILL");
+            process.kill(pid, 0);
+            return true;
           } catch (error) {
-            if ((error as NodeJS.ErrnoException).code !== "ESRCH") throw error;
+            if ((error as NodeJS.ErrnoException).code === "ESRCH") return false;
+            throw error;
           }
+        };
+        try {
+          await expect
+            .poll(async () => {
+              try {
+                pids = JSON.parse(await readFile(ready, "utf8"));
+                return true;
+              } catch {
+                return false;
+              }
+            })
+            .toBe(true);
+          expect(alive(pids!.leader)).toBe(true);
+          expect(alive(pids!.descendant)).toBe(true);
+          if (victim === "caller") expect(parent.kill("SIGKILL")).toBe(true);
+          else process.kill(pids!.supervisor, "SIGKILL");
+          await exited;
+          if (victim === "supervisor") {
+            expect(parent.exitCode).toBe(1);
+            expect([alive(pids!.leader), alive(pids!.descendant)]).toEqual([
+              false,
+              false,
+            ]);
+          }
+          await expect
+            .poll(() => [alive(pids!.leader), alive(pids!.descendant)], {
+              timeout: 3000,
+            })
+            .toEqual([false, false]);
+          expect(pids!.supervisor).not.toBe(parent.pid);
+          await expect.poll(() => alive(pids!.supervisor)).toBe(false);
+        } finally {
+          if (parent.exitCode === null && parent.signalCode === null)
+            parent.kill("SIGKILL");
+          await exited;
+          // Only this test's detached process group, never the owner's services.
+          if (pids && (alive(pids.leader) || alive(pids.descendant))) {
+            for (const group of new Set([pids.supervisor, pids.leader])) {
+              if (group === parent.pid) continue;
+              try {
+                process.kill(-group, "SIGKILL");
+              } catch (error) {
+                if ((error as NodeJS.ErrnoException).code !== "ESRCH")
+                  throw error;
+              }
+            }
+          }
+          if (pids && pids.supervisor !== parent.pid && alive(pids.supervisor))
+            process.kill(pids.supervisor, "SIGKILL");
+          await rm(directory, { recursive: true, force: true });
         }
-        if (pids && pids.supervisor !== parent.pid && alive(pids.supervisor))
-          process.kill(pids.supervisor, "SIGKILL");
+      },
+      12000,
+    );
+
+    it("fails safely if the supervisor dies before the startup command is delivered", async () => {
+      const directory = await mkdtemp(join(tmpdir(), "reseller-startup-loss-"));
+      const marker = join(directory, "target-started");
+      const script = `
+        const cp=require('node:child_process');
+        const spawn=cp.spawn;
+        let guardian;
+        cp.spawn=(...args)=>{
+          const child=spawn(...args); guardian=child.pid;
+          child.once('spawn',()=>child.kill('SIGKILL'));
+          return child;
+        };
+        const {runProcess}=require(${JSON.stringify(resolve(".worker-build/worker/process.js"))});
+        runProcess(process.execPath,['-e',${JSON.stringify(`require('node:fs').writeFileSync(${JSON.stringify(marker)},'unexpected');`)}],{
+          cwd:${JSON.stringify(directory)},env:{},signal:new AbortController().signal,timeoutMs:1000
+        }).then(()=>{process.exitCode=2},()=>{
+          let alive=true;
+          try {process.kill(-guardian,0)} catch(e){if(e.code==='ESRCH')alive=false}
+          console.log(JSON.stringify({rejected:true,groupAlive:alive}));
+        });
+      `;
+      try {
+        const result = await promisify(execFile)(
+          process.execPath,
+          ["-e", script],
+          {
+            env: { NODE_ENV: "test" },
+            timeout: 5000,
+          },
+        );
+        expect(JSON.parse(result.stdout)).toEqual({
+          rejected: true,
+          groupAlive: false,
+        });
+        await expect(readFile(marker)).rejects.toMatchObject({
+          code: "ENOENT",
+        });
+      } finally {
         await rm(directory, { recursive: true, force: true });
       }
-    }, 12000);
+    });
   },
 );

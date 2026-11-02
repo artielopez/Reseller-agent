@@ -1,4 +1,5 @@
 import { spawn } from "node:child_process";
+import { setTimeout as delay } from "node:timers/promises";
 import { processSupervisorSource } from "./process-supervisor";
 export type ProcessResult = { code: number; stdout: string; stderr: string };
 const failure = () => new Error("Worker process could not finish safely.");
@@ -33,9 +34,27 @@ export async function runProcess(
   });
   let result: ProcessResult | undefined;
   let failed = false;
+  let killTimer: ReturnType<typeof setTimeout> | undefined;
+  const signalGroup = (signal: NodeJS.Signals) => {
+    if (!supervisor.pid) return;
+    try {
+      process.kill(-supervisor.pid, signal);
+    } catch (error) {
+      if (
+        !["ESRCH", "EPERM"].includes(
+          (error as NodeJS.ErrnoException).code ?? "",
+        )
+      )
+        failed = true;
+    }
+  };
+  const terminate = () => {
+    signalGroup("SIGTERM");
+    killTimer ??= setTimeout(() => signalGroup("SIGKILL"), 200);
+  };
   const abort = () => {
     failed = true;
-    if (supervisor.connected) supervisor.send({ type: "abort" }, () => {});
+    terminate();
   };
   options.signal.addEventListener("abort", abort, { once: true });
   try {
@@ -45,7 +64,7 @@ export async function runProcess(
         resolve();
       });
       supervisor.once("close", (code) => {
-        if (code !== 0) failed = true;
+        if (code !== 0 && !result) failed = true;
         resolve();
       });
       supervisor.on("message", (raw: unknown) => {
@@ -63,6 +82,7 @@ export async function runProcess(
           return;
         }
         result = value as ProcessResult;
+        terminate();
       });
       supervisor.once("spawn", () => {
         if (options.signal.aborted) {
@@ -86,9 +106,29 @@ export async function runProcess(
       });
       if (options.signal.aborted) abort();
     });
+    // The supervisor is the group anchor, known before any target can start.
+    // Its crash cannot strand an unknown target group behind a completed call.
+    signalGroup("SIGKILL");
+    if (supervisor.pid) {
+      let alive = true;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        try {
+          process.kill(-supervisor.pid, 0);
+        } catch (error) {
+          if ((error as NodeJS.ErrnoException).code === "ESRCH") {
+            alive = false;
+            break;
+          }
+          if ((error as NodeJS.ErrnoException).code !== "EPERM") break;
+        }
+        await delay(50);
+      }
+      if (alive) failed = true;
+    }
     if (failed || options.signal.aborted || !result) throw failure();
     return result;
   } finally {
+    if (killTimer) clearTimeout(killTimer);
     options.signal.removeEventListener("abort", abort);
   }
 }
