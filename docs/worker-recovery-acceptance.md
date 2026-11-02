@@ -17,6 +17,19 @@ These characterize existing behavior; no production code changed. The tests inte
 
 All four focused cases passed. Lint, type checks and the full suite passed: **225 tests, six optional skips**. A fresh read-only reviewer found no Critical/Important test defects and verified the production SQL/transport boundaries. No build or UI retest was needed for this test/documentation-only increment. These are acceptance/characterization tests, not claims of a newly fixed defect or a RED→GREEN implementation. The earlier normal-generation and installed-runtime checks remain separate evidence.
 
+## Local process lifecycle acceptance — 3 November 2026
+
+`tests/worker-cli-lifecycle.test.ts` compiles the production CLI and launches actual Node processes with a fresh private state directory and an explicit synthetic environment. A preload replaces only fetch and denies any destination except the fake queue. The installed OpenClaw path is deliberately absent; no normal account configuration is read. These are actual OS-signal/CLI/lock checks with synthetic transport, not hosted or model tests.
+
+- SIGTERM after an idle claim: CLI exits normally, releases its lock, and a new once process can start and claim only once.
+- SIGINT while an empty-queue response is pending: the CLI drains that response, exits normally and releases its lock without polling again.
+- SIGKILL after an idle claim: the exact lock and owner metadata remain; a new process exits with failure before making any request. The test removes only its fixture after both process close handles establish termination. This is explicit test cleanup, not an automatic recovery feature.
+- A separate production `runProcess` test aborts an active leader and descendant that both ignore SIGTERM. Escalation removes both PIDs before returning a safe failure.
+
+All eight focused process/CLI tests passed (four new cases). No production behavior changed. The initial checks found an unused test import and a circular inferred test type, both corrected. Final lint/type checks and the full suite passed: **229 tests, six optional skips**. A fresh read-only review found no Critical/Important defects; no build/browser rerun was needed for this test-only increment. Physical restart/sleep, killing a parent during actual inference, real provider expiry and cleanup of an interrupted real run remain separate acceptance gates. The CLI cases deliberately have no claimed work; they do not prove cancellation of an admitted provider request.
+
+Ruling: execute the existing process contract as characterization/acceptance, without weakening production code to create a failing baseline. Failure to cover a real runtime phase remains an explicit limit rather than permission for unattended startup.
+
 ## Recovery procedure
 
 1. Stop the foreground worker. Subscription mode supports one pass only and must not be installed as an automatic watcher or login service.

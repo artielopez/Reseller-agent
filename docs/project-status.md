@@ -1,5 +1,9 @@
 # Reseller Agent status
 
+## Worker process lifecycle acceptance — 3 November 2026
+
+Four new [process recovery cases](worker-recovery-acceptance.md#local-process-lifecycle-acceptance--3-november-2026) passed: compiled CLI shutdown while idle, shutdown during a pending empty-queue request, retained lock/refused restart after forced kill, and termination of an active process group that ignores SIGTERM. The tests use synthetic fetch and private temporary state, with no real credentials, cloud rows or model calls. They establish those local process boundaries; physical restart/sleep and interrupted real inference remain unverified. Final lint/type checks and **229 tests passed** (six optional skips); fresh independent review found no Critical/Important defects. Added to [PR #24](https://github.com/artielopez/Reseller-agent/pull/24), whose preceding head passed GitHub checks. No production code or deployment changed.
+
 ## Hosted concurrency acceptance — 3 November 2026
 
 [Three real overlapping SQL/HTTP cases](hosted-concurrency-acceptance.md) passed against hosted PostgreSQL: competing claims yielded one lease, competing start calls reserved one app attempt, and identical competing submissions saved one unapproved Agent Draft. PostgreSQL blocking-PID evidence established actual contention in every phase. The synthetic inquiry stayed Open; no model or marketplace call occurred. Scoped cleanup confirmed zero fixture rows across all nine checked tables, and private input files/capabilities were removed. Earlier harness attempts did not establish overlap and are recorded as unsuccessful, with cleanup verified.

@@ -1,4 +1,7 @@
 import { expect, it } from "vitest";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { join } from "node:path";
+import { tmpdir } from "node:os";
 import { runProcess } from "../src/worker/process";
 const options = () => ({
   cwd: process.cwd(),
@@ -70,4 +73,58 @@ it("preserves UTF-8 characters split across output chunks", async () => {
     options(),
   );
   expect(r.stdout).toBe("₱");
+});
+
+it("abort kills an active leader and descendant even when both ignore SIGTERM", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "reseller-process-abort-"));
+  const ready = join(directory, "ready.json");
+  const controller = new AbortController();
+  const task = runProcess(
+    process.execPath,
+    [
+      "-e",
+      `
+      const {spawn}=require('node:child_process');
+      const fs=require('node:fs');
+      process.on('SIGTERM',()=>{});
+      const child=spawn(process.execPath,['-e',
+        "process.on('SIGTERM',()=>{});process.send('ready');setInterval(()=>{},1000);"
+      ],{stdio:['ignore','ignore','ignore','ipc']});
+      child.once('message',()=>fs.writeFileSync(${JSON.stringify(ready)},
+        JSON.stringify({leader:process.pid,descendant:child.pid}),{mode:0o600}));
+      setInterval(()=>{},1000);
+    `,
+    ],
+    { ...options(), timeoutMs: 5000, signal: controller.signal },
+  );
+  // Attach a rejection handler before aborting to avoid an unhandled rejection.
+  const outcome = task.then(
+    () => "unexpected success",
+    (error: Error) => error.message,
+  );
+  try {
+    let pids: { leader: number; descendant: number } | undefined;
+    await expect
+      .poll(async () => {
+        try {
+          pids = JSON.parse(await readFile(ready, "utf8"));
+          return true;
+        } catch {
+          return false;
+        }
+      })
+      .toBe(true);
+    controller.abort();
+    expect(await outcome).toBe("Worker process could not finish safely.");
+    for (const pid of [pids!.leader, pids!.descendant]) {
+      expect(pid).toBeGreaterThan(0);
+      expect(() => process.kill(pid, 0)).toThrowError(
+        expect.objectContaining({ code: "ESRCH" }),
+      );
+    }
+  } finally {
+    controller.abort();
+    await outcome;
+    await rm(directory, { recursive: true, force: true });
+  }
 });
