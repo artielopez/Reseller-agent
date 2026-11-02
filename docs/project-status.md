@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Hosted concurrency acceptance — 3 November 2026
+
+[Three real overlapping SQL/HTTP cases](hosted-concurrency-acceptance.md) passed against hosted PostgreSQL: competing claims yielded one lease, competing start calls reserved one app attempt, and identical competing submissions saved one unapproved Agent Draft. PostgreSQL blocking-PID evidence established actual contention in every phase. The synthetic inquiry stayed Open; no model or marketplace call occurred. Scoped cleanup confirmed zero fixture rows across all nine checked tables, and private input files/capabilities were removed. Earlier harness attempts did not establish overlap and are recorded as unsuccessful, with cleanup verified.
+
+This closes only the one-job claim/start/identical-submit concurrency case. Pause/revoke/edit and quota races, physical Mac recovery, second-user/device acceptance and permitted intake/delivery remain outstanding. The worker stays paused. Test scripts and evidence are added to [PR #24](https://github.com/artielopez/Reseller-agent/pull/24). Lint, script syntax and whitespace checks passed; fresh independent review found no Critical/Important issues. The preceding PR head passed GitHub checks. No production code/schema change or new deployment. Beeper’s inquiry thread still has no response at this check.
+
 ## Network recovery acceptance — 3 November 2026
 
 Four new [network recovery tests](worker-recovery-acceptance.md) exercise real local HTTP disconnects around production queue RPC commits. Lost claim/start/save acknowledgments do not replay inference or duplicate saved drafts on restart. Lint, types and the full suite passed: **225 tests, six optional skips**. Independent review found no Critical/Important test defects; the recovery instructions now explicitly explain that only a later claim retires an expired lease. This is local synthetic acceptance, not physical Mac restart, hosted concurrency or provider-expiry evidence. No production code changed or model call occurred.

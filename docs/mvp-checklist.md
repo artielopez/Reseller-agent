@@ -65,7 +65,7 @@ Buyer inbox limits: latest 200 questions shown, no realtime updates or inquiry e
 
 ## Restricted worker hosted acceptance (partially complete)
 
-Hosted synthetic and one supervised real-question trial are recorded in [current status](project-status.md). Concurrent hosted sessions, physical-device and provider-failure checks remain incomplete; the list below is the full acceptance scope, not a claim that all checks passed. Use a dedicated synthetic item/question and an explicit model choice for additional trials before more real buyer text. Follow [Mac setup](mac-draft-worker.md). Record actual versions, project/deployment, time and sanitized pass/fail evidence; do not record keys or question text in the tracker.
+Hosted synthetic and one supervised real-question trial are recorded in [current status](project-status.md). The one-job concurrent claim/start/identical-submit case has [hosted evidence](hosted-concurrency-acceptance.md); other hosted races, physical-device and provider-failure checks remain incomplete; the list below is the full acceptance scope, not a claim that all checks passed. Use a dedicated synthetic item/question and an explicit model choice for additional trials before more real buyer text. Follow [Mac setup](mac-draft-worker.md). Record actual versions, project/deployment, time and sanitized pass/fail evidence; do not record keys or question text in the tracker.
 
 1. Verify enroll/revoke/pause/queue actions require the correct signed-in owner, a second owner cannot inspect or mutate the first owner's records, and the one-time worker key cannot call owner controls or read inventory outside its lease.
 2. Run credential-free preflight. Keep cloud drafting paused; `worker:once` must claim nothing and incur no model usage.

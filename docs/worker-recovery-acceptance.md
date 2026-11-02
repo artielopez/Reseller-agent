@@ -29,7 +29,7 @@ All four focused cases passed. Lint, type checks and the full suite passed: **22
 
 ## Still required
 
-Physical Mac restart/sleep and external connectivity loss; actual provider session expiry; multiple independent hosted PostgreSQL sessions; alert deduplication; two-user device acceptance; and permitted platform intake/delivery. Do not represent local network tests as proof of those scenarios or enable unattended operation from these results.
+Physical Mac restart/sleep and external connectivity loss; actual provider session expiry; remaining hosted races (the [one-job claim/start/identical-submit concurrency cases](hosted-concurrency-acceptance.md) have now passed); alert deduplication; two-user device acceptance; and permitted platform intake/delivery. Do not represent local network tests as proof of those scenarios or enable unattended operation from these results.
 
 ## Execution ledger
 
