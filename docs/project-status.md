@@ -2,6 +2,8 @@
 
 ## Supervised buyer-draft acceptance — 3 November 2026
 
+Manual completion follow-up: the owner reported completing the copy/send/mark-answered steps; a read-only cloud check confirms **Answered** and the worker still paused. External delivery is owner-reported, not independently verified. The existing inquiry-change trigger clears reply approval on any inquiry update, so the reply returning to Draft after marking Answered is expected; the question remains Answered and no reapproval is needed to complete this trial. The supervised question → model draft → owner approval → owner-reported manual reply → Answered milestone is complete. Automatic intake/sending remains disabled.
+
 Owner review follow-up: after the owner confirmed completion, a read-only cloud check verified **Approved** with an approval timestamp. The question remains Open and the worker remains paused. This completes the supervised save → draft → human approval milestone; clipboard use, buyer delivery and Answered status are not established by this check. No private question, item, reply content or production identifiers are recorded here. This approval does not authorize a GitHub merge or automatic sending.
 
 One owner-selected real question completed the existing OpenClaw subscription workflow: private cloud queue → restricted Mac worker → unapproved Agent Draft in the private app. The exact minimal input was reviewed and hash-pinned; account identity and allowance were checked before one foreground pass. No buyer name, contact details or photos were included in the model input. Question text, inventory facts, reply text, payload hashes, production record identifiers and credentials are intentionally omitted from this repository record.
