@@ -45,3 +45,11 @@ The optional fake-delivery lab migration is still absent. No real worker, paid m
 Initialize the supported Sites starter in the dedicated checkout only once, preserve `.openai/hosting.json`, then run `node scripts/prepare-sites-cloud.mjs` from the application root. Refresh the dedicated lockfile when copied dependency versions change, install with the Sites helper, inject public build configuration from ignored environment files, and use the source workflow helper for checks/build/commit/push/package. Publish the exact returned artifact and source commit. Do not run the static demo preparation script against the cloud checkout.
 
 Next: finish email-service/domain setup, confirm the owner's real login, add Janyl's Sites viewer access and Supabase app invitation, then verify both accounts' own-data workflows. [Multi-organization MCP findings](supabase-mcp-access.md) are separate from app sign-in.
+
+## Invitation recovery follow-up
+
+The owner's mobile screenshot was traced to an expired invitation, followed by `signup_disabled` for ordinary OTP login on the still-unconfirmed account. The pending invitation was renewed through the dashboard's Send invitation flow; database timestamps verified success. A generic confirmation-resend button did not advance the send timestamp and was not counted as successful recovery.
+
+The deployed app now distinguishes invitation activation from later sign-ins and displays fixed, actionable messages for expired redirects and known Auth failure codes. It never displays raw error descriptions, tokens or arbitrary provider text. URL feedback is hydration-safe and reacts to hash/history navigation. Four focused regression tests plus lint/types and the Worker build passed. Published source `97d16365d48ec5e17dbf7e893d5cadd9405f79fc`, deployment `appgdep_6ae867cbdfd88191b88038ef3e39fc8c` succeeded; first real login still requires owner confirmation.
+
+The owner supplied artielopez.com. Its DNS uses Cloudflare and root MX records point to Google. Resend setup will use auth.artielopez.com, preserving existing root mail/DNS. Both provider dashboards currently require owner login; no provider account, credential or DNS write was performed.

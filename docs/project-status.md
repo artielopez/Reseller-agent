@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Invitation recovery and email setup
+
+The owner reported the mobile sign-in error. Hosted Auth logs establish an expired email link at `2026-11-02T10:27:26Z`, followed by `422 signup_disabled` at `10:27:58Z`; the existing invited account was still unconfirmed. The dashboard confirmation resend did not update its send timestamp. Repeating **Send invitation** for the existing unconfirmed address succeeded, with `confirmation_sent_at` and `invited_at` advancing to `2026-11-02T10:31:53.511604Z`. The owner was told to open the newest invitation promptly. Public signup remains disabled; no account was deleted or manually confirmed.
+
+The private cloud app now explains first-time activation, expired links, sending limits and sender-configuration errors using safe fixed messages. Four focused regression tests, main lint/types and Sites types/Worker build passed. Sites source `97d16365d48ec5e17dbf7e893d5cadd9405f79fc`, deployment `appgdep_6ae867cbdfd88191b88038ef3e39fc8c`, succeeded at the existing cloud URL. Branch: `codex/sign-in-invitation-recovery`. Live browser verification with a synthetic expired-link URL showed the new recovery instructions. Completed owner login remains unverified.
+
+The owner supplied **artielopez.com** for email delivery. Public DNS shows Cloudflare nameservers (`lloyd`/`isabel`) and existing Google MX records. Use the dedicated `auth.artielopez.com` sender namespace; preserve the root mail records. Cloudflare and Resend are both signed out in Chrome; the owner was asked to sign in/create the free Resend account and complete its terms. No DNS record, provider credential or SMTP setting has been changed. Janyl remains app-only, with her invitation pending verified email delivery.
+
 ## Shared cloud publication — 1 November 2026
 
 The [cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) is published separately from the demo, with real Supabase configuration and its server endpoint. Exact Auth redirects are saved. Artie's app invitation was sent; completed email login is awaiting the owner's check. Janyl's invitation is pending custom email delivery. The owner explicitly chose private app access for her, not Supabase organization membership; a sender-domain/DNS question is pending.
