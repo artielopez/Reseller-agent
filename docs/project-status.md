@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Network recovery acceptance — 3 November 2026
+
+Four new [network recovery tests](worker-recovery-acceptance.md) exercise real local HTTP disconnects around production queue RPC commits. Lost claim/start/save acknowledgments do not replay inference or duplicate saved drafts on restart. Lint, types and the full suite passed: **225 tests, six optional skips**. Independent review found no Critical/Important test defects; the recovery instructions now explicitly explain that only a later claim retires an expired lease. This is local synthetic acceptance, not physical Mac restart, hosted concurrency or provider-expiry evidence. No production code changed or model call occurred.
+
+The owner approved the [Beeper support inquiry](channel-access-support-draft.md); it was sent through Gmail and confirmed SENT. Awaiting their explanation of permitted personal Messenger/Marketplace coverage and delivery guarantees. No channel was connected, messages collected or buyer replies sent. The separate OpenAI support report remains unsent as requested.
+
+Read-only checks still show Janyl has not activated/signed in, and the Supabase connector reaches only Artie’s Projects. The five hosted migrations were reconciled in the setup record, including the ten-photo update; fresh-install instructions/checklist now name all five. Remaining gates: Janyl/two-user and physical-device acceptance, actual ten-photo cloud upload, physical/provider recovery, permitted intake/delivery and a separately scoped multi-organization connection. The worker stays paused.
+
 ## Supervised buyer-draft acceptance — 3 November 2026
 
 Manual completion follow-up: the owner reported completing the copy/send/mark-answered steps; a read-only cloud check confirms **Answered** and the worker still paused. External delivery is owner-reported, not independently verified. The existing inquiry-change trigger clears reply approval on any inquiry update, so the reply returning to Draft after marking Answered is expected; the question remains Answered and no reapproval is needed to complete this trial. The supervised question → model draft → owner approval → owner-reported manual reply → Answered milestone is complete. Automatic intake/sending remains disabled.

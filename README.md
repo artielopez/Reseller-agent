@@ -44,7 +44,9 @@ The owner's project is now provisioned; see the [cloud setup record](docs/cloud-
 
 All inventory rows and image paths are scoped to the signed-in user. The browser uses Supabase Auth and its public publishable key; PostgreSQL and Storage enforce ownership. The save RPC uses the caller's privileges and saves the item, photo metadata and three channel records in one transaction.
 
-Apply [`202610310001_seller_preferences.sql`](supabase/migrations/202610310001_seller_preferences.sql) after the draft queue migration for owner-supplied private reply terms and the optional in-app review reminder. It does not depend on the optional delivery simulation. See [seller preferences and review](docs/seller-preferences.md); these branch features are not yet deployed to the shared demo.
+Apply [`202610310001_seller_preferences.sql`](supabase/migrations/202610310001_seller_preferences.sql) after the draft queue migration for owner-supplied private reply terms and the optional in-app review reminder. It does not depend on the optional delivery simulation. See [seller preferences and review](docs/seller-preferences.md) and [current cloud release evidence](docs/project-status.md).
+
+Apply [`20261102183945_ten_item_photos.sql`](supabase/migrations/20261102183945_ten_item_photos.sql) after the migrations above. It raises both database photo limits to ten, matching the editor. Without this migration, an older database still rejects more than six photos. The private cloud app has this migration; do not reapply it there.
 
 ### 2. Configure sign-in for your account
 

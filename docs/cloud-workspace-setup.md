@@ -1,5 +1,7 @@
 # Hosted workspace setup — 1 November 2026
 
+This is the initial 1 November setup snapshot, except for the migration mapping maintained below. Later sign-in, email, account and release evidence is in [current status](project-status.md). Do not interpret the initial unprovisioned-user or localhost statements as current configuration.
+
 ## Actual resources
 
 - Organization: **Artie's Projects**, `oitbiothcymcqgcocyqo`, Personal / Free. The owner's explicit organization choice supersedes earlier SoleVault proposals.
@@ -16,12 +18,13 @@ The current ChatGPT Supabase connector lists only Artie's Projects. Its OAuth au
 
 The connected Supabase tool applied exact repository SQL, assigning its own remote version identifiers:
 
-| Local file in `supabase/migrations/` | Remote version | Remote name |
-| --- | --- | --- |
-| `202610280001_initial.sql` | `20261101105011` | `reseller_initial` |
-| `202610300001_buyer_inbox.sql` | `20261101105020` | `reseller_buyer_inbox` |
-| `202610300002_draft_queue.sql` | `20261101105027` | `reseller_draft_queue` |
+| Local file in `supabase/migrations/`  | Remote version   | Remote name                   |
+| ------------------------------------- | ---------------- | ----------------------------- |
+| `202610280001_initial.sql`            | `20261101105011` | `reseller_initial`            |
+| `202610300001_buyer_inbox.sql`        | `20261101105020` | `reseller_buyer_inbox`        |
+| `202610300002_draft_queue.sql`        | `20261101105027` | `reseller_draft_queue`        |
 | `202610310001_seller_preferences.sql` | `20261101105034` | `reseller_seller_preferences` |
+| `20261102183945_ten_item_photos.sql`  | `20261102184444` | `ten_item_photos`             |
 
 The optional `202610300003_delivery_simulation.sql` is not applied: no app screen or drafting worker uses that engineering lab.
 
