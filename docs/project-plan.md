@@ -1,6 +1,6 @@
 # Reseller Agent project plan
 
-Updated 1 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
+Updated 2 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
 ## Current assignment
 
@@ -14,7 +14,7 @@ The owner selected a dedicated Free organization, **Artie's Projects**, and its 
 
 ### Shared cloud continuation — 1 November
 
-The owner explicitly authorized finishing the shared cloud app and sign-in flow, sending app invitations to Artie and Janyl, and checking multi-organization MCP access. The [cloud app is published](shared-cloud-release.md); Auth redirects are configured and Artie's invitation was sent. Janyl remains an ordinary private app user. The owner chose custom email delivery over Supabase team membership. Complete sender-domain/provider setup and authenticated user acceptance next; do not bypass the email restriction by granting dashboard privileges. Multi-organization MCP needs a separately scoped credential and verification, while the existing Artie's Projects connector remains working.
+The owner explicitly authorized finishing the shared cloud app and sign-in flow, sending app invitations to Artie and Janyl, and checking multi-organization MCP access. The [cloud app is published](shared-cloud-release.md), Auth redirects are configured, and custom Resend SMTP is working through the verified auth.artielopez.com subdomain. Artie is activated and has signed in. Janyl has private Sites viewer access and her Supabase app invitation is delivered; she remains an ordinary app user with her own inventory. Next is her invitation acceptance and both users' authenticated photo/persistence checks. No Supabase team/admin access was granted. Multi-organization MCP needs a separately scoped credential and verification, while the existing Artie's Projects connector remains working.
 
 ### Earlier assignment and completed delivery
 
