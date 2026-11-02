@@ -167,3 +167,7 @@ Drafting begins paused. Once the restricted runtime is configured and verified, 
 The [single-request drafting boundary](docs/single-request-drafting-stage.md) adds a worker-only loopback endpoint and optional bounded OpenAI provider. It holds the model key in parent code and limits each endpoint to one provider invocation, even if an agent retries. It is not started by the app. The foreground launcher and durable queue wiring are implemented; live model/cloud acceptance remains pending. Mac developers can run its synthetic installed-runtime checks with `RUN_OPENCLAW_PROBE=1 npx vitest run tests/openclaw-gateway.test.ts`.
 
 The optional foreground [Mac draft worker](docs/mac-draft-worker.md) processes explicitly queued saved private questions into review drafts. It requires private cloud setup and separate acceptance; it does not connect personal buyer channels or send messages.
+
+### Current end-to-end readiness
+
+See the [acceptance register](docs/automation-acceptance.md) for evidence and remaining gates, and the [operating guide](docs/automation-operations.md) for the current assisted workflow, bounded subscription drafting and recovery. Automatic marketplace message capture/sending remains unavailable.

@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## End-to-end release audit — 3 November 2026
+
+The plan’s [acceptance register](automation-acceptance.md) and [operating guide](automation-operations.md) now map the full objective to actual evidence, remaining implementation and participant/external dependencies. This audit does not mark the project complete: automatic capture/sending, channel pilots, unattended operation and several actual-device/account checks remain incomplete. The broader objective is preserved; the passing manual trial and synthetic tests are not substituted for it.
+
+Fresh read-only checks still show Janyl unactivated/never signed in and only Artie’s Projects accessible through the current Supabase connector. A request for Janyl to use a fresh sign-in link and save a labelled test item is pending. No reminder email was sent, no account was impersonated and no connector scope changed. The new runbook explicitly separates daily manual use, the bounded subscription trial, recovery, retention limits and compatible release/rollback steps.
+
 ## Worker process lifecycle acceptance — 3 November 2026
 
 Four new [process recovery cases](worker-recovery-acceptance.md#local-process-lifecycle-acceptance--3-november-2026) passed: compiled CLI shutdown while idle, shutdown during a pending empty-queue request, retained lock/refused restart after forced kill, and termination of an active process group that ignores SIGTERM. The tests use synthetic fetch and private temporary state, with no real credentials, cloud rows or model calls. They establish those local process boundaries; physical restart/sleep and interrupted real inference remain unverified. Final lint/type checks and **229 tests passed** (six optional skips); fresh independent review found no Critical/Important defects. Added to [PR #24](https://github.com/artielopez/Reseller-agent/pull/24), whose preceding head passed GitHub checks. No production code or deployment changed.
