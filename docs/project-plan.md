@@ -16,6 +16,10 @@ The owner selected a dedicated Free organization, **Artie's Projects**, and its 
 
 The owner explicitly authorized finishing the shared cloud app and sign-in flow, sending app invitations to Artie and Janyl, and checking multi-organization MCP access. The [cloud app is published](shared-cloud-release.md), Auth redirects are configured, and custom Resend SMTP is working through the verified auth.artielopez.com subdomain. Artie is activated and has signed in. Janyl has private Sites viewer access and her Supabase app invitation is delivered; she remains an ordinary app user with her own inventory. Next is her invitation acceptance and both users' authenticated photo/persistence checks. No Supabase team/admin access was granted. Multi-organization MCP needs a separately scoped credential and verification, while the existing Artie's Projects connector remains working.
 
+### Buyer drafting continuation — 2 November
+
+The owner prefers existing OpenClaw or Hermes subscription access instead of a new paid API key. [Hosted draft queue acceptance](hosted-draft-acceptance.md) now verifies the existing database boundary with rolled-back synthetic fixtures, and installed-runtime tests passed without inference. [Subscription route research](research/subscription-drafting.md) found both configured for OpenAI subscription access; only OpenClaw's local OAuth status was verified. Next: enforce subscription-only authentication and no paid fallback/overage in a dedicated adapter, then perform a synthetic draft trial. The current API-key worker does not yet implement that route. Preserve review-only replies and channel access gates; no general-agent configuration change or automatic sending is authorized by this route choice.
+
 ### Earlier assignment and completed delivery
 
 Take over the existing repository, make the local demo available, maintain this plan and the status tracker, and prepare the buyer reply implementation plan. Do not merge without the owner's explicit approval.

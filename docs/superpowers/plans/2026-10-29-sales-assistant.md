@@ -146,3 +146,9 @@ PR #13 implements the restricted foreground OpenClaw draft worker with local syn
 ## Execution update — seller preferences, 31 October 2026
 
 The [seller preferences stage](../../seller-preferences-stage.md) adds saved general private-reply terms and Task 4's in-app review settings/summary. Terms changes bind to fresh draft context and invalidate approvals; reminders alone do not. This is not an external digest or unattended reply release. Tasks 1/3/live5/6 still require permitted access, a selected hosted project and separate live acceptance; original whole-task checkboxes remain incomplete.
+
+## Execution update — hosted queue and subscription preference, 2 November 2026
+
+The private cloud app and custom email sender are ready; Artie has signed in and Janyl's delivered invitation awaits acceptance. Task 6 has partial [hosted queue evidence](../../hosted-draft-acceptance.md), plus 20 passing installed-runtime/database tests and one exact-SQL rollback regression. No original whole-task checkbox is completed by this single-session SQL check. HTTP/Storage ownership, concurrency, devices and full worker/model acceptance remain outstanding.
+
+For Task 4 the owner now prefers existing OpenClaw/Hermes subscription access without additional API spend. [Research and implementation gates](../../research/subscription-drafting.md) replace the immediate API-key setup request. Local configuration indicates subscription routes, but a dedicated no-overage/no-fallback adapter is not implemented. No channel reader, sender, live worker or model request was enabled.

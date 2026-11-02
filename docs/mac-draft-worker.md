@@ -4,7 +4,9 @@ This foreground worker processes explicitly queued private buyer questions from 
 
 ## Prerequisites
 
-- A private cloud instance of the app, Supabase Auth and the first three migrations (through `202610300002_draft_queue.sql`) applied in order. The fourth, optional migration adds a separate fake-delivery engineering lab. Hosted acceptance is still pending. Do not use a service-role or secret Supabase key.
+**Current route decision (2 November):** the owner wants existing subscription access, not a new paid API key. The implementation below still uses an API-key parent provider and must not be activated for that trial. Follow the [subscription adapter work](research/subscription-drafting.md); login metadata is verified, but that adapter is not built. The [hosted draft queue checks](hosted-draft-acceptance.md) passed separately and do not establish live model readiness.
+
+- A private cloud instance of the app, Supabase Auth and all four application migrations, including `202610310001_seller_preferences.sql`, applied in order. `202610300003_delivery_simulation.sql` is a separate optional engineering lab and is not applied in the hosted project. Hosted database acceptance passed; authenticated HTTP and live worker/model acceptance remain pending. Do not use a service-role or secret Supabase key.
 - Parent application Node 22 and `npm ci`. The worker compiles with the existing TypeScript dependency; there is no additional package.
 - macOS, `/usr/bin/sandbox-exec`, a trusted OpenClaw **2026.9.6** install and its Node 24 executable. That installed version is the tested version; a changed version is rejected until revalidated. Paths are operator-controlled, never supplied by a buyer.
 - An OpenAI API key and an explicitly selected model supporting Responses structured output and `reasoning.effort: none`. Real model/account compatibility and billing are not yet tested. The request sets `store: false`; this is not a zero-retention guarantee. See [provider acceptance](single-request-drafting-stage.md).

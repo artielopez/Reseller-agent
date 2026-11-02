@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Buyer draft acceptance and subscription route — 2 November 2026
+
+The existing queue passed [hosted rollback-only acceptance](hosted-draft-acceptance.md): owner isolation, scoped lease, single admission, shared daily allowance, draft-only/idempotent submission, stale seller-term rejection, pause and revocation. Before/after counts were unchanged (two real Auth users and no inventory/inbox/worker/usage fixtures). The exact SQL has a passing local rollback regression. Four existing installed-runtime/database test files also passed, **20 tests**, without live model calls. Real authenticated HTTP, concurrent-session, physical-device and full worker/model acceptance remain incomplete.
+
+The owner selected existing OpenClaw/Hermes access to avoid additional API costs. OpenClaw reports OpenAI OAuth `ok` with `openai/gpt-6-sol`; Hermes selects `openai-codex` / `gpt-6-sol`. [The route investigation](research/subscription-drafting.md) records why ambient fallbacks must not be inherited and how to prove subscription-only operation. No API key is requested for this route. The current worker is still API-key-based; a safe subscription adapter and verified no-overage behavior are next, not completed features. No live worker, model call, automatic inbox reader or sender was enabled. Janyl's delivered invitation is still awaiting her sign-in acceptance.
+
+Work is on `codex/hosted-buyer-draft-acceptance`, based on PR #18 delivery head `6be4847`; no merge or production deployment is part of this acceptance/research change.
+
 ## Shared sign-in and invitations — 2 November 2026
 
 Custom SMTP is saved and working. The owner created and entered the Resend credential directly; the agent did not read or store it. The sender is `login@auth.artielopez.com`, with the verified subdomain and the three approved DNS records; existing root Google mail records are unchanged.
