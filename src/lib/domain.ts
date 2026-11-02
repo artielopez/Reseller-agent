@@ -33,7 +33,7 @@ export const publicationStatuses = [
   "Published",
   "Removed",
 ] as const;
-export const MAX_PHOTOS = 6;
+export const MAX_PHOTOS = 10;
 
 export const itemInputSchema = z.object({
   title: z

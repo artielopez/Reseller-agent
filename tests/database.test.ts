@@ -136,6 +136,48 @@ it("enforces private storage folders for reads and writes", async () => {
     0,
   );
 });
+it("saves ten ordered photos and rejects an eleventh without changing the item", async () => {
+  await asUser(alice);
+  const photos = Array.from({ length: 11 }, () => {
+    const id = crypto.randomUUID();
+    return { id, path: `${alice}/${itemId}/${id}.jpg` };
+  });
+  await db.query("select public.save_inventory_item($1::jsonb)", [
+    JSON.stringify({ ...payload, photos: photos.slice(0, 10) }),
+  ]);
+  const saved = await db.query(
+    "select id, path, position from public.item_photos order by position",
+  );
+  expect(saved.rows).toEqual(
+    photos.slice(0, 10).map((photo, position) => ({ ...photo, position })),
+  );
+  await expect(
+    db.query("select public.save_inventory_item($1::jsonb)", [
+      JSON.stringify({ ...payload, title: "Must not save", photos }),
+    ]),
+  ).rejects.toThrow("Invalid photos");
+  expect(
+    (
+      await db.query(
+        "select id, path, position from public.item_photos order by position",
+      )
+    ).rows,
+  ).toEqual(saved.rows);
+  expect(
+    (await db.query<{ title: string }>("select title from public.items"))
+      .rows[0].title,
+  ).toBe("Lamp");
+  await expect(
+    db.query(
+      "insert into public.item_photos (id, item_id, owner_id, path, position) values ($1, $2, $3, $4, 10)",
+      [photos[10].id, itemId, alice, photos[10].path],
+    ),
+  ).rejects.toThrow();
+  await asUser(bob);
+  expect(
+    (await db.query("select * from public.item_photos")).rows,
+  ).toHaveLength(0);
+});
 it("limits AI requests durably and prevents users resetting their usage", async () => {
   await asUser(alice);
   for (let index = 0; index < 20; index++)

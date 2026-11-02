@@ -1,6 +1,16 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { User } from "@supabase/supabase-js";
+import { writeClipboard } from "@/lib/clipboard";
+import { SellerPreferencesPanel } from "./seller-preferences";
+import { termsContext, type Preferences } from "@/lib/seller/preferences";
+import { DraftWorkerControls } from "./draft-worker-controls";
 import { AuthPanel } from "./auth-panel";
 import { demoMode, configurationError } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
@@ -27,10 +37,13 @@ import {
   type Thread,
 } from "@/lib/buyer/domain";
 import { signOutWithDraftProtection } from "@/lib/buyer/session";
-type ReportUnsaved = (part: "form" | "reply", dirty: boolean) => void;
+type ReportUnsaved = (
+  part: "form" | "reply" | "preferences",
+  dirty: boolean,
+) => void;
 type Mutation = Parameters<typeof mutateThread>[0];
 export function BuyerInbox() {
-  const unsaved = useRef({ form: false, reply: false });
+  const unsaved = useRef({ form: false, reply: false, preferences: false });
   const reportUnsaved = useCallback<ReportUnsaved>((part, dirty) => {
     unsaved.current[part] = dirty;
   }, []);
@@ -95,7 +108,8 @@ export function BuyerInbox() {
             </>
           )}{" "}
           Nothing is read from Facebook or Carousell, and nothing is sent
-          automatically. Templates use saved facts; no AI service is called.
+          automatically. Templates use saved facts; worker drafts require
+          separate setup and review.
         </span>
       </div>
       {(configurationError || error) && (
@@ -117,10 +131,12 @@ export function BuyerInbox() {
               onClick={async () => {
                 try {
                   await signOutWithDraftProtection(
-                    unsaved.current.form || unsaved.current.reply,
+                    unsaved.current.form ||
+                      unsaved.current.reply ||
+                      unsaved.current.preferences,
                     () =>
                       window.confirm(
-                        "Sign out and discard unsaved question or reply text?",
+                        "Sign out and discard unsaved question, reply or preference edits?",
                       ),
                     () => getSupabase().auth.signOut(),
                   );
@@ -179,6 +195,20 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     return () => {
       alive.current = false;
     };
+  }, []);
+  const reportPreferencesDirty = useCallback(
+    (dirty: boolean) => reportUnsaved("preferences", dirty),
+    [reportUnsaved],
+  );
+  const onPreferences = useCallback((p: Preferences) => {
+    setThread((current) =>
+      current
+        ? {
+            ...current,
+            context: { ...current.context, seller_terms: termsContext(p) },
+          }
+        : current,
+    );
   }, []);
   const editedDirty = useRef(false);
   const reportReplyDirty = useCallback(
@@ -355,6 +385,12 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
         </p>
       ) : (
         <>
+          <SellerPreferencesPanel
+            refresh={questions}
+            onPreferences={onPreferences}
+            reportDirty={reportPreferencesDirty}
+          />
+          {!demoMode && <DraftWorkerControls questions={questions} />}
           <section className="panel section-pad">
             <h2>Record a buyer question</h2>
             <form
@@ -678,6 +714,15 @@ function ReplyReview({
   }, []);
   const changed = body !== reply.body,
     stale = !contextMatches(reply.context, thread.context);
+  const eligible =
+    !changed &&
+    !stale &&
+    reply.status === "Approved" &&
+    thread.inquiry.status === "Open";
+  const copyEligibility = useRef({ context: thread.context, eligible });
+  useLayoutEffect(() => {
+    copyEligibility.current = { context: thread.context, eligible };
+  }, [thread.context, eligible]);
   useEffect(() => {
     onDirtyChange(changed);
     return () => {
@@ -694,19 +739,26 @@ function ReplyReview({
     return () => window.removeEventListener("beforeunload", warn);
   }, [changed]);
   async function copy() {
+    const requestedContext = thread.context;
+    const stillEligible = () =>
+      alive.current &&
+      mounted.current &&
+      copyEligibility.current.eligible &&
+      contextMatches(requestedContext, copyEligibility.current.context);
+    if (!stillEligible()) return;
     setCopying(true);
     onError("");
     setNotice("");
     setCopyText("");
     try {
       const current = await approvedText(reply.id, reply.revision);
-      if (!alive.current || !mounted.current) return;
+      if (!stillEligible()) return;
       try {
-        await navigator.clipboard.writeText(current.body);
-        if (alive.current && mounted.current)
+        await writeClipboard(current.body);
+        if (stillEligible())
           setNotice("Copied. Send it yourself on the original platform.");
       } catch {
-        if (alive.current && mounted.current) {
+        if (stillEligible()) {
           setCopyText(current.body);
           setNotice(
             "Clipboard unavailable. Select the approved text below and copy it manually.",
@@ -714,7 +766,7 @@ function ReplyReview({
         }
       }
     } catch (e) {
-      if (alive.current && mounted.current) onError(errorMessage(e));
+      if (stillEligible()) onError(errorMessage(e));
     } finally {
       if (mounted.current) setCopying(false);
     }
@@ -725,8 +777,11 @@ function ReplyReview({
         Reply status: {reply.status} ·{" "}
         {reply.source === "template"
           ? "Template — no AI used"
-          : "Written by you"}
+          : reply.source === "agent"
+            ? "Agent draft — review required"
+            : "Written by you"}
       </p>
+      {reply.review_note && <p>Review note: {reply.review_note}</p>}
       {stale && (
         <p role="status">
           Saved facts changed. Prepare a fresh draft before approval or copying.
@@ -793,8 +848,8 @@ function ReplyReview({
           </button>
         </div>
       </fieldset>
-      {notice && <p role="status">{notice}</p>}
-      {copyText && (
+      {eligible && notice && <p role="status">{notice}</p>}
+      {eligible && copyText && (
         <label className="field">
           Approved text to copy manually
           <textarea
