@@ -1,5 +1,15 @@
 # Reseller Agent status
 
+## Existing OpenClaw route resumed — 3 November 2026
+
+The owner asked to work directly with the Mac mini OpenClaw codebase/setup. `/opt/homebrew/lib/node_modules/openclaw` resolves to `/Users/artielopez/openclaw-src`, package 2026.9.6, HEAD `28226d9`; its checkout is clean and contains two local commits, which are preserved. An isolated source worktree is preparing the canonical SIWC fix; the normal installation and gateway are untouched.
+
+The existing normal OpenAI OAuth profile is present, belongs to Artie and expires on 4 November. Current ChatGPT Usage shows **46% remaining, zero credits, automatic reload off**. The owner explicitly approved turning off **Improve the model for everyone**, and the live Data controls UI now shows it off. The current Reseller worker built successfully and its real no-inference broker preflight against this existing OpenClaw setup returned compatible. No model call, real buyer processing or new cloud job occurred.
+
+[Supervised trial decision](subscription-worker-trial.md#existing-connection-decision--3-november): reuse the existing account for one owner-selected question with exact input hash, short-lived allowance attestation, draft-only capability and human review. The separate connection is no longer a prerequisite for that bounded trial; unattended work remains unreleased. The owner has been asked to save one real item/question and identify it. Janyl is still unactivated. PR #21's final GitHub Application checks passed; it remains open with auto-merge disabled.
+
+The [SIWC investigation](siwc-compatibility-experiment.md) found missing required host identity and a callback-address mismatch. Correcting the copied runtime passed offline and emitted-request checks but still produced the provider's **Operation timed out** at consent. The process was stopped; no 8080 listener remained. A [sanitized support report](support-siwc-consent-timeout.md) is drafted; the owner explicitly chose **not to send it**. No further consent retries are planned without new evidence. Lint and 220 standard tests passed (six optional skips) for the diagnostic increment. No GitHub merge or new cloud publication.
+
 ## Photo persistence verified; listing price warning — 2 November 2026
 
 Resumed acceptance now verifies **two synthetic photos** on the labelled acceptance lamp: the native Chrome picker completed upload, the app confirmed save, both images decoded after a full reload, and a read-only database/Storage join confirms two photo rows and two private JPEG objects. The fixtures are 1×1 test PNGs converted by the app, not personal photos. This closes the Mac Chrome photo-save/reload check; physical iPhone/Windows and two-user isolation acceptance remain separate. No extension permission or browser-security setting was changed.

@@ -22,7 +22,7 @@ export type SubscriptionBrokerOptions = {
   nodePath: string;
   pluginPath: string;
   profileId: string;
-  /** Exact synthetic acceptance payload; no arbitrary inbox processing yet. */
+  /** Exact operator-reviewed trial payload; no arbitrary inbox processing. */
   inputSha256: string;
   /** Operator-observed allowance, zero credits and auto-reload off.
    * Short-lived attestation, not a provider spending-limit API. */
