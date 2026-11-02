@@ -50,4 +50,20 @@ Read-only inspection narrowed the remaining gaps; no further inference, login, p
 - **A supported candidate:** [OpenAI documents per-app limits](https://help.openai.com/en/articles/20001542-using-your-chatgpt-plan-in-other-apps-and-sites) for participating subscription-sharing apps. A limit below 100% prevents that app from using credits; credit-use permission and automatic reload are separate controls. [OpenClaw's authentication guide](https://docs.openclaw.ai/providers/openai/authentication) distinguishes its app-specific Sign in with ChatGPT (Beta) method from Codex login. The installed version supports `--method siwc` and a named CLI profile with isolated state. This could offer a better operational boundary if the account exposes those controls after authorization. Eligibility and saved settings must be verified; absence of controls is not success. No new authorization has been started and the existing OpenClaw login is unchanged.
 - **Privacy:** the live Data controls page shows “Improve the model for everyone” enabled. [OpenAI's Codex guidance](https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan) says ChatGPT training preferences apply to Codex. The owner has been asked before changing that account-wide preference. `store: false` is not a promise of zero retention, and training opt-out would not make it one. No real buyer text was used in these trials.
 
-Next implementation decision: test the supported app-specific route's request bounds offline, then prepare a separate named-profile authorization only if it can meet the existing worker contract. Let the owner complete any new consent; verify provider-side app limits and credit use before inference. Keep the current synthetic worker gates until that route is accepted, or record a deliberate reviewed change to the contract. Do not continue adding synthetic delivery machinery as a substitute for the unresolved platform permissions.
+### App-specific route follow-up
+
+The installed OpenClaw `token-sharing-stream.test.ts` and `provider-auth.contract.test.ts` suites passed **19 tests** using fake transports/credentials. The simple-completion hook forces SSE, complete-context replay and `store: false`, keeps the no-tool input tool-free, and rejects identity-only grants or a sharing credential aimed at the Codex/custom endpoint. These are installed-framework boundary tests, not an authenticated Reseller worker run. They also confirm a material limitation: SIWC deliberately removes `max_output_tokens`. Switching sign-in methods does not repair the upstream token-cap gap.
+
+Reproduction (installed OpenClaw root, Node 24):
+
+```sh
+/opt/homebrew/bin/node node_modules/vitest/vitest.mjs run \
+  --config test/vitest/vitest.extension-provider-openai.config.ts \
+  extensions/openai/token-sharing-stream.test.ts \
+  extensions/openai/provider-auth.contract.test.ts \
+  --maxWorkers 1 --no-file-parallelism
+```
+
+Prepared the official `--profile reseller-agent models auth login --provider openai --method siwc` flow in a previously absent, separate named profile. The browser reached the exact consent for **Reseller Agent — OpenClaw**, requesting identity and use of the owner's ChatGPT plan. It has not been approved. Browser-control policy requires action-time confirmation for this new grant; the owner has been asked. No paid credit setting, training preference or normal OpenClaw profile was changed. The short-lived login process must be checked before continuing; never reuse an expired callback or assume the consent created credentials.
+
+Next: after consent, verify the separately named app's actual provider-side limit and disabled credit use, before any model call. If those controls are unavailable, stop this route without starting a worker. Any supervised real-buyer release must explicitly document enforced wall-clock/output-size/application-attempt limits and the absence of an upstream token cap; it must not claim zero provider retention. The current synthetic worker gates remain unchanged. No further synthetic delivery machinery substitutes for unresolved platform permissions.

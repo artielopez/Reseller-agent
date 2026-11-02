@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Subscription consent prepared — 2 November 2026
+
+Installed OpenClaw app-specific subscription boundary checks passed **19 tests**, using fake credentials/transports and no model calls. This route enforces SSE and `store: false` for simple completions, but also strips the upstream output-token cap. [Evidence and exact next gate](research/subscription-drafting.md#app-specific-route-follow-up). A separate named-profile login reached **Reseller Agent — OpenClaw** consent; approval is pending. The existing worker remains synthetic-only and paused. The account-wide training preference is also awaiting the owner's decision.
+
+Fresh read-only hosted checks: Artie is activated/signed in; Janyl is not yet activated or signed in; the acceptance lamp still has zero saved photos. The Supabase connector still lists only Artie's Projects. These are external dependencies, not completed acceptance. No GitHub merge, live buyer access/sending or additional publication occurred.
+
 ## Publication follow-through and remaining gates — 2 November 2026
 
 Re-read Sites state confirms the approved cloud fixes are live at version 4, with the existing custom audience. GitHub PR #20 remains open and unmerged at `d4b3982`. The saved cloud draft/review/copy acceptance below is complete; the plan now reflects that outcome rather than listing it as future work.
