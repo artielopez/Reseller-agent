@@ -21,7 +21,7 @@ The default `api` route remains available for explicitly configured API deployme
 
 ## Cloud acceptance
 
-The owner’s labelled synthetic lamp was saved through the live app at PHP 850, then changed to PHP 900. A saved private Marketplace question entered the owner-only queue. One foreground worker pass completed through the existing sandbox and the exact profile-bound OAuth broker. Hosted result: job `f408f8ec-7598-46e5-8a66-16959afff82f` completed, source `agent`, status `Draft`, correct PHP 900 asking price and disclosed mark. The daily app allowance was admitted by the queue before inference. Nothing was approved or sent by the worker.
+The owner’s labelled synthetic lamp was saved through the live app at PHP 850, then changed to PHP 900. A saved private Marketplace question entered the owner-only queue. One foreground worker pass completed through the existing sandbox and the exact profile-bound OAuth broker. Hosted result: job `f408f8ec-7598-46e5-8a66-16959afff82f` completed, source `agent`, status `Draft`, correct PHP 900 asking price and disclosed mark. The daily app allowance was admitted by the queue before inference. Nothing was approved or sent by the worker. The deployed UI later displayed the Agent Draft; it was explicitly approved for the synthetic copy test, and the manual-copy fallback worked. The question remained Open.
 
 Afterward the queue was paused, acceptance enrollment `91e428af-1704-4b03-8df4-1938b557788c` revoked, and private helper/payload files removed. No worker lock remained. The saved fixture and real usage/job audit remain; no uncertain attempt was retried.
 
