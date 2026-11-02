@@ -1,4 +1,32 @@
 import { test, expect } from "@playwright/test";
+test("a stale second editor preserves its edits and cannot overwrite a newer inventory save", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/");
+  const other = await context.newPage();
+  await other.goto("/");
+  for (const tab of [page, other])
+    await tab
+      .getByRole("button", { name: "Edit Sony WH-1000XM4 headphones" })
+      .click();
+  await page.getByLabel("Price (PHP)").fill("6600");
+  await page.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Your inventory" }),
+  ).toBeVisible();
+  await other.getByLabel("Price (PHP)").fill("100");
+  await other.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    other.getByRole("alert").filter({ hasText: /changed.*reload/i }),
+  ).toBeVisible();
+  await expect(other.getByLabel("Price (PHP)")).toHaveValue("100");
+  await page.reload();
+  await page
+    .getByRole("button", { name: "Edit Sony WH-1000XM4 headphones" })
+    .click();
+  await expect(page.getByLabel("Price (PHP)")).toHaveValue("6600");
+});
 test("ten photos survive saving and reload; oversized selections preserve existing photos", async ({
   page,
 }) => {

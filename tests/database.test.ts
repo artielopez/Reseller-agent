@@ -1,12 +1,13 @@
 import { PGlite } from "@electric-sql/pglite";
 import { readFileSync, readdirSync } from "node:fs";
-import { beforeAll, afterAll, expect, it } from "vitest";
+import { beforeAll, beforeEach, afterAll, expect, it } from "vitest";
 const db = new PGlite();
 const alice = "11111111-1111-4111-8111-111111111111";
 const bob = "22222222-2222-4222-8222-222222222222";
 const itemId = "33333333-3333-4333-8333-333333333333";
 const payload = {
   id: itemId,
+  saveRevision: null as string | null,
   title: "Lamp",
   description: "Scratch on base.",
   price: 500,
@@ -50,6 +51,16 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await db.close();
+});
+beforeEach(async () => {
+  await asUser(alice);
+  const row = (
+    await db.query<{ save_revision: string }>(
+      "select save_revision from public.items where id=$1",
+      [itemId],
+    )
+  ).rows[0];
+  payload.saveRevision = row?.save_revision ?? null;
 });
 it("atomically saves an item with three channels and isolates another owner", async () => {
   await asUser(alice);

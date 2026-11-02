@@ -48,7 +48,9 @@ Apply [`202610310001_seller_preferences.sql`](supabase/migrations/202610310001_s
 
 Apply [`20261102183945_ten_item_photos.sql`](supabase/migrations/20261102183945_ten_item_photos.sql) after the migrations above. It raises both database photo limits to ten, matching the editor. Without this migration, an older database still rejects more than six photos. The private cloud app has this migration; do not reapply it there.
 
-Apply [`20261102202606_non_retryable_conflicts.sql`](supabase/migrations/20261102202606_non_retryable_conflicts.sql) last. It prevents stale business conflicts from triggering PostgREST transaction retry loops. The existing cloud project already has it; see [fix evidence](docs/non-retryable-conflicts.md).
+Apply [`20261102202606_non_retryable_conflicts.sql`](supabase/migrations/20261102202606_non_retryable_conflicts.sql) next. It prevents stale business conflicts from triggering PostgREST transaction retry loops. The existing cloud project already has it; see [fix evidence](docs/non-retryable-conflicts.md).
+
+Apply [`202611030001_inventory_save_revision.sql`](supabase/migrations/202611030001_inventory_save_revision.sql) last, with the matching app version. It rejects stale inventory saves across devices and returns the saved revision atomically. Older open editors must reload before saving existing items. Check [deployment evidence](docs/inventory-save-conflicts.md) before changing the existing cloud project.
 
 ### 2. Configure sign-in for your account
 
@@ -80,7 +82,7 @@ The model is configurable. The default is [`gpt-6-luna`](https://developers.open
 
 ## Everyday workflow
 
-1. Select **Add item**. Add up to six JPEG, PNG or WebP photos and enter the title, PHP asking price, condition, category and flaws. Photos are optional for a draft.
+1. Select **Add item**. Add up to ten JPEG, PNG or WebP photos and enter the title, PHP asking price, condition, category and flaws. Photos are optional for a draft.
 2. Select **Generate listing copy**. Review and edit the Carousell, Marketplace and Groups tabs. Regeneration asks before replacing existing copy.
 3. **Save item**, then copy its title, description or full post into the platform. Add the photos through the platform's normal posting flow.
 4. Paste the published URL into the matching channel, choose **Published**, and save. Copying does not mark anything published.

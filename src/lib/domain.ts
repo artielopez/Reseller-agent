@@ -90,6 +90,7 @@ export type Listing = z.infer<typeof listingSchema>;
 export type Photo = { id: string; url: string; path?: string };
 export type Item = ItemInput & {
   replyContextRevision?: string;
+  saveRevision?: string | null;
   id: string;
   photos: Photo[];
   listings: Listing[];
@@ -116,6 +117,7 @@ export function formatPHP(price: number) {
 export function emptyItem(): Item {
   return {
     id: crypto.randomUUID(),
+    saveRevision: null,
     title: "",
     description: "",
     price: 0,

@@ -6,6 +6,8 @@ const state = vi.hoisted(() => ({
   rpcError: false,
   committed: false,
   confirmError: false,
+  rpcCode: "",
+  calls: [] as { name: string; payload: unknown }[],
 }));
 vi.mock("../src/lib/config", () => ({ demoMode: false }));
 vi.mock("../src/lib/supabase", () => ({
@@ -37,12 +39,22 @@ vi.mock("../src/lib/supabase", () => ({
       }),
     }),
     rpc: async (
-      _name: string,
+      name: string,
       { payload }: { payload: { photos: { path: string }[] } },
     ) => {
+      state.calls.push({ name, payload });
       if (state.committed || !state.rpcError)
         payload.photos.forEach((photo) => state.referenced.add(photo.path));
-      return { error: state.rpcError ? new Error("Lost response") : null };
+      return {
+        data: {
+          saveRevision: "44444444-4444-4444-8444-444444444444",
+          updatedAt: "2026-11-03T00:00:00Z",
+          replyContextRevision: "2",
+        },
+        error: state.rpcError
+          ? Object.assign(new Error("Lost response"), { code: state.rpcCode })
+          : null,
+      };
     },
   }),
 }));
@@ -58,6 +70,8 @@ beforeEach(() => {
   state.rpcError = false;
   state.committed = false;
   state.confirmError = false;
+  state.rpcCode = "";
+  state.calls.length = 0;
 });
 it("keeps uploaded photos when a lost RPC response may already have committed metadata", async () => {
   state.rpcError = true;
@@ -72,9 +86,15 @@ it("retains uploads if it cannot confirm whether metadata committed", async () =
   await expect(saveItem(item())).rejects.toThrow();
   expect(state.objects.size).toBe(1);
 });
-it("cleans up failed uploads only when metadata is confirmed unreferenced", async () => {
+it("retains uploads after an uncertain save even when metadata is not visible yet", async () => {
   state.rpcError = true;
   await expect(saveItem(item())).rejects.toThrow();
+  expect(state.objects.size).toBe(1);
+});
+it("reports an explicit conflict and cleans only definitively rejected unreferenced uploads", async () => {
+  state.rpcError = true;
+  state.rpcCode = "PT409";
+  await expect(saveItem(item())).rejects.toThrow(/changed.*reload/i);
   expect(state.objects.size).toBe(0);
 });
 it("returns persisted photo paths on successful save", async () => {
@@ -83,4 +103,13 @@ it("returns persisted photo paths on successful save", async () => {
     /^11111111-1111-4111-8111-111111111111\//,
   );
   expect(state.objects.has(result.photos[0].path!)).toBe(true);
+  expect(result).toMatchObject({
+    saveRevision: "44444444-4444-4444-8444-444444444444",
+    updatedAt: "2026-11-03T00:00:00Z",
+    replyContextRevision: "2",
+  });
+  expect(state.calls[0]).toMatchObject({
+    name: "save_inventory_item_checked",
+    payload: { saveRevision: null },
+  });
 });

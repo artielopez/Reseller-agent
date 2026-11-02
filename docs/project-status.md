@@ -1,5 +1,9 @@
 # Reseller Agent status
 
+## Inventory save conflicts — 3 November 2026
+
+Two-device acceptance exposed an unguarded inventory overwrite: an older editor could replace newer item details, photos and copy. [The revision guard](inventory-save-conflicts.md) now rejects those stale writes and preserves unsaved editor text. The demo uses one atomic IndexedDB transaction; the cloud client uses an invoker RPC returning the exact saved revision. Unknown save responses also retain uploads, because a missing metadata row does not rule out a delayed commit. Regression failures were reproduced before the fixes. Local lint/types, 247 tests (six optional skips), all 52 desktop/mobile browser checks and the production build passed. Independent review and cloud release remain pending; the migration has not been applied remotely.
+
 ## Active subprocess crash recovery — 3 November 2026
 
 Reviewable delivery: [PR #26](https://github.com/artielopez/Reseller-agent/pull/26), implementation `bf1fbc9` plus review fix `6d2f189`. The production build also passed. No GitHub merge or new cloud deployment; the compiled Mac worker contains the fix for future supervised runs. The previous PR #25's GitHub Application checks passed. Beeper's inquiry thread still has no response at the latest read-only check.
