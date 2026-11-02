@@ -1,0 +1,69 @@
+# Subscription-backed buyer drafts — 2 November 2026
+
+## Decision and current evidence
+
+The owner asked to reuse OpenClaw or Hermes to avoid additional model costs. Use an existing subscription allowance, with no API-key or paid-provider fallback and no automatic credit purchase. Prefer OpenClaw for the first adapter because the existing restricted worker already has installed-runtime tests. Hermes remains an alternative, not a second simultaneous worker.
+
+Read-only local inspection found:
+
+| Installation      | Safe metadata observed                                        | What this establishes                                                                                          |
+| ----------------- | ------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| OpenClaw 2026.9.6 | Default/resolved `openai/gpt-6-sol`; OpenAI OAuth status `ok` | A configured subscription-capable route and locally valid login metadata; no inference or account billing test |
+| Hermes            | `model.provider: openai-codex`, `model.default: gpt-6-sol`    | Subscription provider selected; Hermes login validity was not checked                                          |
+
+Only provider/model/type/status fields were retained. No credential values or personal agent history were read or copied. The general OpenClaw configuration has additional model/provider fallbacks, including providers with API-key/token authentication. It is unsuitable to inherit unchanged for a no-additional-cost trial. Neither installation was reconfigured.
+
+[OpenClaw's official setup guide](https://docs.openclaw.ai/providers/openai/setup) supports ChatGPT/Codex sign-in separately from API-key billing. [Hermes' official quickstart](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart) also lists OpenAI Codex subscription access. These are supported routes to investigate, not proof of this account's model entitlement or remaining allowance.
+
+[OpenClaw's cost documentation](https://docs.openclaw.ai/providers/openai/coverage-and-cost) distinguishes subscription quota and credits from Platform API billing. A subscription is not unlimited use. Before inference, establish that the selected route will not consume paid overage/credits when included allowance runs out; stop if this cannot be enforced. An OAuth label or a reported zero/absent cost estimate is not a spending guarantee.
+
+## Why the current worker needs an adapter
+
+The existing `src/worker/main.ts` uses OpenClaw as a restricted runtime, but its parent process calls `createOpenAIDraftProvider`, which requires an API key. The child only reaches a one-use local endpoint. Switching a model name cannot convert that API request to subscription access.
+
+The [documented one-shot CLI](https://docs.openclaw.ai/cli/agent) can use existing framework-managed authentication. However, its ordinary defaults can include tools and ambient configuration. [Model failover](https://docs.openclaw.ai/concepts/model-failover) includes auth rotation and same-model recovery as well as model fallback. Merely choosing `--model` or checking that the final output reports one assistant turn does not prove one inference request or prevent API-key fallback. Preserve the current worker's stronger boundaries until replacement controls are tested.
+
+## Implementation sequence
+
+1. **Prove a supported subscription-only route without buyer data.** Use a dedicated, pinned configuration and framework-owned login handling. Do not extract OAuth tokens into our app or copy the user's complete agent state. Verify no API credentials, alternate auth profiles, paid fallback, provider override, credit overage or hidden recovery can be selected. If the installed public interface cannot enforce the existing single-request contract, record that limitation and keep the adapter disabled rather than weakening the contract silently.
+2. **Add a provider behind the existing draft interface.** Preserve owned saved facts, output validation, shared daily attempt admission, time/output bounds, cancellation, secret-free logs and stale-context checks. Do not let the buyer choose model, config, endpoint, tools, files or auth. The subscription subprocess must have no browser, shell, marketplace, messaging, memory or general personal-file access. Account/profile credentials stay with the trusted auth broker, not model tools.
+3. **Test failure paths offline before a synthetic model trial.** Invalid/expired OAuth, exhausted quota, paid fallback candidate, missing telemetry, extra provider attempts, malformed output, tool requests, cancellation, crash leftovers and changed seller terms must fail closed. A fake provider test does not establish live subscription billing or retention.
+4. **Run one synthetic question after the cost boundary is verified.** Record selected auth mode, model, request count, result validation and cleanup without secrets. Then connect one paused, owner-enrolled cloud worker and verify one reviewed Draft. Do not start a background daemon or process real buyer data from a successful login check alone.
+5. **Accept the real workflow separately.** Start with questions pasted into the private app and owner review/copy. Automatic reading/replying still needs a permitted, account-specific channel integration; subscription access does not grant Facebook or Carousell permissions. Keep public Group comments distinct from private messages and Janyl's inventory distinct from Artie's.
+
+Template/manual replies already work without model charges. They remain available when the subscription adapter is disabled or its allowance is exhausted, with their existing label; do not label a template as AI output. There is no automatic failover from OpenClaw to Hermes in this proposal.
+
+## Release state
+
+The first adapter and one real synthetic OAuth-only trial now work locally (2 November). Installed OpenClaw 2026.9.6 returned a valid PHP 850 draft using `api.runtime.llm.complete`, `requiredAuthMode: oauth`, pinned `openai/gpt-6-sol` and strict structured output. The framework resolves its own existing login; no token was extracted, and the subprocess inherited no API key. One app attempt was reserved before inference. The owner signed into ChatGPT; its Usage screen showed 59% weekly allowance, zero credits and automatic reload off. No settings or purchases were changed.
+
+The adapter invokes the host completion capability once, with a 20-second deadline, no tools, no retry and no model/auth fallback. This does **not** prove a single underlying network request: the installed transport has recovery paths. Provider retention and ongoing quota/credit enforcement are not yet certified. Do not process real buyer data or enable unattended operation on this evidence alone.
+
+`src/worker/subscription-broker.ts` constructs private temporary configuration, permits one OAuth profile, strips inherited environment, validates host version, and cleans/drains owned processes. It is a trusted authentication broker, not the model's tool environment. The existing sandboxed runtime remains the model-facing boundary. `RESELLER_DRAFT_PROVIDER=subscription` is a foreground `once` trial only, requiring an operator-observed allowance attestation expiring within one hour. This timestamp is a local operational gate, **not a monetary cap**, and must never be refreshed automatically. The default plugin remains inference-disabled. A subsequent synthetic cloud queue/model round trip passed through the existing sandbox: saved question → profile-bound OAuth completion → unapproved Agent Draft. Its enrollment is revoked and queue paused. No real-buyer or sending release is claimed.
+
+## Remaining controls investigation — 2 November
+
+Read-only inspection narrowed the remaining gaps; no further inference, login, purchase or account setting change was made.
+
+- **Token and transport controls:** installed `src/plugins/runtime/types-core.ts` explicitly describes `maxTokens` as advisory. Its direct-completion parameters expose no transport/retry selector. `packages/ai/src/providers/openai-chatgpt-responses.ts` builds `store: false` but does not put `max_output_tokens` in its request; the shared Responses sanitizer also lists that field as unsupported on the Codex backend. The same transport has WebSocket/SSE recovery and semantic recovery paths. Our 20-second deadline, one host call and validated response-size limit are real controls, but they are not proof of exactly one network request or a provider-enforced 1,800-token limit. Do not patch the owner's global OpenClaw installation or extract its OAuth credential to work around this interface.
+- **Cost controls:** the live ChatGPT Usage page showed 53% weekly allowance remaining, zero credits and automatic reload off. No App limits section was visible. [OpenAI's credits guide](https://help.openai.com/en/articles/12642688-using-credits-for-flexible-usage-in-chatgpt-personal-plans) distinguishes included usage, credit consumption and automatic purchases. This observation supports the supervised trial; it does not establish a persistent per-worker cap.
+- **A supported candidate:** [OpenAI documents per-app limits](https://help.openai.com/en/articles/20001542-using-your-chatgpt-plan-in-other-apps-and-sites) for participating subscription-sharing apps. A limit below 100% prevents that app from using credits; credit-use permission and automatic reload are separate controls. [OpenClaw's authentication guide](https://docs.openclaw.ai/providers/openai/authentication) distinguishes its app-specific Sign in with ChatGPT (Beta) method from Codex login. The installed version supports `--method siwc` and a named CLI profile with isolated state. This could offer a better operational boundary if the account exposes those controls after authorization. Eligibility and saved settings must be verified; absence of controls is not success. No new authorization has been started and the existing OpenClaw login is unchanged.
+- **Privacy:** the live Data controls page shows “Improve the model for everyone” enabled. [OpenAI's Codex guidance](https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan) says ChatGPT training preferences apply to Codex. The owner has been asked before changing that account-wide preference. `store: false` is not a promise of zero retention, and training opt-out would not make it one. No real buyer text was used in these trials.
+
+### App-specific route follow-up
+
+The installed OpenClaw `token-sharing-stream.test.ts` and `provider-auth.contract.test.ts` suites passed **19 tests** using fake transports/credentials. The simple-completion hook forces SSE, complete-context replay and `store: false`, keeps the no-tool input tool-free, and rejects identity-only grants or a sharing credential aimed at the Codex/custom endpoint. These are installed-framework boundary tests, not an authenticated Reseller worker run. They also confirm a material limitation: SIWC deliberately removes `max_output_tokens`. Switching sign-in methods does not repair the upstream token-cap gap.
+
+Reproduction (installed OpenClaw root, Node 24):
+
+```sh
+/opt/homebrew/bin/node node_modules/vitest/vitest.mjs run \
+  --config test/vitest/vitest.extension-provider-openai.config.ts \
+  extensions/openai/token-sharing-stream.test.ts \
+  extensions/openai/provider-auth.contract.test.ts \
+  --maxWorkers 1 --no-file-parallelism
+```
+
+Prepared the official `--profile reseller-agent models auth login --provider openai --method siwc` flow in a previously absent, separate named profile. The browser reached the exact consent for **Reseller Agent — OpenClaw**, requesting identity and use of the owner's ChatGPT plan. The owner subsequently explicitly approved this connection. Two fresh submissions returned “Operation timed out” from the consent page; the intermediate page retry did not advance. A refreshed ChatGPT connection list still has no Reseller Agent entry. No successful callback reached either CLI process; both were stopped and port 8080 had no listener afterward. No paid credit setting, training preference or normal OpenClaw profile was changed. Approval for the same connection persists, but authorization is not complete. Use a fresh official login flow for a later retry, never an expired callback. Do not substitute manual token extraction or API-key fallback.
+
+Next: after consent, verify the separately named app's actual provider-side limit and disabled credit use, before any model call. If those controls are unavailable, stop this route without starting a worker. Any supervised real-buyer release must explicitly document enforced wall-clock/output-size/application-attempt limits and the absence of an upstream token cap; it must not claim zero provider retention. The current synthetic worker gates remain unchanged. No further synthetic delivery machinery substitutes for unresolved platform permissions.

@@ -133,3 +133,22 @@ Planning is complete as a conditional staged proposal; access feasibility remain
 ## Execution update — 29 October 2026
 
 [Account evidence](../../research/channel-capability-evidence.md) and the [buyer lab](../../buyer-lab.md) are prepared on `codex/buyer-foundation`. Tasks 2, 4 and 5 are **partial**: browser-local validated events, narrow templates, editable private drafts, policy controls and simulated outbox only. The owner-scoped Supabase queue/migration, worker enrollment and daemon, agent isolation, external connectors and live acceptance remain unimplemented. Task 3 and live parts of Tasks 5–6 are blocked by unresolved permitted access. Existing manual buyer cloud/copy workflow is still planned. No plan checkbox claims these broader tasks complete.
+
+## Execution update — 30 October 2026
+
+PR #7 merged and the existing private Sites demo was updated after owner approval. Saved manual inquiry/draft/approval/copy workflow is implemented. [Draft preparation](../../agent-drafting-stage.md) adds a provider-neutral boundary, and [owned drafting queue](../../owned-draft-queue-stage.md) adds the draft-only portion of Tasks 2/4: hashed expiring enrollment, owner pause/revocation, exact-context leases, shared allowance and review-draft persistence. No live runtime or daemon is connected. Event ingestion, connection/thread mapping, seller policies, true outbound outbox, native-mode coordination and hosted/device acceptance remain incomplete; the draft queue is not a substitute for those requirements. Owner Supabase connection/target is pending, but local queue UI/runtime harness work can continue.
+
+
+## Execution update — durable simulation, 30 October 2026
+
+PR #13 implements the restricted foreground OpenClaw draft worker with local synthetic acceptance. PR #14 adds an owner-only server-persisted delivery simulation over saved inbox records, a fenced claim/start/outcome protocol and an in-memory fake executor. It verifies stale-context/native/takeover controls, uncertain outcomes and explicit fake reconciliation. No real capture/delivery or new worker sending capability exists. Tasks 2/5 now have this additional tested synthetic foundation, but are not complete for real channel operation. Seller policy/digest/exception UI, real event ingestion/coverage, history lifecycle, hosted concurrent-session acceptance and live release gates remain separate work; do not mark the original whole-task checkboxes complete from these narrower tests.
+
+## Execution update — seller preferences, 31 October 2026
+
+The [seller preferences stage](../../seller-preferences-stage.md) adds saved general private-reply terms and Task 4's in-app review settings/summary. Terms changes bind to fresh draft context and invalidate approvals; reminders alone do not. This is not an external digest or unattended reply release. Tasks 1/3/live5/6 still require permitted access, a selected hosted project and separate live acceptance; original whole-task checkboxes remain incomplete.
+
+## Execution update — hosted queue and subscription preference, 2 November 2026
+
+The private cloud app and custom email sender are ready; Artie has signed in and Janyl's delivered invitation awaits acceptance. Task 6 has partial [hosted queue evidence](../../hosted-draft-acceptance.md), plus 20 passing installed-runtime/database tests and one exact-SQL rollback regression. No original whole-task checkbox is completed by this single-session SQL check. HTTP/Storage ownership, concurrency, devices and full worker/model acceptance remain outstanding.
+
+For Task 4 the owner now prefers existing OpenClaw/Hermes subscription access without additional API spend. [Research and implementation gates](../../research/subscription-drafting.md) replace the immediate API-key setup request. Local configuration indicates subscription routes, but a dedicated no-overage/no-fallback adapter is not implemented. No channel reader, sender, live worker or model request was enabled.

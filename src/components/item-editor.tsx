@@ -1,5 +1,8 @@
 "use client";
+import { writeClipboard } from "@/lib/clipboard";
+import { listingPriceReview } from "@/lib/listing-price-review";
 import { useEffect, useState, type FormEvent } from "react";
+import { z } from "zod";
 import {
   ArrowLeft,
   Check,
@@ -18,6 +21,7 @@ import {
   channels,
   conditions,
   errorMessage,
+  formatPHP,
   generateTemplate,
   generatedCopySchema,
   itemInputSchema,
@@ -50,6 +54,7 @@ export function ItemEditor({
   const [copied, setCopied] = useState("");
   const [dirty, setDirty] = useState(false);
   const listing = item.listings.find((entry) => entry.channel === channel)!;
+  const priceReview = listingPriceReview(listing, price);
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
       if (dirty) event.preventDefault();
@@ -121,7 +126,7 @@ export function ItemEditor({
     setBusy("generate");
     try {
       const facts = currentItem();
-      let result;
+      let result: unknown;
       if (demoMode) {
         result = { source: "template", copy: generateTemplate(facts) };
       } else {
@@ -136,12 +141,21 @@ export function ItemEditor({
           body: JSON.stringify(itemInputSchema.parse(facts)),
         });
         result = await response.json();
-        if (!response.ok)
+        if (!response.ok) {
+          const failure = z.object({ error: z.string() }).safeParse(result);
           throw new Error(
-            result.error || "Generation failed. Please try again.",
+            failure.success
+              ? failure.data.error
+              : "Generation failed. Please try again.",
           );
+        }
       }
-      const copy = generatedCopySchema.parse(result.copy);
+      const { copy, source } = z
+        .object({
+          source: z.enum(["ai", "template"]),
+          copy: generatedCopySchema,
+        })
+        .parse(result);
       update({
         listings: item.listings.map((entry) => ({
           ...entry,
@@ -149,7 +163,7 @@ export function ItemEditor({
         })),
       });
       setNotice(
-        result.source === "ai"
+        source === "ai"
           ? "AI drafts are ready. Check all details before posting, then save your changes."
           : "Template drafts are ready — no AI was used. Review the copy and save your changes.",
       );
@@ -165,7 +179,7 @@ export function ItemEditor({
         kind === "post"
           ? `${listing.title}\n\n${listing.description}`
           : listing[kind];
-      await navigator.clipboard.writeText(text);
+      await writeClipboard(text);
       setCopied(kind);
       setNotice(
         "Copied. Paste into your listing, then save its URL here after posting.",
@@ -474,6 +488,27 @@ export function ItemEditor({
                 placeholder="Your editable listing copy will appear here."
               />
             </label>
+            <div
+              role="status"
+              aria-label="Listing price review"
+              className={
+                priceReview.hasDifferentAmount ? "error" : "posting-note"
+              }
+            >
+              <strong>
+                {priceReview.price === null
+                  ? "Enter a valid asking price before posting."
+                  : `Current asking price: ${formatPHP(priceReview.price)}`}
+              </strong>
+              <p>
+                {priceReview.hasDifferentAmount
+                  ? "Check the amounts in this copy: at least one peso amount differs from your asking price. It may be an old price, shipping fee or discount. Edit the copy if needed. "
+                  : ""}
+                Listing copy does not update automatically when item details
+                change. Review all details before copying or updating a
+                published post.
+              </p>
+            </div>
             <div className="copy-actions">
               {(["title", "description", "post"] as const).map((kind) => (
                 <button
