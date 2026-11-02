@@ -1,5 +1,9 @@
 # Reseller Agent status
 
+## Active subprocess crash recovery — 3 November 2026
+
+An actual OS-signal regression found that killing the worker caller left its detached target and descendant running. The [parent-crash fix](worker-parent-crash-recovery.md) moves process-group deadlines and cleanup into a short-lived independent supervisor that aborts on loss of the caller's IPC pipe. The failing regression now passes; lint/types and 239 tests passed (six optional skips). Installed-runtime checks and independent review are in progress. No model calls, cloud schema changes or normal OpenClaw service changes. The queue remains paused; physical/provider recovery and unattended release remain incomplete.
+
 ## Stale-conflict retry-loop fix — 3 November 2026
 
 Hosted owner-control races uncovered a real defect: custom stale-data `40001` errors were repeatedly retried by PostgREST 14.18. The [tested incremental migration and adapter fix](non-retryable-conflicts.md) use explicit `PT409` conflicts while preserving guards and permissions. The database migration is applied and verified. Pause/revoke, stale-price submission and shared-last-slot quota races now have the stated hosted evidence; all synthetic fixtures were removed. Post-fix logs show one conflict and no repeated serialization errors in the verification window. No model calls or buyer sending occurred.

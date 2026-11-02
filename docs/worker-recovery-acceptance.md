@@ -32,6 +32,8 @@ Ruling: execute the existing process contract as characterization/acceptance, wi
 
 ## Recovery procedure
 
+The later [parent-crash fix](worker-parent-crash-recovery.md) addresses loss of the process-launcher caller during active synthetic work. Its independent supervisor drains the target group; physical/provider failures and retained run-directory/lock inspection remain separate requirements.
+
 1. Stop the foreground worker. Subscription mode supports one pass only and must not be installed as an automatic watcher or login service.
 2. Open Inbox → Worker settings → Reload worker settings. If state cannot be loaded, leave work stopped. Do not repeatedly press enroll or queue in response to an ambiguous failure.
 3. For a completed job, inspect its saved draft. An `unknown` local outcome can still mean a successful database save. Do not queue the same question again merely because acknowledgment was lost.

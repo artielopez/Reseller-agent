@@ -1,9 +1,10 @@
-import { StringDecoder } from "node:string_decoder";
 import { spawn } from "node:child_process";
-import { setTimeout as delay } from "node:timers/promises";
+import { processSupervisorSource } from "./process-supervisor";
 export type ProcessResult = { code: number; stdout: string; stderr: string };
 const failure = () => new Error("Worker process could not finish safely.");
-/** POSIX owned-process-group execution. Never inherits env or invokes a shell. */
+
+/** A separate supervisor owns the target group. IPC loss aborts it even if
+ * this worker is SIGKILLed, so its deadline/cleanup outlive the worker. */
 export async function runProcess(
   executable: string,
   args: string[],
@@ -18,89 +19,76 @@ export async function runProcess(
   if (
     process.platform === "win32" ||
     options.signal.aborted ||
+    !Number.isFinite(options.timeoutMs) ||
     options.timeoutMs <= 0
   )
     throw failure();
-  const child = spawn(executable, args, {
-    cwd: options.cwd,
-    env: options.env,
+
+  // No input, credentials, inherited NODE_OPTIONS or environment on argv.
+  // The child gets the caller's explicit environment over the private pipe.
+  const supervisor = spawn(process.execPath, ["-e", processSupervisorSource], {
+    env: { NODE_ENV: "production" },
     detached: true,
-    stdio: ["pipe", "pipe", "pipe"],
+    stdio: ["ignore", "ignore", "ignore", "ipc"],
   });
-  let failed = false,
-    stdout = "",
-    stderr = "",
-    size = 0;
-  const outDecoder = new StringDecoder("utf8"),
-    errDecoder = new StringDecoder("utf8");
-  let killTimer: ReturnType<typeof setTimeout> | undefined;
-  const signalGroup = (signal: NodeJS.Signals) => {
-    if (!child.pid) return;
-    try {
-      process.kill(-child.pid, signal);
-    } catch (e) {
-      if (!["ESRCH", "EPERM"].includes((e as NodeJS.ErrnoException).code ?? ""))
-        failed = true;
-    }
-  };
-  const terminate = () => {
-    signalGroup("SIGTERM");
-    killTimer ??= setTimeout(() => signalGroup("SIGKILL"), 200);
-  };
+  let result: ProcessResult | undefined;
+  let failed = false;
   const abort = () => {
     failed = true;
-    terminate();
+    if (supervisor.connected) supervisor.send({ type: "abort" }, () => {});
   };
-  const timer = setTimeout(abort, options.timeoutMs);
   options.signal.addEventListener("abort", abort, { once: true });
-  child.stdout.on("data", (chunk: Buffer) => {
-    size += chunk.length;
-    if (size > 262144) abort();
-    else stdout += outDecoder.write(chunk);
-  });
-  child.stderr.on("data", (chunk: Buffer) => {
-    size += chunk.length;
-    if (size > 262144) abort();
-    else stderr += errDecoder.write(chunk);
-  });
-  child.stdin.on("error", abort);
-  child.once("exit", terminate); // Reap descendants even after a successful leader exit.
-  let code: number | null;
   try {
-    code = await new Promise<number | null>((resolve) => {
-      child.once("error", () => {
+    await new Promise<void>((resolve) => {
+      supervisor.once("error", () => {
         failed = true;
-        resolve(null);
+        resolve();
       });
-      child.once("close", resolve);
-      if (options.signal.aborted) abort();
-      child.stdin.end(options.input ?? "");
-    });
-    signalGroup("SIGKILL");
-    if (child.pid) {
-      let alive = true;
-      for (let attempt = 0; attempt < 10; attempt++) {
-        try {
-          process.kill(-child.pid, 0);
-        } catch (e) {
-          if ((e as NodeJS.ErrnoException).code === "ESRCH") {
-            alive = false;
-            break;
-          } else if ((e as NodeJS.ErrnoException).code !== "EPERM") break;
+      supervisor.once("close", (code) => {
+        if (code !== 0) failed = true;
+        resolve();
+      });
+      supervisor.on("message", (raw: unknown) => {
+        const value = raw as Partial<ProcessResult> | null;
+        if (
+          !value ||
+          !Number.isInteger(value.code) ||
+          typeof value.stdout !== "string" ||
+          typeof value.stderr !== "string" ||
+          Buffer.byteLength(value.stdout) + Buffer.byteLength(value.stderr) >
+            262144 ||
+          result
+        ) {
+          abort();
+          return;
         }
-        await delay(50);
-      }
-      if (alive) failed = true;
-    }
-    if (failed || code === null) throw failure();
-    return {
-      code,
-      stdout: stdout + outDecoder.end(),
-      stderr: stderr + errDecoder.end(),
-    };
+        result = value as ProcessResult;
+      });
+      supervisor.once("spawn", () => {
+        if (options.signal.aborted) {
+          abort();
+          return;
+        }
+        supervisor.send(
+          {
+            type: "run",
+            executable,
+            args,
+            cwd: options.cwd,
+            env: options.env,
+            timeoutMs: options.timeoutMs,
+            input: options.input ?? "",
+          },
+          (error) => {
+            if (error) abort();
+          },
+        );
+      });
+      if (options.signal.aborted) abort();
+    });
+    if (failed || options.signal.aborted || !result) throw failure();
+    return result;
   } finally {
-    clearTimeout(timer);
-    if (killTimer) clearTimeout(killTimer);
     options.signal.removeEventListener("abort", abort);
   }
 }

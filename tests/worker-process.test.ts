@@ -9,6 +9,30 @@ const options = () => ({
   signal: new AbortController().signal,
   timeoutMs: 2000,
 });
+it("preserves private stdin, explicit environment and nonzero target exit through supervision", async () => {
+  const result = await runProcess(
+    process.execPath,
+    [
+      "-e",
+      "let input='';process.stdin.on('data',c=>input+=c);process.stdin.on('end',()=>{process.stdout.write(input+'|'+process.env.ONLY_TARGET);process.exitCode=7})",
+    ],
+    {
+      ...options(),
+      env: { NODE_ENV: "test", ONLY_TARGET: "synthetic" },
+      input: "₱ synthetic input",
+    },
+  );
+  expect(result).toEqual({
+    code: 7,
+    stdout: "₱ synthetic input|synthetic",
+    stderr: "",
+  });
+});
+it("rejects a missing executable without leaving a pending supervised request", async () => {
+  await expect(
+    runProcess("/nonexistent/reseller-synthetic-executable", [], options()),
+  ).rejects.toThrow("Worker process could not finish safely.");
+});
 it("captures bounded output without a shell or inherited secrets", async () => {
   const r = await runProcess(
     process.execPath,
