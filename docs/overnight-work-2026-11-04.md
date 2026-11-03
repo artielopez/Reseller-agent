@@ -436,3 +436,21 @@ persists but requires normal build/verification and private-audience checks.
 - Added physical keyboard/screen-reader acceptance to the supervised checklist.
   Synthetic desktop/mobile Chromium does not establish Safari/VoiceOver or actual
   device acceptance. No model calls, worker changes, email or merge.
+
+### Ninth overnight cloud release — 05:42 Manila
+
+- Implementation `a81960ba7ecca54058a508af85f40da54cf0bdb2` is on draft PR #29;
+  CI run `41724002505` is in progress. No merge or auto-merge.
+- Sites **version 18** succeeded from source
+  `c061f0a979cbdd41167a4a4cd101fec80c7556d6`, deployment
+  `appgdep_6aea55374da08191a3c1237c7df488ef`. The Artie/Janyl audience and
+  environment revision 1 remain unchanged. No synthetic configuration in output.
+- Final checks: lint/types, **288 tests** (six optional skips), **62 ordinary +
+  52 Next cloud + 52 Sites adapter browser checks**, Next/worker builds and Sites
+  types/Worker build. Eight focus regressions failed before the change and passed
+  afterward; automated checks do not claim physical screen-reader acceptance.
+- Next: review remaining concrete worker/recovery acceptance gaps and release
+  reproducibility. Avoid expanding external access or adding tests that merely
+  mirror code. Beeper next eligible read remains 06:36 Manila. Keep unresolved
+  real-device, supported-channel and subscription-use gates visible; no owner
+  action is requested during the sleep window.
