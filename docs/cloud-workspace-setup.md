@@ -28,6 +28,8 @@ The connected Supabase tool applied exact repository SQL, assigning its own remo
 
 Additional mapping verified 3 November: local `20261102202606_non_retryable_conflicts.sql` → remote `20261102203123`, name `non_retryable_conflicts`. This is the sixth required migration; existing function permissions are preserved.
 
+Additional mapping verified 3 November: local `202611030001_inventory_save_revision.sql` → remote `20261103030151`, name `inventory_save_revision`. This is the seventh required migration; existing-item edits require a save revision and the matching Sites version 8 client.
+
 The optional `202610300003_delivery_simulation.sql` is not applied: no app screen or drafting worker uses that engineering lab.
 
 **Do not blindly run `supabase db push` on this project.** Local filenames and remote history identifiers differ. Use this mapping to inspect what already exists; reconcile history deliberately before adopting CLI-managed pushes. Do not reapply the initial migration, rename applied files, or assume the optional simulation is deployed. No migration-history repair was performed.
