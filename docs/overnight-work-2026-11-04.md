@@ -217,3 +217,21 @@ persists but requires normal build/verification and private-audience checks.
 - Next: release/CI follow-through, then audit any concrete remaining recovery,
   accessible navigation or validation gaps. Beeper's next permitted check is
   04:34 Manila or later; no normal OpenClaw restart or live model request.
+
+### Fourth overnight cloud release — 04:26 Manila
+
+- Implementation `82c883c3715e5ddd6a0c507eb8dfc6b814f44c22` is pushed on draft
+  PR #29. Its CI run `41712045720` was in progress at packaging.
+- Sites **version 13** deployed from exact source
+  `b592ec18bddd9073ce8100e894086a68e13c9d69`, deployment
+  `appgdep_6aea433f2dc0819188a21e0a5ef4ec42`, preserving Artie/Janyl access.
+  No schema, permission, credential or normal OpenClaw change.
+- Read-only `npm audit --omit=dev` completed successfully with zero reported
+  advisories for this Next.js repository's production dependency tree. No
+  dependency was changed. This is a registry advisory snapshot, not a security
+  certification or an audit of the separate Sites dependency tree.
+- Next useful checks: separate Sites dependency advisory snapshot; review whether
+  the server-side listing handler stops before model admission when its request
+  is canceled during Auth/quota checks (no real model calls). Avoid claiming
+  client cancellation alone cancels server/provider work. Continue other concrete
+  validation/navigation issues only if inspection establishes them.

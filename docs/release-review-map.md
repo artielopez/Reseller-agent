@@ -28,9 +28,9 @@ The open GitHub requests #8–#29 all target `main` and preserve successive deve
 Released increment: [PR #28](https://github.com/artielopez/Reseller-agent/pull/28), implementation `ee843e4`; Sites version 9, source `2b7919c121c53d7cf08bc9bc825d94a687d60157`. The privacy migration and rollback-only hosted checks passed. Signed-in post-release UI check awaits local browser access. No merge/auto-merge.
 
 Current release: draft [PR #29](https://github.com/artielopez/Reseller-agent/pull/29),
-implementation `38e1086`; Sites version **12**, exact source
-`e01c3fa9679ee0eb262da7277cee8c85beda30d6`. Local checks: 281 tests (six optional
-skips), 96 browser checks, lint/types and builds. Prior isolated no-inference
+implementation `82c883c`; Sites version **13**, exact source
+`b592ec18bddd9073ce8100e894086a68e13c9d69`. Local checks: 284 tests (six optional
+skips), 100 browser checks, lint/types and builds. Prior isolated no-inference
 preflight and five installed-runtime synthetic checks passed without runtime
 changes in this increment. No new migration, model call or worker activation.
 Signed-in post-release UI acceptance still requires local browser access.

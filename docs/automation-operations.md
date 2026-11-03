@@ -35,6 +35,8 @@ After verifying the saved unapproved draft, pause the queue, revoke that tempora
 | Item facts, terms or the question change                  | The old approval/draft context may be stale. Review and approve the current saved wording again before copying                                                                                       |
 | A platform lacks supported automatic access               | Keep that channel manual or use an eligible platform-native feature under its own controls. Do not substitute scraping or unattended UI sending                                                      |
 
+If sign-out is unconfirmed, keep the device private and refresh to check its session before leaving it. A timed-out logout may still finish; clicking again while it is pending does not queue another SDK logout. Photo decoding timeouts preserve existing photos and allow a deliberate retry.
+
 The app now shows advisory [worker contact/job health](worker-health-workflow.md) and specific recovery guidance. Recent contact is not an online or provider-login guarantee. The current app has no external outage alert service. A quiet terminal or an old status timestamp is not evidence of healthy operation. No guaranteed availability or response-time claim is made while the worker is paused.
 
 ## Pause, recovery and data handling
@@ -47,7 +49,7 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **12**, published from source `e01c3fa9679ee0eb262da7277cee8c85beda30d6`, with its audience limited to Artie and Janyl. The [overnight release ledger](overnight-work-2026-11-04.md) records the current successful deployment and the pending signed-in UI check. GitHub and the separate Sites source repository have different release histories. The eight hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
+The live cloud app is Sites version **13**, published from source `b592ec18bddd9073ce8100e894086a68e13c9d69`, with its audience limited to Artie and Janyl. The [overnight release ledger](overnight-work-2026-11-04.md) records the current successful deployment and the pending signed-in UI check. GitHub and the separate Sites source repository have different release histories. The eight hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
 
 [Draft PR #29](https://github.com/artielopez/Reseller-agent/pull/29) contains the latest cumulative unmerged work, including request recovery and saved-question editing. See the [review map](release-review-map.md). Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
 
