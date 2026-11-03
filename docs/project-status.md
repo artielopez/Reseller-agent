@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Worker-health release verified — 3 November 2026
+
+[PR #28](https://github.com/artielopez/Reseller-agent/pull/28) contains implementation `ee843e4`; no merge or auto-merge. Final checks: **258 tests passed**, six optional skips, **72 desktop/mobile browser checks** (52 ordinary + 20 synthetic cloud contracts), lint/types, Next and worker builds. Fresh independent review found no blocking issues.
+
+The read-only privacy migration is applied as `20261103073544`; hosted rollback-only owner/anonymous/isolation checks passed and fixture cleanup verified. Sites **version 9** deployed successfully from `2b7919c121c53d7cf08bc9bc825d94a687d60157`, deployment `appgdep_6ae98f1525008191ba2643a27071a1d1`; Artie/Janyl custom audience is unchanged. [Details and limitations](worker-health-workflow.md#hosted-release--3-november-2026). Signed-in screen verification awaits enabling local browser use in Codex Work settings; the tool currently reports it disabled.
+
+Fresh read-only checks: worker remains paused at revision 5 with zero active enrollments; Beeper still has no response; Supabase exposes only Artie's Projects. Janyl now has one saved item, one photo row and its matching private Storage object (new progress beyond activation); her actual device reload/image-decoding and cross-account HTTP acceptance remain separate. The labelled acceptance lamp still has two photos, so actual ten-photo cloud acceptance remains pending. No model call, message sending, deletion or normal OpenClaw change.
+
 ## Worker health, draft workflow and privacy preview — 3 November 2026
 
 Implemented on `codex/worker-health-workflow`, based on PR #27 head `e50e99d`. [Feature/recovery guide](worker-health-workflow.md) · [release review map](release-review-map.md). Saved private questions now have an inline AI request/status panel and guarded saved-reply reload. Worker contact is explicitly advisory, with failure-specific recovery guidance. The owner-scoped privacy RPC/panel previews older completed history and possibly unused photos, without deleting data or activating retention.

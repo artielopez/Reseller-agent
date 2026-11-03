@@ -30,6 +30,8 @@ Additional mapping verified 3 November: local `20261102202606_non_retryable_conf
 
 Additional mapping verified 3 November: local `202611030001_inventory_save_revision.sql` → remote `20261103030151`, name `inventory_save_revision`. This is the seventh required migration; existing-item edits require a save revision and the matching Sites version 8 client.
 
+Additional mapping verified 3 November: local `20261103072649_workspace_privacy_preview.sql` → remote `20261103073544`, name `workspace_privacy_preview`. This eighth required migration adds the authenticated invoker read-only preview used in Sites version 9; it enables no deletion or retention policy.
+
 The optional `202610300003_delivery_simulation.sql` is not applied: no app screen or drafting worker uses that engineering lab.
 
 **Do not blindly run `supabase db push` on this project.** Local filenames and remote history identifiers differ. Use this mapping to inspect what already exists; reconcile history deliberately before adopting CLI-managed pushes. Do not reapply the initial migration, rename applied files, or assume the optional simulation is deployed. No migration-history repair was performed.

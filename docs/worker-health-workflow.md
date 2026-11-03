@@ -33,3 +33,13 @@ Before implementation, the health module, privacy RPC/client and browser panels 
 Local lint/types, 257 tests (six optional skips), all 52 ordinary desktop/mobile browser checks, all 20 cloud-contract browser checks, Next production build and worker build passed. Cloud-contract tests use synthetic HTTP responses, not real user sessions. Database tests exercise real migrations in PGlite with synthetic roles/Storage metadata, including owner isolation and no-delete behavior. They do not replace hosted or physical-device acceptance.
 
 One fresh independent review found no blocking issues and independently passed the ten new health/privacy tests. The hosted rollback acceptance script also passed a subsequent local regression (one additional test). Hosted migration verification and Sites release evidence will be recorded below when complete.
+
+## Hosted release — 3 November 2026
+
+Implementation `ee843e4` is in [PR #28](https://github.com/artielopez/Reseller-agent/pull/28), open with auto-merge disabled. The final full suite passed **258 tests**, with six optional skips; other checks above remain unchanged.
+
+The additive privacy migration is applied as remote `20261103073544` (`workspace_privacy_preview`). The rollback-only hosted script passed owner counts, window/open exclusion, invalid-window/anonymous rejection and synthetic cross-owner database/Storage checks. The function is verified invoker, anon execution is false, and no acceptance fixture item remained. Security Advisor retained its existing six definer-entrypoint warnings and leaked-password-protection warning; it added no privacy-function warning. This is not a finding-free security audit.
+
+Sites **version 9** is live from exact source `2b7919c121c53d7cf08bc9bc825d94a687d60157`, deployment `appgdep_6ae98f1525008191ba2643a27071a1d1` succeeded. The built archive is attached to the saved version. Read-back preserves Artie owner/Janyl viewer under custom access. Sites type checks and production packaging passed. No paid model call or GitHub merge.
+
+Signed-in post-release UI verification could not proceed: computer-use reports **Local browser use is disabled in Work settings**. The owner has been asked to enable it for that check. Native deployment success, automated browser contracts and hosted SQL are verified; actual signed-in screen acceptance of these new panels remains pending.

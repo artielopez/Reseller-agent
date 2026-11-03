@@ -11,7 +11,7 @@ The open GitHub requests #8–#27 all target `main` and preserve successive deve
 | Private cloud and sign-in | #16–#18 | Supabase setup, custom SMTP, private audience and invitation recovery |
 | Subscription drafting and workflow | #19–#22 | Hosted queue checks and bounded OpenClaw trial; optional SIWC timeout remains unresolved |
 | Photos and reliability | #23–#27 | Ten-photo limits, HTTP/concurrency/crash tests, PT409 fix, inventory CAS |
-| Current increment | worker-health-workflow | Per-question queue/status/reload, advisory health, read-only privacy preview |
+| Current increment | #28, worker-health-workflow | Per-question queue/status/reload, advisory health, read-only privacy preview |
 
 ## Release checks
 
@@ -22,3 +22,5 @@ The open GitHub requests #8–#27 all target `main` and preserve successive deve
 - Keep the draft worker paused and its trial capability revoked. Publishing a request button does not authorize a new model call or continuous operation.
 - Do not equate automated tests with Janyl's own save/photo acceptance, actual ten-photo cloud upload, physical iPhone/Windows checks or physical Mac recovery. These remain in the acceptance register.
 - Channel integration remains gated by permitted access. The Carousell inquiry stays unsent; the Beeper inquiry is awaiting its response. Group comments require separate coverage.
+
+Released increment: [PR #28](https://github.com/artielopez/Reseller-agent/pull/28), implementation `ee843e4`; Sites version 9, source `2b7919c121c53d7cf08bc9bc825d94a687d60157`. The privacy migration and rollback-only hosted checks passed. Signed-in post-release UI check awaits local browser access. No merge/auto-merge.
