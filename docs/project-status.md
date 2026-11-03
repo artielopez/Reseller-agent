@@ -16,6 +16,8 @@ The next released increment bounds server generation to 35 seconds and prevents 
 
 Further dependency follow-through patches fflate and the modern esbuild copies; all **42 adapter browser checks**, Sites types/build and main lint pass. Full Sites audit is down to **23 moderate affected packages**, with the remaining paths documented. Main full audit reports **16 moderate lint-toolchain findings**. Application/worker code is unchanged. Both `a0b9adc` and `ccf0e40` passed GitHub checks. Implementation `da4f142` is in draft PR #29; its CI is running. Sites **version 15** deployed from `1af53df7bf83d9a48bf53cb5eb0a32986deb8cc9`, deployment `appgdep_6aea4aa4a1d881919f1ea49d9b38bf9e`, preserving Artie/Janyl access.
 
+The staged Vinext 1.4.2 upgrade passes **44 adapter browser checks**, types/build and a separate compiled-Worker smoke test. Matched React/RSC updates remove the Satori findings; full Sites audit now has **20 moderate tooling findings**, production audit zero. Two new endpoint checks also pass against Next. Main lint/types pass, with application/worker implementation unchanged. Both previous PR heads passed CI. Publication is being prepared; version 15 remains live until the receipt below.
+
 ## Worker-health release verified — 3 November 2026
 
 [PR #28](https://github.com/artielopez/Reseller-agent/pull/28) contains implementation `ee843e4`; no merge or auto-merge. Final checks: **258 tests passed**, six optional skips, **72 desktop/mobile browser checks** (52 ordinary + 20 synthetic cloud contracts), lint/types, Next and worker builds. Fresh independent review found no blocking issues.

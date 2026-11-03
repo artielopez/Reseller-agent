@@ -66,10 +66,12 @@ for (const name of ["@supabase/supabase-js", "openai", "zod", "lucide-react"]) {
 // and retain Vinext's integration; older starter pins have published advisories.
 // Refresh the Sites lockfile and run its supported installer after changing these.
 manifest.dependencies.next = "16.4.3";
-manifest.dependencies.react = "19.2.9";
-manifest.dependencies["react-dom"] = "19.2.9";
+manifest.dependencies.react = "19.3.1";
+manifest.dependencies["react-dom"] = "19.3.1";
 manifest.devDependencies["eslint-config-next"] = "16.4.3";
-manifest.devDependencies["react-server-dom-webpack"] = "19.2.9";
+manifest.devDependencies["react-server-dom-webpack"] = "19.3.1";
+manifest.devDependencies["@vitejs/plugin-rsc"] = "0.5.37";
+manifest.devDependencies.vinext = "1.4.2";
 manifest.devDependencies.vite = "8.1.6";
 manifest.overrides = {
   ...manifest.overrides,
@@ -80,12 +82,19 @@ manifest.overrides = {
   // Restrict this fix to the recent build API; Drizzle's legacy loader is separate.
   "esbuild@>=0.27.3 <0.28.1": "0.28.1",
   "esbuild@^0.28.0": "0.28.1",
-  vinext: { ...manifest.overrides?.vinext, "image-size": "2.0.4" },
+  // Satori's exact archive-decoder pin needs its own override for reproducible ci.
+  satori: { ...manifest.overrides?.satori, fflate: "0.7.5" },
   miniflare: {
     ...manifest.overrides?.miniflare,
     sharp: "0.35.5",
   },
 };
+// Remove only our obsolete pin when upgrading an older prepared checkout.
+if (manifest.overrides.vinext?.["image-size"] === "2.0.4") {
+  delete manifest.overrides.vinext["image-size"];
+  if (!Object.keys(manifest.overrides.vinext).length)
+    delete manifest.overrides.vinext;
+}
 writeFileSync(
   path.join(target, "package.json"),
   JSON.stringify(manifest, null, 2) + "\n",

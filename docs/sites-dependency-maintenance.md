@@ -104,3 +104,39 @@ The remaining roots are:
 These observations narrow the known paths; they do not waive the findings or
 prove all framework code is unreachable. No exploit was run, no dependency was
 hidden from the audit and no platform permission was changed.
+
+## Verified adapter upgrade — 05:12 Manila
+
+Vinext 1.4.2 retains the Worker's `vinext/server/fetch-handler` entry point and
+uses the patched Satori 0.33.5 through @vercel/og 1.0.3. Its peer requirements are
+met with matched React/DOM/RSC 19.3.1 and @vitejs/plugin-rsc 0.5.37. The existing
+Sites integration, Cloudflare plugin, Worker wrapper, ordinary-link compatibility
+fix and private audience are retained. The old image-size override is no longer
+needed by this version. Satori's exact fflate 0.7.3 pin requires a scoped 0.7.5
+override; this resolved a reproduced clean-install lock validation failure.
+
+Verified using the supported clean installer, package-tree/peer inspection,
+Vinext's static compatibility scanner (11 supported checks), TypeScript and the
+supported Worker build. All **44 synthetic adapter browser checks** pass, including
+the real anonymous generation endpoint returning 401 with `Cache-Control: no-store`.
+That new endpoint contract also passes twice against Next, once per test project.
+The scan alone is not used as proof of application compatibility.
+
+A separate **production Worker** smoke test serves both inventory and inbox HTML
+and rejects anonymous generation. It uses the compiled artifact in local Wrangler,
+not the development Vite handler. Reproduce after the supported build:
+
+```sh
+# In the Sites checkout, keep this owned server running temporarily:
+npm run start -- --port 3020
+# In the main repository, in another terminal:
+node scripts/acceptance/sites-worker-smoke.mjs
+# Stop the temporary server with Ctrl+C when done.
+```
+
+The smoke test supplies no cookie/token and never requests an email or model call.
+It does not establish real sign-in, persistence or physical-device acceptance.
+Full Sites audit now reports **20 moderate affected packages** inherited from lint
+minimatch and the legacy Drizzle-loader esbuild. Production audit reports zero.
+Satori, Vinext and fflate are no longer flagged; the two remaining roots retain
+the limitations documented above. Exact release evidence follows in the ledger.

@@ -326,3 +326,30 @@ persists but requires normal build/verification and private-audience checks.
   dependency upgrade; preserve the working release unless checks establish the
   replacement. Do not force incompatible lint or Drizzle overrides merely to
   suppress an audit finding.
+
+### Compatible adapter upgrade — 05:13 Manila
+
+- Previous implementation `da4f142` and documentation head `210a4a0` passed CI
+  (runs `41717061258` and `41717425740`). The branch/PR remain unmerged.
+- Inspected the published Vinext 1.4.2 package's peer requirements and preserved
+  Worker entry point before changing dependencies. Matched React/DOM/RSC 19.3.1
+  and RSC plugin 0.5.37 pass with existing Sites/Cloudflare integration and the
+  ordinary-link repair. No template regeneration or hosting/permission change.
+- Reproduced a supported clean-install failure: Satori's exact fflate pin was
+  absent from the override-resolved lock. A scoped 0.7.5 override fixes clean
+  installation. Its installed Satori 0.33.5 removes the SVG advisory; no global
+  forced major override or hidden audit exception.
+- Passed: static compatibility scan (11 supported checks), Sites types/build,
+  **44 adapter desktop/mobile checks**, and the new anonymous generation-route
+  contract twice against Next. Main lint/types pass. No app/worker implementation
+  changed, so the prior 288 unit tests are not claimed as rerun here.
+- The compiled **production Worker** separately returns inventory/inbox HTML and
+  rejects anonymous generation with 401/no-store. The reusable smoke script and
+  exact local commands are in the dependency-maintenance guide. Both temporary
+  local test servers were stopped; no normal OpenClaw service was touched.
+- Production audit remains zero; full Sites audit is now **20 moderate affected
+  packages** from lint minimatch and legacy Drizzle esbuild. Those known paths
+  remain documented; actual-device/cloud sign-in and channel acceptance stay open.
+- Publication is being prepared. Next work after the release receipt: inspect
+  concrete application recovery/accessibility gaps, while retaining the documented
+  build-tool limitations rather than forcing incompatible dependency changes.
