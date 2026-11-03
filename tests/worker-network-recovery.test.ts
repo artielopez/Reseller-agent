@@ -71,7 +71,7 @@ async function fixture(dropAfter: "claim" | "start" | "submit" | null) {
         },
       }),
     ]);
-    const enrolled = await owner<{ token: string }>({
+    const enrolled = await owner<{ id: string; token: string }>({
       op: "enroll",
       label: "Synthetic recovery worker",
     });
@@ -142,6 +142,33 @@ async function fixture(dropAfter: "claim" | "start" | "submit" | null) {
       commands,
       jobId,
       snapshot,
+      // Called only after the synthetic model has started and no RPC is pending.
+      // Use real owner commands, then restore the worker's anonymous SQL role.
+      changeWhileGenerating: async (
+        change: "pause" | "revoke" | "cancel" | "facts",
+      ) => {
+        await asUser(db, alice);
+        try {
+          if (change === "pause") {
+            const controls = await owner<{ revision: string }>({ op: "list" });
+            await owner({
+              op: "pause",
+              paused: true,
+              expected_revision: controls.revision,
+            });
+          } else if (change === "revoke") {
+            await owner({ op: "revoke", id: enrolled.id });
+          } else if (change === "cancel") {
+            await owner({ op: "cancel", id: jobId });
+          } else {
+            await db.query("update public.items set price=950 where id=$1", [
+              itemId,
+            ]);
+          }
+        } finally {
+          await asUser(db, null);
+        }
+      },
       closeServer,
       close: async () => {
         await closeServer();
@@ -239,3 +266,84 @@ it("a disconnected endpoint leaves a queued question untouched and makes no mode
     await f.close();
   }
 }, 15000);
+
+it.each(["pause", "revoke", "cancel", "facts"] as const)(
+  "%s during generation rejects late output and does not replay the consumed attempt",
+  async (change) => {
+    const f = await fixture(null);
+    let signalStarted!: () => void;
+    const started = new Promise<void>((resolve) => {
+      signalStarted = resolve;
+    });
+    let release!: () => void;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    f.runtime.generate.mockImplementation(async () => {
+      signalStarted();
+      await held;
+      return {
+        body: "The saved asking price is ₱850.",
+        reviewReason: "Synthetic late output",
+      };
+    });
+    const wait = vi.fn(async () => {
+      throw new Error("An interrupted draft must stop before polling again.");
+    });
+    const close = vi.fn(async () => {});
+    const running = runWorkerLoop({
+      watch: true,
+      signal: new AbortController().signal,
+      job: () => ({ run: () => runDraftJob(f.transport, f.runtime), close }),
+      wait,
+      report: () => {},
+    });
+    try {
+      await Promise.race([
+        started,
+        running.then(() => {
+          throw new Error(
+            "Worker stopped before synthetic generation started.",
+          );
+        }),
+      ]);
+      const admitted = await f.snapshot();
+      expect(admitted.job).toMatchObject({
+        status: "leased",
+        attempt_started: true,
+      });
+      expect(admitted.usage).toBe(1);
+      expect(admitted.replies).toEqual([]);
+      await f.changeWhileGenerating(change);
+      release();
+      expect(await running).toBe("failed");
+      expect(wait).not.toHaveBeenCalled();
+      expect(close).toHaveBeenCalledTimes(1);
+      expect(f.runtime.generate).toHaveBeenCalledTimes(1);
+      expect(f.commands.filter((op) => op === "start")).toHaveLength(1);
+      expect(f.commands).not.toContain("submit");
+      const after = await f.snapshot();
+      expect(after.job).toMatchObject({
+        status: change === "facts" ? "failed" : "canceled",
+        attempt_started: true,
+      });
+      expect(after.usage).toBe(1);
+      expect(after.replies).toEqual([]);
+
+      // A deliberate later invocation cannot recover the consumed model attempt.
+      expect(await runDraftJob(f.transport, f.runtime)).toEqual({
+        status: change === "revoke" ? "unavailable" : "idle",
+      });
+      expect(await f.snapshot()).toEqual(after);
+      expect(f.runtime.generate).toHaveBeenCalledTimes(1);
+    } finally {
+      release();
+      try {
+        await running;
+      } finally {
+        await f.close();
+      }
+    }
+  },
+  15000,
+);

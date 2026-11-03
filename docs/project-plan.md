@@ -11,8 +11,10 @@ The remaining [moderate tooling findings](sites-dependency-maintenance.md) have
 explicit compatibility/path limits. Confirmed inbox save recovery is now deployed in Sites version 17: a failed
 optional list refresh cannot mislabel an acknowledged save. Compiled runtime
 checks passed. Keyboard focus recovery for item/question editors is deployed in Sites version
-18, verified across Next and Sites. Continue a bounded review of remaining
-worker/recovery acceptance gaps before adding further changes. Platform and real-device gates stay open.
+18, verified across Next and Sites. Four local in-flight owner-change checks now
+verify late-output rejection without replay; this does not prove real provider
+cancellation. Next independent work: make compiled Sites browser acceptance
+reproducible and review remaining release evidence. Platform and real-device gates stay open.
 
 Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window. The overnight changes are live in Sites version 18: bounded owner RPC/inventory save/read waits, recoverable sign-in, account-bound request cancellation, bounded listing/photo preparation, recoverable sign-out and guarded saved-question editing. Draft PR #29 remains unmerged.
 

@@ -30,6 +30,31 @@ All eight focused process/CLI tests passed (four new cases). No production behav
 
 Ruling: execute the existing process contract as characterization/acceptance, without weakening production code to create a failing baseline. Failure to cover a real runtime phase remains an explicit limit rather than permission for unattended startup.
 
+## In-flight owner changes — 4 November 2026
+
+Four additional cases use the same actual loopback HTTP transport, production
+worker/drafting logic and fully migrated PGlite database. The synthetic model
+waits after the shared attempt is reserved. While it is pending, the owner pauses
+the queue, revokes its enrollment, cancels the job, or changes the item's price.
+The model then returns its now-invalid output.
+
+All four cases verify that the worker stops without another poll, submits no
+reply, retains exactly one consumed app attempt, and does not invoke the model
+again on a deliberate later run. Pause/revoke/cancel preserve the canceled job;
+changed facts leave a failed job. Every case has zero saved replies. Real owner
+RPCs are used for queue controls and the worker resumes under the anonymous role.
+
+These are characterization/acceptance tests of existing behavior, not a newly
+implemented cancellation feature. The synthetic model is allowed to finish:
+there is **no claim that pause or revoke cancels an admitted provider request or
+refunds its usage**. Concurrent hosted transaction lock orderings, physical
+restart and actual provider cancellation remain separate gates.
+
+Focused HTTP recovery suite: **8 passed** (four prior faults plus four new
+in-flight cases). Full suite: **292 passed**, six optional skips; lint/type checks
+pass. No production code, schema, credentials or cloud data changed, so browser
+and production-build suites were not rerun for this test/documentation increment.
+
 ## Recovery procedure
 
 The later [parent-crash fix](worker-parent-crash-recovery.md) addresses loss of the process-launcher caller during active synthetic work. Its independent supervisor drains the target group; physical/provider failures and retained run-directory/lock inspection remain separate requirements.

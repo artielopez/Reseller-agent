@@ -454,3 +454,27 @@ persists but requires normal build/verification and private-audience checks.
   mirror code. Beeper next eligible read remains 06:36 Manila. Keep unresolved
   real-device, supported-channel and subscription-use gates visible; no owner
   action is requested during the sleep window.
+
+### In-flight worker acceptance — 05:54 Manila
+
+- Added four real-loopback HTTP + migrated PGlite + production worker cases:
+  owner pause, revoke, cancel or item-price change while a synthetic model waits
+  after attempt admission. Allow its late output to finish, then inspect durable
+  state and deliberately run the worker again.
+- All cases stop the watch loop before another poll, submit no reply, preserve
+  one consumed attempt, and never call the model a second time. The three owner
+  controls retain canceled jobs; a changed fact leaves a failed job. This does
+  not promise cancellation/refund of an admitted real provider request.
+- **8 focused recovery cases** and **292 full tests** pass, with six optional
+  skips, lint and types. Logs: `/tmp/reseller-inflight-recovery.log` and
+  `/tmp/reseller-inflight-full.log`. This characterizes existing behavior; no
+  manufactured failing baseline or production-code change.
+- Updated the acceptance register, whose latest-release/count summary still
+  referred to version 9. It now points to version 18 and distinguishes fresh
+  worker checks from preceding browser/build evidence. Janyl activation is not
+  requested again; device image/reload and HTTP isolation gates stay open.
+- Prior heads `a81960b`/`c1adb34` passed CI (41724002505/41724355001). Existing
+  Sites version 18 is unchanged; no new deployment needed for tests/docs.
+- Next: turn the compiled Sites browser smoke check into a reproducible release
+  artifact. Beeper not due until 06:36 Manila. No account/model calls, cloud
+  mutations, normal OpenClaw changes, external messages or merge.
