@@ -415,3 +415,24 @@ persists but requires normal build/verification and private-audience checks.
   Beeper next eligible check is 05:34 Manila, not checked early during this run.
   Physical-device/cloud acceptance, channel permission and subscription usage
   controls remain unresolved. No owner action requested during sleep.
+
+### Keyboard editor recovery — 05:41 Manila
+
+- Eight new desktop/mobile checks reproduced lost keyboard focus when opening
+  item/question editors and returning after item save or question cancellation.
+  Headings existed but were inactive; the browser lost the removed control.
+- Editors now focus a non-tabbable heading on entry; closing restores the relevant
+  dashboard/review heading. Normal state updates do not steal focus. Tab proceeds
+  to the next control; no input auto-focus or mobile keyboard is forced.
+- Eight focused regressions pass after the fix. Fresh main checks: **288 tests**
+  (six optional skips), lint/types, **62 ordinary + 52 cloud browser checks**,
+  application and worker builds. All **52 Sites adapter browser checks** passed
+  without the preceding run’s development parser failure. Packaging is next.
+  Logs: `/tmp/reseller-{editor,question}-focus-{red,green}.log` and
+  `/tmp/reseller-focus-{unit,browser,cloud,build,sites}.log`.
+- Prior implementation `6461df2` and documentation head `fbee87d` both passed CI
+  (41722419855/41722914527). Beeper checked at **05:36 Manila**: still only the
+  original sent inquiry, no response. Next eligible check **06:36 Manila**.
+- Added physical keyboard/screen-reader acceptance to the supervised checklist.
+  Synthetic desktop/mobile Chromium does not establish Safari/VoiceOver or actual
+  device acceptance. No model calls, worker changes, email or merge.

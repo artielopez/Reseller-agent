@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { channelNames, channels, type Channel } from "@/lib/domain";
 import type { Inquiry, InquiryInput } from "@/lib/buyer/domain";
 
@@ -16,6 +16,10 @@ export function InquiryEditor({
   onCancel: () => void;
   onDirtyChange: (dirty: boolean) => void;
 }) {
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    heading.current?.focus();
+  }, []);
   const [message, setMessage] = useState(inquiry.message),
     [buyer, setBuyer] = useState(inquiry.buyer_name),
     [channel, setChannel] = useState<Channel>(inquiry.channel),
@@ -55,7 +59,9 @@ export function InquiryEditor({
         });
       }}
     >
-      <h3>Edit saved question</h3>
+      <h3 ref={heading} tabIndex={-1}>
+        Edit saved question
+      </h3>
       <p>
         Correct the recorded question or its source. Saving changes invalidates
         existing reply approval; review a fresh draft afterward. This does not

@@ -1,7 +1,7 @@
 "use client";
 import { writeClipboard } from "@/lib/clipboard";
 import { listingPriceReview } from "@/lib/listing-price-review";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { z } from "zod";
 import {
   ArrowLeft,
@@ -47,6 +47,10 @@ export function ItemEditor({
   onClose: () => void;
 }) {
   const requestSignal = useRequestLifetime();
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    heading.current?.focus();
+  }, []);
   const [item, setItem] = useState<Item>(initial);
   const [price, setPrice] = useState(String(initial.price));
   const [channel, setChannel] = useState<Channel>("carousell");
@@ -201,7 +205,7 @@ export function ItemEditor({
       <div className="page-heading">
         <div>
           <span className="eyebrow">MAKE ROOM FOR SOMETHING NEW</span>
-          <h1>
+          <h1 ref={heading} tabIndex={-1}>
             {initial.title
               ? "Your item, ready to go."
               : "Give it a second life."}

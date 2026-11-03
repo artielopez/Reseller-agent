@@ -46,6 +46,14 @@ export function Workspace() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState<Item | null>(null);
+  const dashboardHeading = useRef<HTMLHeadingElement>(null);
+  const wasEditing = useRef(false);
+  useEffect(() => {
+    // A full editor replaces its opener. Restore a stable dashboard landmark
+    // after save/cancel, without stealing focus on ordinary inventory updates.
+    if (wasEditing.current && !editing) dashboardHeading.current?.focus();
+    wasEditing.current = !!editing;
+  }, [editing]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All items");
   const [reload, setReload] = useState(0);
@@ -332,7 +340,7 @@ export function Workspace() {
                       <span className="eyebrow">
                         A FRESH START FOR YOUR PRELOVED THINGS
                       </span>
-                      <h1>
+                      <h1 ref={dashboardHeading} tabIndex={-1}>
                         A little space.
                         <br className="mobile-break" /> A lot of possibility.
                       </h1>

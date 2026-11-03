@@ -30,6 +30,11 @@ to read platform inboxes or send automatically. Record outcomes in
    Reload deliberately; do not overwrite the first save by recreating the item.
 4. Verify sign-in recovery using the newest email on the same device. A request
    timeout is uncertain: check the inbox before requesting another link.
+5. With a keyboard or screen reader, open an item or saved-question editor.
+   Confirm the new heading is announced/focused and Tab reaches its controls.
+   Save or cancel and confirm focus returns to the dashboard/review heading.
+   Synthetic Chromium coverage does not establish VoiceOver or physical-device
+   behavior.
 
 ## Buyer assistance
 

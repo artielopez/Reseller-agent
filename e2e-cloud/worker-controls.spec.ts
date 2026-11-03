@@ -978,3 +978,43 @@ for (const mode of ["new", "edited"] as const) {
     expect(saves).toBe(1);
   });
 }
+
+for (const phase of ["opening", "cancelling"] as const) {
+  test(`keyboard focus follows ${phase} saved-question edits`, async ({
+    page,
+  }) => {
+    await fixture(page);
+    await page
+      .getByRole("button", {
+        name: "Is this available? · Open · Facebook Marketplace",
+        exact: true,
+      })
+      .click();
+    await page
+      .getByRole("button", { name: "Edit saved question", exact: true })
+      .focus();
+    await page.keyboard.press("Enter");
+    if (phase === "opening") {
+      await expect(
+        page.getByRole("heading", { name: "Edit saved question", exact: true }),
+      ).toBeFocused();
+      await page.keyboard.press("Tab");
+      await expect(page.getByLabel("Saved question channel")).toBeFocused();
+    } else {
+      await page
+        .getByRole("button", { name: "Cancel question edits", exact: true })
+        .focus();
+      await page.keyboard.press("Enter");
+      await expect(
+        page.getByRole("heading", {
+          name: "Review this question",
+          exact: true,
+        }),
+      ).toBeFocused();
+      await page.keyboard.press("Tab");
+      await expect(
+        page.getByRole("button", { name: "Edit saved question", exact: true }),
+      ).toBeFocused();
+    }
+  });
+}

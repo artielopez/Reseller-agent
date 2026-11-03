@@ -212,6 +212,13 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     [replyId, setReplyId] = useState(""),
     [replyReload, setReplyReload] = useState(0),
     [editingQuestion, setEditingQuestion] = useState(false);
+  const reviewHeading = useRef<HTMLHeadingElement>(null);
+  const wasEditingQuestion = useRef(false);
+  useEffect(() => {
+    if (wasEditingQuestion.current && !editingQuestion)
+      reviewHeading.current?.focus();
+    wasEditingQuestion.current = editingQuestion;
+  }, [editingQuestion]);
   const [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState(""),
@@ -620,7 +627,9 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
           </section>
           {thread && (
             <section className="panel section-pad">
-              <h2>Review this question</h2>
+              <h2 ref={reviewHeading} tabIndex={-1}>
+                Review this question
+              </h2>
               {editingQuestion ? (
                 <InquiryEditor
                   key={thread.inquiry.id + ":" + thread.inquiry.revision}
