@@ -1,6 +1,6 @@
 # Operating Reseller Agent
 
-Current mode, 3 November 2026: private cloud inventory and assisted replies. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
+Current mode, 4 November 2026: private cloud inventory and assisted replies. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
 
 ## Everyday use
 
@@ -12,6 +12,8 @@ Current mode, 3 November 2026: private cloud inventory and assisted replies. The
 Copying does not send a message or change inventory. Marking Answered invalidates the old reply approval under the current inquiry-change trigger, so a completed question can display its reply as Draft again; the inquiry remains Answered. Do not reapprove merely to complete the already-recorded manual reply.
 
 The cloud's unconfigured listing-generation API uses labelled templates. The successful existing-OpenClaw connection is a separate buyer-drafting path; it does not automatically add AI listing generation to the cloud app.
+
+Use **Edit saved question** for corrections; saving invalidates old approval while preserving status and the linked item. For device acceptance, follow [the supervised end-to-end checklist](supervised-end-to-end-check.md).
 
 ## Supervised AI drafting
 
@@ -45,9 +47,9 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **9**, published from source `2b7919c121c53d7cf08bc9bc825d94a687d60157`, with its audience limited to Artie and Janyl. The [worker-health release](worker-health-workflow.md#hosted-release--3-november-2026) records the current successful deployment and the pending signed-in UI check. GitHub and the separate Sites source repository have different release histories. The eight hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
+The live cloud app is Sites version **10**, published from source `69dd9b391dcf6650b0a8d1e46d44e397e85d022a`, with its audience limited to Artie and Janyl. The [worker-health release](worker-health-workflow.md#hosted-release--3-november-2026) records the current successful deployment and the pending signed-in UI check. GitHub and the separate Sites source repository have different release histories. The eight hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
 
-[PR #28](https://github.com/artielopez/Reseller-agent/pull/28) contains the unmerged implementation stack plus current worker health/workflow/privacy increment. See the [review map](release-review-map.md). Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
+[Draft PR #29](https://github.com/artielopez/Reseller-agent/pull/29) contains the latest cumulative unmerged work, including request recovery and saved-question editing. See the [review map](release-review-map.md). Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
 
 For a regression, first pause/revoke the affected worker capability and preserve the manual workflow. Prepare and verify a compatible prior app source before an authorized rollback. Do not revert to a client lacking save-revision support while the guard is active. Older open cloud editors must reload. Do not blindly revert to an older six-photo client after ten-photo data exists, reapply initial migrations, weaken RLS, or delete data to make an older build work. Disabling drafting is safer than guessing a migration downgrade.
 

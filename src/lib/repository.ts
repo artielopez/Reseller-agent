@@ -134,7 +134,11 @@ async function readCloudItems(signal: AbortSignal): Promise<Item[]> {
     }),
   );
 }
-export async function saveItem(item: Item, previous?: Item): Promise<Item> {
+export async function saveItem(
+  item: Item,
+  previous?: Item,
+  parent?: AbortSignal,
+): Promise<Item> {
   validateItem(item);
   const saved = { ...item, updatedAt: new Date().toISOString() };
   if (demoMode) {
@@ -159,75 +163,106 @@ export async function saveItem(item: Item, previous?: Item): Promise<Item> {
     });
   }
   const supabase = getSupabase();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-  if (authError || !user)
-    throw new Error("Your session expired. Sign in again to save.");
   const uploaded: string[] = [];
   const photos: Photo[] = [];
   let saveAttempted = false;
   let definitivelyRejected = false;
   try {
-    for (const photo of item.photos) {
-      if (photo.path) {
-        photos.push(photo);
-        continue;
-      }
-      if (!photo.url.startsWith("data:image/jpeg;base64,"))
-        throw new Error("Please upload a JPEG, PNG or WebP photo.");
-      const blob = await (await fetch(photo.url)).blob();
-      const id = crypto.randomUUID();
-      const path = `${user.id}/${item.id}/${id}.jpg`;
-      const { error } = await supabase.storage
-        .from(BUCKET)
-        .upload(path, blob, { contentType: "image/jpeg", upsert: false });
-      if (error)
-        throw new Error(
-          "Photo upload failed. Check your connection and try again.",
-        );
-      uploaded.push(path);
-      photos.push({ ...photo, id, path });
-    }
-    saveAttempted = true;
-    const { data, error } = await supabase.rpc("save_inventory_item_checked", {
-      payload: {
-        ...saved,
-        saveRevision: item.saveRevision ?? null,
-        photos: photos.map(({ id, path }) => ({ id, path })),
+    // Ten compressed photos may take longer on mobile than a metadata request.
+    // Stop starting new work after two minutes, even if Auth/Storage ignores abort.
+    await withRequestDeadline(
+      async (signal) => {
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+        signal.throwIfAborted();
+        if (authError || !user)
+          throw new Error("Your session expired. Sign in again to save.");
+        for (const photo of item.photos) {
+          signal.throwIfAborted();
+          if (photo.path) {
+            photos.push(photo);
+            continue;
+          }
+          if (!photo.url.startsWith("data:image/jpeg;base64,"))
+            throw new Error("Please upload a JPEG, PNG or WebP photo.");
+          const blob = await (await fetch(photo.url, { signal })).blob();
+          signal.throwIfAborted();
+          const id = crypto.randomUUID();
+          const path = `${user.id}/${item.id}/${id}.jpg`;
+          const { error } = await supabase.storage
+            .from(BUCKET)
+            .upload(path, blob, { contentType: "image/jpeg", upsert: false });
+          signal.throwIfAborted();
+          if (error)
+            throw new Error(
+              "Photo upload failed. Check your connection and try again.",
+            );
+          uploaded.push(path);
+          photos.push({ ...photo, id, path });
+        }
+        signal.throwIfAborted();
+        saveAttempted = true;
+        const { data, error } = await supabase
+          .rpc("save_inventory_item_checked", {
+            payload: {
+              ...saved,
+              saveRevision: item.saveRevision ?? null,
+              photos: photos.map(({ id, path }) => ({ id, path })),
+            },
+          })
+          .abortSignal(signal);
+        signal.throwIfAborted();
+        if (error) {
+          definitivelyRejected = [
+            "PT409",
+            "22023",
+            "23514",
+            "23505",
+            "42501",
+          ].includes(error.code);
+          if (error.code === "PT409") throw staleSave();
+          throw new Error(
+            "Could not confirm the save. Check your connection and database setup, then reload inventory before retrying.",
+          );
+        }
+        Object.assign(saved, saveReceipt.parse(data));
       },
-    });
-    if (error) {
-      definitivelyRejected = [
-        "PT409",
-        "22023",
-        "23514",
-        "23505",
-        "42501",
-      ].includes(error.code);
-      if (error.code === "PT409") throw staleSave();
-      throw new Error(
-        "Could not confirm the save. Check your connection and database setup, then reload inventory before retrying.",
-      );
-    }
-    Object.assign(saved, saveReceipt.parse(data));
+      "Could not confirm the save. Keep your edits, then reload inventory before retrying; the save may have completed.",
+      parent,
+      120_000,
+    );
   } catch (error) {
-    if (uploaded.length && (!saveAttempted || definitivelyRejected)) {
+    if (
+      !parent?.aborted &&
+      uploaded.length &&
+      (!saveAttempted || definitivelyRejected)
+    ) {
       // Only a definitively rejected transaction (or no RPC attempt) permits cleanup.
       // Missing metadata after a network failure cannot rule out a later commit.
       try {
-        const { data: referenced, error: lookupError } = await supabase
-          .from("item_photos")
-          .select("path")
-          .in("path", uploaded);
-        if (!lookupError) {
-          const retained = new Set(
-            (referenced || []).map((photo) => photo.path),
-          );
-          const unused = uploaded.filter((path) => !retained.has(path));
-          if (unused.length) await supabase.storage.from(BUCKET).remove(unused);
-        }
+        await withRequestDeadline(
+          async (signal) => {
+            const { data: referenced, error: lookupError } = await supabase
+              .from("item_photos")
+              .select("path")
+              .in("path", uploaded)
+              .abortSignal(signal);
+            signal.throwIfAborted();
+            if (!lookupError) {
+              const retained = new Set(
+                (referenced || []).map((photo) => photo.path),
+              );
+              const unused = uploaded.filter((path) => !retained.has(path));
+              if (unused.length)
+                await supabase.storage.from(BUCKET).remove(unused);
+            }
+          },
+          "Photo cleanup did not finish.",
+          undefined,
+          5_000,
+        );
       } catch {
         /* Offline: prefer orphaned files over breaking saved photos. */
       }
@@ -243,7 +278,12 @@ export async function saveItem(item: Item, previous?: Item): Promise<Item> {
   // Cleanup is best-effort after the atomic database save. Never report a saved item as unsaved.
   if (removed.length) {
     try {
-      await supabase.storage.from(BUCKET).remove(removed);
+      await withRequestDeadline(
+        () => supabase.storage.from(BUCKET).remove(removed),
+        "Photo cleanup did not finish.",
+        undefined,
+        5_000,
+      );
     } catch {
       /* The item is saved; orphan cleanup can be retried separately. */
     }

@@ -32,13 +32,15 @@ vi.mock("../src/lib/supabase", () => ({
     },
     from: () => ({
       select: () => ({
-        in: async () => ({
-          data: [...state.referenced].map((path) => ({ path })),
-          error: state.confirmError ? new Error("Offline") : null,
+        in: () => ({
+          abortSignal: async () => ({
+            data: [...state.referenced].map((path) => ({ path })),
+            error: state.confirmError ? new Error("Offline") : null,
+          }),
         }),
       }),
     }),
-    rpc: async (
+    rpc: (
       name: string,
       { payload }: { payload: { photos: { path: string }[] } },
     ) => {
@@ -46,14 +48,16 @@ vi.mock("../src/lib/supabase", () => ({
       if (state.committed || !state.rpcError)
         payload.photos.forEach((photo) => state.referenced.add(photo.path));
       return {
-        data: {
-          saveRevision: "44444444-4444-4444-8444-444444444444",
-          updatedAt: "2026-11-03T00:00:00Z",
-          replyContextRevision: "2",
-        },
-        error: state.rpcError
-          ? Object.assign(new Error("Lost response"), { code: state.rpcCode })
-          : null,
+        abortSignal: async () => ({
+          data: {
+            saveRevision: "44444444-4444-4444-8444-444444444444",
+            updatedAt: "2026-11-03T00:00:00Z",
+            replyContextRevision: "2",
+          },
+          error: state.rpcError
+            ? Object.assign(new Error("Lost response"), { code: state.rpcCode })
+            : null,
+        }),
       };
     },
   }),

@@ -2,6 +2,9 @@
 import { useState, useSyncExternalStore, type FormEvent } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
+import { withRequestDeadline } from "@/lib/request-deadline";
+const emailTimeout =
+  "Could not confirm the sign-in email request. Check your inbox before requesting another link; the email may already have been sent.";
 import { authFailureMessage, authRedirectMessage } from "@/lib/auth-feedback";
 function subscribeToUrlChanges(notify: () => void) {
   window.addEventListener("hashchange", notify);
@@ -30,19 +33,27 @@ export function AuthPanel() {
     setError("");
     setMessage("");
     try {
-      const { error } = await getSupabase().auth.signInWithOtp({
-        email: email.trim(),
-        options: {
-          shouldCreateUser: false,
-          emailRedirectTo: window.location.origin,
-        },
-      });
+      const { error } = await withRequestDeadline(
+        () =>
+          getSupabase().auth.signInWithOtp({
+            email: email.trim(),
+            options: {
+              shouldCreateUser: false,
+              emailRedirectTo: window.location.origin,
+            },
+          }),
+        emailTimeout,
+      );
       if (error) throw error;
       setMessage(
         "Check your email for a sign-in link. Open it on this device to continue.",
       );
     } catch (error) {
-      setError(authFailureMessage(error));
+      setError(
+        error instanceof Error && error.message === emailTimeout
+          ? emailTimeout
+          : authFailureMessage(error),
+      );
     } finally {
       setBusy(false);
     }

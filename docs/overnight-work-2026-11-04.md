@@ -3,7 +3,7 @@
 Owner requested seven hours of independent work while sleeping. Window starts
 2026-11-03 19:33:55 UTC (03:33:55 Manila) and ends 2026-11-04 02:33:55 UTC
 (10:33:55 Manila). Heartbeat `reseller-agent-overnight-work` continues this thread
-hourly, at most seven runs; its prompt also enforces the end time. Do not ask the
+every 15 minutes until that deadline; its prompt also enforces the end time and pauses it when useful independent work is exhausted. Do not ask the
 owner for decisions during this window. Record unresolved dependencies instead.
 
 ## Boundaries
@@ -89,3 +89,45 @@ persists but requires normal build/verification and private-audience checks.
   Keep adding reviewable increments to this branch/PR; do not create one PR per
   documentation update. Current publication is being prepared; live v9 remains
   authoritative until a new receipt is recorded.
+
+### First overnight cloud release — 03:50 Manila
+
+- Implementation `f14f5c6` passed GitHub Application checks (run `41706165260`).
+- Sites **version 10** deployed successfully from exact pushed source
+  `69dd9b391dcf6650b0a8d1e46d44e397e85d022a`, deployment
+  `appgdep_6aea3ac8cf048191969c5e0674b6d8c9`. Artie/Janyl audience unchanged.
+- No schema change, model call, worker activation or merge. Signed-in visual
+  acceptance is still unavailable while local browser use is disabled; synthetic
+  browser checks and deployment success do not replace that acceptance.
+- Next: bound inventory save/upload/rejected-save cleanup without replaying a
+  write, deleting uncertain uploads or reporting a confirmed save as unsaved.
+
+### Save, session and account recovery increment — 04:00 Manila
+
+- Six failing save regressions now pass: indefinitely pending Auth/upload/RPC,
+  stalled post-save cleanup, stalled rejected-save cleanup, and account
+  cancellation during upload. The whole Auth/upload/save phase has two minutes
+  for ten compressed mobile photos, then at most five seconds for best-effort
+  cleanup. Uncertain committed uploads remain intact. Late work cannot advance
+  to another save after timeout or account cancellation.
+- A synthetic browser regression exposed a previous account's successful item
+  save entering the next account's inventory display. Account generations now
+  discard it, and switching/unmounting cancels the pending operation. This is
+  local response isolation, not a claim that an in-flight server write rolls back.
+- Stalled initial session refresh and sign-in-email responses release controls
+  after 15 seconds. New Auth events take precedence over old restore results.
+  Uncertain email requests direct the user to check the inbox before retrying;
+  no automatic resend or actual email occurred in tests.
+- Initial browser failures included a broad alert locator and a fake clock
+  installed after the deadline timer; these were corrected in the test fixture.
+  The account-switch and session-refresh defects were reproduced before fixes.
+- Isolated Mac preflight passed, with no cloud/model request and empty temporary
+  state afterward. Five installed-runtime synthetic checks passed. The first
+  preflight attempt correctly rejected a /private/tmp state directory: the
+  sandbox requires denied home-tree state. Re-running in a private repository
+  test directory met that invariant; no runtime/security rule was changed.
+- Lint/types and **275 tests** (six optional skips) passed. Final **56 ordinary + 36 cloud-contract browser checks** and production build
+  passed (92 browser checks). Source/release receipts follow.
+- Next independent audit: remaining account-bound asynchronous mutations and
+  listing-generation waits; inspect before adding tests or changing behavior.
+  Do not equate a cancelled request with a rolled-back server transaction.

@@ -1,4 +1,5 @@
 "use client";
+import { withRequestDeadline } from "@/lib/request-deadline";
 import {
   useCallback,
   useEffect,
@@ -69,17 +70,24 @@ export function BuyerInbox() {
       data: { subscription },
     } = client.auth.onAuthStateChange((_event, session) => {
       events++;
-      if (active) setAuth({ ready: true, user: session?.user ?? null });
+      if (active) {
+        setError("");
+        setAuth({ ready: true, user: session?.user ?? null });
+      }
     });
-    client.auth
-      .getSession()
+    withRequestDeadline(
+      () => client.auth.getSession(),
+      "Could not check sign-in. Reload and try again.",
+    )
       .then(({ data, error }) => {
         if (!active || events) return;
         if (error) setError("Could not restore sign-in. Reload and try again.");
         setAuth({ ready: true, user: data.session?.user ?? null });
       })
       .catch(() => {
-        if (active) setError("Could not check sign-in. Reload and try again.");
+        if (!active || events) return;
+        setError("Could not check sign-in. Reload and try again.");
+        setAuth({ ready: true, user: null });
       });
     return () => {
       active = false;

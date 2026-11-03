@@ -1,6 +1,6 @@
 # Subscription-backed draft trial
 
-This is a supervised **one-question** trial, not unattended buyer automation. Synthetic direct and cloud queue-to-Mac-to-Agent-Draft acceptance have passed. The owner explicitly requested reuse of the existing Mac mini OpenClaw codebase/setup. One owner-selected real question completed under the conditions below on 3 November; its Agent Draft remains unapproved.
+This is a supervised **one-question** trial, not unattended buyer automation. Synthetic direct and cloud queue-to-Mac-to-Agent-Draft acceptance have passed. The owner explicitly requested reuse of the existing Mac mini OpenClaw codebase/setup. One owner-selected real question completed under the conditions below on 3 November; its Agent Draft was subsequently reviewed/approved and manually sent by the owner, with Answered verified in the status record. The historical trial sections below describe the state at generation time.
 
 ## Existing connection decision — 3 November
 

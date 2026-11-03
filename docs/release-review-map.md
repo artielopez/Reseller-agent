@@ -1,8 +1,8 @@
-# Review map — 3 November 2026
+# Review map — 4 November 2026
 
 No merge or auto-merge is authorized for this increment. The owner must approve a concrete final PR/head before merge. Sites publication is a separate, previously authorized delivery path.
 
-The open GitHub requests #8–#27 all target `main` and preserve successive development snapshots. The worker-health branch continues from #27 head `e50e99d`; it includes the accumulated work. Do not merge each snapshot independently or cherry-pick overlapping migrations. For final integration, review the latest cumulative PR against `main`, verify that all earlier branch heads remain ancestors, then obtain owner approval. Only after the approved integration succeeds should superseded requests be closed. No PR was closed, rebased or merged during this preparation.
+The open GitHub requests #8–#29 all target `main` and preserve successive development snapshots. The current overnight branch continues from #28 head `01e704d`; draft PR #29 includes the accumulated work. Do not merge each snapshot independently or cherry-pick overlapping migrations. For final integration, review the latest cumulative PR against `main`, verify that all earlier branch heads remain ancestors, then obtain owner approval. Only after the approved integration succeeds should superseded requests be closed. No PR was closed, rebased or merged during this preparation.
 
 | Review area | Earlier PRs | Main evidence |
 | --- | --- | --- |
@@ -11,7 +11,9 @@ The open GitHub requests #8–#27 all target `main` and preserve successive deve
 | Private cloud and sign-in | #16–#18 | Supabase setup, custom SMTP, private audience and invitation recovery |
 | Subscription drafting and workflow | #19–#22 | Hosted queue checks and bounded OpenClaw trial; optional SIWC timeout remains unresolved |
 | Photos and reliability | #23–#27 | Ten-photo limits, HTTP/concurrency/crash tests, PT409 fix, inventory CAS |
-| Current increment | #28, worker-health-workflow | Per-question queue/status/reload, advisory health, read-only privacy preview |
+| Worker health | #28, worker-health-workflow | Per-question queue/status/reload, advisory health, read-only privacy preview |
+
+| Current increment | #29, overnight-reliability | Request/save/session recovery, saved-question corrections and account-switch isolation |
 
 ## Release checks
 

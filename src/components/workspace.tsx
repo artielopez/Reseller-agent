@@ -26,6 +26,7 @@ import {
   type Item,
 } from "@/lib/domain";
 import { listItems, saveItem } from "@/lib/repository";
+import { withRequestDeadline } from "@/lib/request-deadline";
 import { getSupabase } from "@/lib/supabase";
 import { AuthPanel } from "./auth-panel";
 import { ItemEditor } from "./item-editor";
@@ -33,6 +34,8 @@ import { ItemEditor } from "./item-editor";
 export function Workspace() {
   const [user, setUser] = useState<User | null>(null);
   const accountId = useRef<string | null>(null);
+  const accountGeneration = useRef(0);
+  const pendingSaves = useRef(new Set<AbortController>());
   const [authReady, setAuthReady] = useState(demoMode);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,24 +48,22 @@ export function Workspace() {
 
   useEffect(() => {
     if (demoMode || configurationError) return;
+    let active = true,
+      events = 0;
+    const invalidatePendingSaves = () => {
+      accountGeneration.current++;
+      for (const pending of pendingSaves.current) pending.abort();
+      pendingSaves.current.clear();
+    };
     const supabase = getSupabase();
-    supabase.auth
-      .getSession()
-      .then(({ data, error }) => {
-        if (error)
-          setError("Could not restore your session. Please sign in again.");
-        setUser(data.session?.user ?? null);
-        setAuthReady(true);
-      })
-      .catch(() => {
-        setError("Could not check your session. Please refresh.");
-        setAuthReady(true);
-      });
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      events++;
+      if (!active) return;
       const nextId = session?.user.id ?? null;
       if (accountId.current !== nextId) {
+        invalidatePendingSaves();
         accountId.current = nextId;
         setItems([]);
         setEditing(null);
@@ -73,7 +74,28 @@ export function Workspace() {
       setUser(session?.user ?? null);
       setAuthReady(true);
     });
-    return () => subscription.unsubscribe();
+    withRequestDeadline(
+      () => supabase.auth.getSession(),
+      "Could not check your session. Please refresh.",
+    )
+      .then(({ data, error }) => {
+        if (!active || events) return;
+        if (error)
+          setError("Could not restore your session. Please sign in again.");
+        accountId.current = data.session?.user.id ?? null;
+        setUser(data.session?.user ?? null);
+        setAuthReady(true);
+      })
+      .catch(() => {
+        if (!active || events) return;
+        setError("Could not check your session. Please refresh.");
+        setAuthReady(true);
+      });
+    return () => {
+      active = false;
+      invalidatePendingSaves();
+      subscription.unsubscribe();
+    };
   }, []);
   useEffect(() => {
     if (!demoMode && !user) return;
@@ -97,10 +119,22 @@ export function Workspace() {
     };
   }, [user, reload]);
   async function save(item: Item) {
-    const result = await saveItem(
-      item,
-      items.find((entry) => entry.id === item.id),
-    );
+    const generation = accountGeneration.current;
+    const controller = new AbortController();
+    pendingSaves.current.add(controller);
+    let result: Item;
+    try {
+      result = await saveItem(
+        item,
+        items.find((entry) => entry.id === item.id),
+        controller.signal,
+      );
+    } finally {
+      pendingSaves.current.delete(controller);
+    }
+    // The old owner may have saved successfully, but its result must never be
+    // rendered in a new account (including a switch away and back).
+    if (generation !== accountGeneration.current) return;
     setItems((current) => [
       result,
       ...current.filter((entry) => entry.id !== result.id),
@@ -239,7 +273,14 @@ export function Workspace() {
               Checking your session…
             </div>
           ) : !demoMode && !user ? (
-            <AuthPanel />
+            <>
+              {error && (
+                <p className="error" role="alert">
+                  {error}
+                </p>
+              )}
+              <AuthPanel />
+            </>
           ) : (
             <>
               {demoMode && (
