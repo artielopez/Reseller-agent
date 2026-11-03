@@ -123,7 +123,10 @@ That new endpoint contract also passes twice against Next, once per test project
 The scan alone is not used as proof of application compatibility.
 
 A separate **production Worker** smoke test serves both inventory and inbox HTML
-and rejects anonymous generation. It uses the compiled artifact in local Wrangler,
+and rejects anonymous generation. The reusable check also launches fresh Chromium
+contexts to render both sign-in forms, catches client/HTTP resource failures, and
+blocks and fails any non-loopback browser request. It uses the compiled artifact
+in local Wrangler,
 not the development Vite handler. Reproduce after the supported build:
 
 ```sh
@@ -135,6 +138,10 @@ node scripts/acceptance/sites-worker-smoke.mjs
 ```
 
 The smoke test supplies no cookie/token and never requests an email or model call.
+It requires the existing Playwright Chromium installation. It never attaches a
+personal browser, supplies stored account state or submits the sign-in form.
+The extended check passed against exact version 18 source
+`c061f0a979cbdd41167a4a4cd101fec80c7556d6` on 4 November.
 It does not establish real sign-in, persistence or physical-device acceptance.
 Full Sites audit now reports **20 moderate affected packages** inherited from lint
 minimatch and the legacy Drizzle-loader esbuild. Production audit reports zero.

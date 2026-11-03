@@ -24,6 +24,8 @@ Keyboard editor recovery is now deployed: entering item/question editors focuses
 
 Four additional in-flight worker acceptance cases pass using real local HTTP, migrated SQL and a deferred synthetic model. Pause/revoke/cancel or changed item facts reject late output, retain one consumed attempt and prevent inference replay; no replies are saved. **292 tests**, six optional skips, lint/types pass. No production code or deployment changed; Sites remains version **18**. Actual provider cancellation, hosted overlap and device checks remain separate. Prior heads `a81960b` and `c1adb34` passed CI (41724002505/41724355001). [Evidence](worker-recovery-acceptance.md#in-flight-owner-changes--4-november-2026).
 
+The compiled production smoke check is now reproducible in `scripts/acceptance/sites-worker-smoke.mjs`: both HTML routes, anonymous generation 401/no-store, and both sign-in forms rendered by fresh Chromium contexts with no page/HTTP-resource errors or external requests. Passed against exact version 18 source `c061f0a`; lint passes. It uses no stored session and does not submit email forms. The test-only worker increment is committed as `36cca10`; no new deployment or merge.
+
 ## Worker-health release verified — 3 November 2026
 
 [PR #28](https://github.com/artielopez/Reseller-agent/pull/28) contains implementation `ee843e4`; no merge or auto-merge. Final checks: **258 tests passed**, six optional skips, **72 desktop/mobile browser checks** (52 ordinary + 20 synthetic cloud contracts), lint/types, Next and worker builds. Fresh independent review found no blocking issues.

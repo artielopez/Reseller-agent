@@ -478,3 +478,22 @@ persists but requires normal build/verification and private-audience checks.
 - Next: turn the compiled Sites browser smoke check into a reproducible release
   artifact. Beeper not due until 06:36 Manila. No account/model calls, cloud
   mutations, normal OpenClaw changes, external messages or merge.
+
+### Reproducible compiled client check — 05:56 Manila
+
+- In-flight tests/docs pushed as `36cca10` to the same draft PR #29.
+- Extended `scripts/acceptance/sites-worker-smoke.mjs` to exercise compiled client
+  chunks in fresh Chromium contexts, verify both sign-in forms, reject page/HTTP
+  resource errors, and block/fail all non-loopback browser requests. No cookies,
+  stored state, personal browser attachment or form submission.
+- Passed against existing version 18 source
+  `c061f0a979cbdd41167a4a4cd101fec80c7556d6`: HTML routes 200; anonymous generation
+  401/no-store; both sign-in screens render without errors or external requests.
+  Lint passes. Logs: `/tmp/reseller-v18-worker-smoke.log`,
+  `/tmp/reseller-v18-worker-smoke-server.log`, `/tmp/reseller-smoke-lint.log`.
+  The temporary local Worker server was stopped.
+- This adds repeatable release evidence without changing or redeploying the app.
+  The earlier 292-test result is not claimed as rerun after this script-only edit.
+  Next useful check: assess running existing synthetic cloud contracts against
+  the compiled artifact, with every backend call intercepted, rather than only
+  the development handler. Do not use or imitate either participant's session.
