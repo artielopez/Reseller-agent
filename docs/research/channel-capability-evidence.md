@@ -1,5 +1,14 @@
 # Account capability evidence — 29 October 2026
 
+## Follow-up — 3 November 2026
+
+Official [Beeper API documentation](https://developers.beeper.com/desktop-api/), [Meta's native reply announcement](https://about.fb.com/news/2026/03/facebook-marketplace-new-meta-ai-tools-make-selling-faster-and-easier/) and [Carousell PH reply documentation](https://support.carousell.com/hc/en-us/articles/900006211046--Philippines-CarouBiz-tools-Quick-and-Auto-Reply) were rechecked. They do not establish this account's native eligibility or permission for our custom connector. The owner-approved [Beeper inquiry](../channel-access-support-draft.md) was sent to its official developer contact; response pending. No new platform account inspection or message access occurred.
+
+A separate [Carousell inquiry](../carousell-access-support-draft.md) is now prepared with the official publisher support email and Help Centre escalation route. The owner subsequently declined sending and requested a terms check. Section 2 of the current terms expressly restricts automated access/monitoring and messaging; the inquiry remains unsent and custom access remains a no-go. The public PH plan article labels its table June 2025; no current account-specific quote or native eligibility is inferred. This advances Carousell separately from Beeper.
+
+The account observations and unimplemented recommendations below are historical. See [current status](../project-status.md) for the deployed manual inbox and completed supervised existing-OpenClaw draft trial; neither establishes platform intake/sending permission.
+
+
 This is a read-only feasibility check, not permission to integrate or evidence of reliable message delivery. The owner signed into Facebook and Carousell in Chrome on the Mac mini. No settings were saved, listings published, buyer conversations opened, messages sent, account connections added, or subscriptions purchased.
 
 ## Findings
@@ -54,3 +63,10 @@ No additional account UI was inspected and no bridge was installed or connected 
 - **Access and delivery:** [Beeper auth](https://developers.beeper.com/desktop-api/auth/) describes approved connections/token access. The [send endpoint](https://developers.beeper.com/desktop-api-reference/resources/messages/methods/send/) returns a pending message ID; pending is not confirmed external delivery. Its returned chat ID can differ for a merged chat. No idempotency parameter appears on the inspected send reference. A future permitted pilot must establish reconciliation and destination verification before dispatch; none is implemented here.
 
 Decision remains **no-go for live custom readers/senders** until permission and actual coverage are established independently per channel. The saved manual inbox can be built and tested without these connections. Public Group comments remain a separate unresolved source; a private Messenger bridge does not solve them. Existing support questions above are still drafts, not sent requests.
+
+## Mac mini follow-up — 30 October 2026
+
+- Installed runtime commands now succeed: OpenClaw **2026.9.6 (28226d9)** and Hermes **v0.21.5+4853.g8d30c4e (2026.9.24), upstream 8d30c4ea**, Python 3.14.7. Hermes version metadata is no longer blocked by the earlier lock. No update or settings repair was performed.
+- OpenClaw's installed `docs/gateway/openresponses-http-api.md` explicitly treats the endpoint as full operator access. Its request table says `store` and `max_tool_calls` are accepted but ignored, so neither can establish retention or tool isolation. `docs/gateway/config-tools/tool-policy.md` documents deny-first wildcard policies; `minimal` still includes session/status and gateway update functionality. A dedicated profile with explicit denial and a verified runtime is required, not just a minimal-profile label.
+- Hermes installed `gateway/platforms/api_server_openai_routes.py` has response-store handling for `store`, session history and agent dispatch. Inspection of this file alone does not establish that all transcripts/memory are suppressed or tools disabled. No personal configuration, memories or chat histories were read.
+- The provider-neutral preparation in `src/lib/automation/drafting.ts` has no network transport or live caller. Its runtime verification and quota dependencies must be supplied by a future trusted adapter. Unit tests do not establish that either installed runtime is safe for buyer text.
