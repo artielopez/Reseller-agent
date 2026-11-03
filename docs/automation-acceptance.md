@@ -39,7 +39,9 @@ ordinary-suite passes.
 The live cloud release is **version 18**, with bounded recovery, saved-question
 editing, advisory worker health and keyboard focus recovery. Its release checks
 passed **62 ordinary + 52 Next cloud + 52 Sites adapter browser checks**, types
-and application/worker builds. Those checks were not repeated for the latest
+and application/worker builds. The same 52 synthetic cloud contracts subsequently
+passed against the exact compiled version 18 artifact, with HTTP network guards
+and invented account identities; they do not establish hosted account access. Those checks were not repeated for the latest
 worker test/documentation-only increment. Hosted privacy rollback checks passed
 previously; signed-in/device acceptance still awaits authorized local browser use
 and participant checks. [Exact current release evidence](overnight-work-2026-11-04.md).

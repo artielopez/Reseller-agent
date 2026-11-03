@@ -497,3 +497,27 @@ persists but requires normal build/verification and private-audience checks.
   Next useful check: assess running existing synthetic cloud contracts against
   the compiled artifact, with every backend call intercepted, rather than only
   the development handler. Do not use or imitate either participant's session.
+
+### Compiled recovery/isolation contracts — 06:11 Manila
+
+- Added `playwright.sites-production.config.ts`, which starts the unchanged built
+  version 18 Worker on loopback and reuses the cloud browser contracts. Shared
+  session helpers select its public storage-key namespace using invented tokens
+  and accounts, with no existing browser/profile state.
+- The context HTTP guard permits only loopback GET/HEAD unless a page fixture
+  fulfills the request; unhandled backend/write traffic aborts and fails. Service
+  workers are blocked. The direct anonymous API check is loopback-only/no bearer.
+- **52 compiled-Worker desktop/mobile checks pass** against exact source
+  `c061f0a979cbdd41167a4a4cd101fec80c7556d6`. The shared-fixture Next suite also
+  passes **52/52**, and lint/types pass. A lint false positive on the Playwright
+  callback name `use` was corrected to `runWithContext`; no app code changed.
+- Logs: `/tmp/reseller-compiled-cloud-contracts.log` (initial passing run),
+  `/tmp/reseller-shared-cloud-fixtures.log`, `/tmp/reseller-compiled-cloud-final.log`.
+  Local servers stopped automatically. No new build, publication or model call;
+  the previous 292-unit-test result is not claimed as rerun for these fixtures.
+- Prior heads `36cca10` and `439a20c` passed CI (41726028450/41726270947). Same
+  PR #29, no merge or auto-merge. No Beeper read before 06:36 Manila.
+- Next: a bounded final review of outstanding acceptance and release dependencies.
+  Preserve real-device, hosted HTTP/Storage, subscription and permitted-channel
+  gates. If useful independent work is exhausted, record the remaining summary
+  and pause the heartbeat as instructed; do not mark the broader goal complete.

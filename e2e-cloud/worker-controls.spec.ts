@@ -1,4 +1,11 @@
-import { test, expect, type Page } from "@playwright/test";
+import {
+  test,
+  expect,
+  type Page,
+  backendOrigin,
+  seedSession,
+  publishSession,
+} from "./fixtures";
 import AxeBuilder from "@axe-core/playwright";
 const owner = "11111111-1111-4111-8111-111111111111";
 const question = "22222222-2222-4222-8222-222222222222";
@@ -35,15 +42,8 @@ async function fixture(page: Page) {
     jobs: Record<string, unknown>[] = [],
     operations: string[] = [],
     queuedIds: string[] = [];
-  await page.addInitScript(
-    (saved) =>
-      localStorage.setItem(
-        "sb-reseller-test-auth-token",
-        JSON.stringify(saved),
-      ),
-    session(),
-  );
-  await page.route("https://reseller-test.supabase.co/**", async (route) => {
+  await seedSession(page, session());
+  await page.route(`${backendOrigin}/**`, async (route) => {
     const url = new URL(route.request().url());
     const respond = (body: unknown, status = 200) =>
       route.fulfill({
@@ -441,12 +441,7 @@ test("stale pause fails closed and closing or switching account clears the key",
   await panel.getByLabel("Worker name").fill("Second worker");
   await panel.getByRole("button", { name: "Create worker key" }).click();
   await expect(panel.getByLabel("One-time worker key")).toHaveValue(token);
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(page.getByLabel("One-time worker key")).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Worker settings", exact: true }),
@@ -483,12 +478,7 @@ test("late enrollment cannot reveal a previous account's key", async ({
   const canceled = page.waitForEvent("requestfailed", (request) =>
     request.url().includes("/rpc/draft_queue"),
   );
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(
     page.getByRole("button", { name: "Worker settings", exact: true }),
   ).toBeVisible();
@@ -547,12 +537,7 @@ test("preference edits protect sign-out and late saves cannot enter the next acc
   const canceled = page.waitForEvent("requestfailed", (request) =>
     request.url().includes("/rpc/seller_workspace"),
   );
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(page.getByLabel("General pickup area")).not.toBeVisible();
   await page.getByText("Seller terms and reminder", { exact: true }).click();
   await expect(page.getByLabel("General pickup area")).toHaveValue("");
@@ -630,12 +615,7 @@ test("late draft status cannot enter the next signed-in workspace", async ({
   const canceled = page.waitForEvent("requestfailed", (request) =>
     request.url().includes("/rpc/draft_queue"),
   );
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(
     page.getByRole("region", { name: "AI draft for this question" }),
   ).toHaveCount(0);
@@ -693,12 +673,7 @@ test("privacy preview is explicit, read-only and clears when the account changes
   expect(windows).toEqual([90]);
   await expect(panel.getByRole("button", { name: /delete/i })).toHaveCount(0);
   expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(panel).toHaveCount(0);
   await page
     .getByRole("button", { name: "Privacy and stored data", exact: true })
@@ -837,12 +812,7 @@ test("late question-save failure cannot affect the next account", async ({
   const canceled = page.waitForEvent("requestfailed", (request) =>
     request.url().includes("/rpc/buyer_workspace"),
   );
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(page.getByLabel("Saved question text")).toHaveCount(0);
   await canceled;
   release();
@@ -876,11 +846,7 @@ test("refreshing the same signed-in account does not cancel a pending enrollment
   await page.getByLabel("Worker name").fill("Refresh-safe test worker");
   await page.getByRole("button", { name: "Create worker key" }).click();
   await expect.poll(() => requested).toBe(true);
-  await page.evaluate((saved) => {
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "TOKEN_REFRESHED", session: saved });
-    channel.close();
-  }, session());
+  await publishSession(page, session(), "TOKEN_REFRESHED");
   release();
   await expect(page.getByLabel("One-time worker key")).toHaveValue(token);
 });

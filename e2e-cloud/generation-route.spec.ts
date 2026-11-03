@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test } from "./fixtures";
 
 test("the real cloud generation route rejects anonymous requests without caching", async ({
   request,

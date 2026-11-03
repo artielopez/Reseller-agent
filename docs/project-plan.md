@@ -14,8 +14,10 @@ checks passed. Keyboard focus recovery for item/question editors is deployed in 
 18, verified across Next and Sites. Four local in-flight owner-change checks now
 verify late-output rejection without replay; this does not prove real provider
 cancellation. Compiled Sites anonymous browser acceptance is now reproducible
-and passed against version 18. Next: assess whether the existing synthetic cloud
-contracts can also exercise the compiled artifact without live account access. Platform and real-device gates stay open.
+and passed against version 18. All 52 synthetic cloud contracts now also pass
+against that compiled artifact with guarded HTTP access and invented identities.
+Next: reconcile the remaining acceptance/release gates and identify any concrete
+independent work; do not manufacture new scope to fill the window. Platform and real-device gates stay open.
 
 Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window. The overnight changes are live in Sites version 18: bounded owner RPC/inventory save/read waits, recoverable sign-in, account-bound request cancellation, bounded listing/photo preparation, recoverable sign-out and guarded saved-question editing. Draft PR #29 remains unmerged.
 
@@ -125,7 +127,7 @@ Future implementation should branch from the latest `main` (for example `codex/b
 
 `docs/project-status.md` is the single shared status record. Update it after meaningful work, with date, actual branch/commit, check results, next action and owner dependencies. Keep historical handoff content unchanged. Mark tasks Done only with evidence; a plan is not a passing feature test. Read plans and repository instructions together before implementation.
 
-No Dot connection, scheduled monitor or external task assignment exists. A coordinator can read these documents later; do not imply automatic synchronization. Dependency/secret CI scanning is a separate proposed hardening task, not a prerequisite for this documentation handoff or an already-running protection.
+The bounded overnight heartbeat is active until the documented deadline or exhaustion of useful independent work. No Dot integration or external task assignment is established; do not imply broader automatic synchronization. Dependency/secret CI scanning is a separate proposed hardening task, not a prerequisite for this documentation handoff or an already-running protection.
 
 The owner approved merge/deploy and a continuation goal on 30 October. PR #7 is merged; the updated private demo is deployed. New [agent drafting preparation](agent-drafting-stage.md) stays on a separate feature branch. Supabase connection/target and verified restricted runtime remain pending.
 

@@ -1,4 +1,11 @@
-import { test, expect, type Page } from "@playwright/test";
+import {
+  test,
+  expect,
+  type Page,
+  backendOrigin,
+  seedSession,
+  publishSession,
+} from "./fixtures";
 const owner = "11111111-1111-4111-8111-111111111111";
 function session(id = owner) {
   return {
@@ -19,15 +26,8 @@ function session(id = owner) {
   };
 }
 async function inventory(page: Page) {
-  await page.addInitScript(
-    (saved) =>
-      localStorage.setItem(
-        "sb-reseller-test-auth-token",
-        JSON.stringify(saved),
-      ),
-    session(),
-  );
-  await page.route("https://reseller-test.supabase.co/**", (route) => {
+  await seedSession(page, session());
+  await page.route(`${backendOrigin}/**`, (route) => {
     const path = new URL(route.request().url()).pathname;
     if (path === "/auth/v1/user")
       return route.fulfill({ json: session().user });
@@ -104,12 +104,7 @@ test("an inventory save finishing after an account switch cannot enter the new w
   const canceled = page.waitForEvent("requestfailed", (request) =>
     request.url().includes("/rpc/save_inventory_item_checked"),
   );
-  await page.evaluate((saved) => {
-    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
-    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
-    channel.postMessage({ event: "SIGNED_IN", session: saved });
-    channel.close();
-  }, session("66666666-6666-4666-8666-666666666666"));
+  await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
   await expect(page.getByLabel("Item title", { exact: true })).toHaveCount(0);
   await canceled;
   release();
@@ -131,20 +126,13 @@ for (const path of ["/", "/inbox"]) {
   test(`stalled initial session refresh releases the ${path} loading screen`, async ({
     page,
   }) => {
-    await page.addInitScript(
-      (saved) =>
-        localStorage.setItem(
-          "sb-reseller-test-auth-token",
-          JSON.stringify(saved),
-        ),
-      { ...session(), expires_at: 1 },
-    );
+    await seedSession(page, { ...session(), expires_at: 1 });
     let requested = false,
       release!: () => void;
     const held = new Promise<void>((resolve) => {
       release = resolve;
     });
-    await page.route("https://reseller-test.supabase.co/**", async (route) => {
+    await page.route(`${backendOrigin}/**`, async (route) => {
       requested = true;
       await held;
       await route
@@ -173,14 +161,11 @@ test("a lost sign-in-email response releases the form without automatically rese
   const held = new Promise<void>((resolve) => {
     release = resolve;
   });
-  await page.route(
-    "https://reseller-test.supabase.co/auth/v1/otp**",
-    async (route) => {
-      requests++;
-      await held;
-      await route.fulfill({ json: {} }).catch(() => {});
-    },
-  );
+  await page.route(`${backendOrigin}/auth/v1/otp**`, async (route) => {
+    requests++;
+    await held;
+    await route.fulfill({ json: {} }).catch(() => {});
+  });
   await page.goto("/");
   await page.getByLabel("Email address").fill("seller@example.test");
   await page.clock.install();
@@ -241,14 +226,11 @@ test("uncertain sign-out retains edits and reports recovery without queueing ano
   const held = new Promise<void>((resolve) => {
     release = resolve;
   });
-  await page.route(
-    "https://reseller-test.supabase.co/auth/v1/logout**",
-    async (route) => {
-      requests++;
-      await held;
-      await route.fulfill({ json: {} });
-    },
-  );
+  await page.route(`${backendOrigin}/auth/v1/logout**`, async (route) => {
+    requests++;
+    await held;
+    await route.fulfill({ json: {} });
+  });
   await page.clock.install();
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Sign out", exact: true }).click();

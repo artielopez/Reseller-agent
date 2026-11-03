@@ -147,3 +147,36 @@ Full Sites audit now reports **20 moderate affected packages** inherited from li
 minimatch and the legacy Drizzle-loader esbuild. Production audit reports zero.
 Satori, Vinext and fflate are no longer flagged; the two remaining roots retain
 the limitations documented above. Exact release evidence follows in the ledger.
+
+
+## Compiled cloud contracts — 4 November 2026
+
+After the supported Sites build, run from the main repository:
+
+```sh
+npx playwright test --config playwright.sites-production.config.ts
+```
+
+This starts and stops the compiled local Worker on port 3020 and runs the same
+**52 desktop/mobile recovery and account-isolation cases** used against Next and
+Vinext development. It does not rebuild or alter the published artifact. Verified
+against version 18 source `c061f0a979cbdd41167a4a4cd101fec80c7556d6`.
+
+`e2e-cloud/fixtures.ts` selects the compiled public project's storage-key namespace
+but supplies only invented identities/tokens. Page handlers fulfill all backend
+HTTP requests. A context guard rejects any request that reaches it except GET/HEAD
+to the owned loopback origin; unhandled backend/write requests abort and fail the
+test. Service workers are blocked. The real anonymous generation-route check uses
+only the loopback endpoint without a bearer token and stops before backend work.
+No existing browser session, real account or cloud row is used.
+
+The public backend hostname is intentionally explicit in the fixture. If a future
+artifact is built for another project, update that public test setting after
+verifying its source configuration; never inject real sessions or weaken the
+network guard. Standard Next/dev tests keep the synthetic backend namespace.
+
+Both the **52 Next checks and 52 compiled-Worker checks** pass with the shared
+fixtures, as do lint/types. An initial lint false positive treated Playwright's
+fixture callback named `use` as a React hook; renaming it fixed lint without an
+application change. This is additional compiled-runtime coverage, not hosted
+Auth/Storage or actual-device acceptance. No app rebuild/redeployment was needed.

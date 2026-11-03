@@ -26,6 +26,8 @@ Four additional in-flight worker acceptance cases pass using real local HTTP, mi
 
 The compiled production smoke check is now reproducible in `scripts/acceptance/sites-worker-smoke.mjs`: both HTML routes, anonymous generation 401/no-store, and both sign-in forms rendered by fresh Chromium contexts with no page/HTTP-resource errors or external requests. Passed against exact version 18 source `c061f0a`; lint passes. It uses no stored session and does not submit email forms. The test-only worker increment is committed as `36cca10`; no new deployment or merge.
 
+The same **52 synthetic cloud contracts now pass against the compiled version 18 Worker**, including account-switch isolation, uncertain-save recovery, worker controls and question editing. Shared fixtures also pass all **52 Next checks**, lint/types. An HTTP guard fails any unhandled backend/write request; no live session or cloud rows are used. Production code and deployment remain unchanged. Prior heads `36cca10`/`439a20c` passed CI (41726028450/41726270947). [Reproduce](sites-dependency-maintenance.md#compiled-cloud-contracts--4-november-2026).
+
 ## Worker-health release verified — 3 November 2026
 
 [PR #28](https://github.com/artielopez/Reseller-agent/pull/28) contains implementation `ee843e4`; no merge or auto-merge. Final checks: **258 tests passed**, six optional skips, **72 desktop/mobile browser checks** (52 ordinary + 20 synthetic cloud contracts), lint/types, Next and worker builds. Fresh independent review found no blocking issues.
