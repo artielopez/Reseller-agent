@@ -193,3 +193,27 @@ persists but requires normal build/verification and private-audience checks.
 - No critical owner action or new support evidence in this run. Continue quietly
   with remaining sign-out/photo-preparation recovery audits. Do not repeat the
   unchanged full suite unless further changes or a real concern warrant it.
+
+### Photo preparation and sign-out recovery — 04:23 Manila
+
+- PR head `681a23f` passed GitHub Application checks (run `41710700934`).
+- Two reproduced photo failures are fixed: stalled decoding releases the editor
+  after 30 seconds, and owner/editor cancellation stops late encoding. Temporary
+  image sources and object URLs are released. Existing photos/facts survive; the
+  desktop/mobile regression verifies a deliberate same-file retry succeeds.
+  This deadline depends on a responsive JS event loop; it cannot preempt a
+  synchronous browser image/canvas operation or a frozen device.
+- Reproduced an indefinitely pending logout. Sign-out now reports uncertainty
+  after 15 seconds, keeps unsaved edits until Auth actually changes, and shares
+  the still-pending SDK call instead of queueing duplicate logout requests. Both
+  screens show busy controls and ignore old-account error messages.
+- Inspected the installed Supabase SDK: signOut has no AbortSignal parameter.
+  The UI deadline is explicitly not cancellation or confirmation of server
+  revocation. The SDK/Auth events remain authoritative for clearing the session;
+  no manual token deletion, privileged endpoint or logout-scope change.
+- Final local checks passed: lint/types, **284 tests** (six optional skips),
+  **100 browser checks** (58 ordinary + 42 cloud-contract), production/worker
+  builds. All sign-out/photo checks used synthetic data and intercepted services.
+- Next: release/CI follow-through, then audit any concrete remaining recovery,
+  accessible navigation or validation gaps. Beeper's next permitted check is
+  04:34 Manila or later; no normal OpenClaw restart or live model request.

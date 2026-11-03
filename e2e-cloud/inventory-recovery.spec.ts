@@ -231,3 +231,44 @@ test("stalled listing generation preserves item facts and can recover without an
   expect(requests).toBe(1);
   release();
 });
+
+test("uncertain sign-out retains edits and reports recovery without queueing another logout", async ({
+  page,
+}) => {
+  await inventory(page);
+  let requests = 0,
+    release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(
+    "https://reseller-test.supabase.co/auth/v1/logout**",
+    async (route) => {
+      requests++;
+      await held;
+      await route.fulfill({ json: {} });
+    },
+  );
+  await page.clock.install();
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect.poll(() => requests).toBe(1);
+  await page.clock.fastForward(15_001);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Could not confirm sign-out",
+  );
+  await expect(page.getByLabel("Item title")).toHaveValue(
+    "Private previous account lamp",
+  );
+  page.once("dialog", (dialog) => dialog.accept());
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Sign out", exact: true }),
+  ).toBeDisabled();
+  expect(requests).toBe(1);
+  release();
+  await expect(
+    page.getByRole("button", { name: "Email me a sign-in link" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Item title")).toHaveCount(0);
+});

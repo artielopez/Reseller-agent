@@ -41,13 +41,17 @@ import {
   type ReplyContext,
   type Thread,
 } from "@/lib/buyer/domain";
-import { signOutWithDraftProtection } from "@/lib/buyer/session";
+import { signOutCloud, signOutWithDraftProtection } from "@/lib/buyer/session";
 type ReportUnsaved = (
   part: "form" | "reply" | "preferences" | "question",
   dirty: boolean,
 ) => void;
 type Mutation = Parameters<typeof mutateThread>[0];
 export function BuyerInbox() {
+  const authIdentity = useRef<string | null>(null),
+    authGeneration = useRef(0),
+    logoutPending = useRef(false);
+  const [signingOut, setSigningOut] = useState(false);
   const unsaved = useRef({
     form: false,
     reply: false,
@@ -66,12 +70,19 @@ export function BuyerInbox() {
     if (demoMode || configurationError) return;
     let active = true,
       events = 0;
+    const observeOwner = (id: string | null) => {
+      if (authIdentity.current !== id) {
+        authIdentity.current = id;
+        authGeneration.current++;
+      }
+    };
     const client = getSupabase();
     const {
       data: { subscription },
     } = client.auth.onAuthStateChange((_event, session) => {
       events++;
       if (active) {
+        observeOwner(session?.user.id ?? null);
         setError("");
         setAuth({ ready: true, user: session?.user ?? null });
       }
@@ -82,6 +93,7 @@ export function BuyerInbox() {
     )
       .then(({ data, error }) => {
         if (!active || events) return;
+        observeOwner(data.session?.user.id ?? null);
         if (error) setError("Could not restore sign-in. Reload and try again.");
         setAuth({ ready: true, user: data.session?.user ?? null });
       })
@@ -145,7 +157,13 @@ export function BuyerInbox() {
           <>
             <button
               className="button secondary"
+              disabled={signingOut}
+              aria-busy={signingOut}
               onClick={async () => {
+                if (logoutPending.current) return;
+                const generation = authGeneration.current;
+                logoutPending.current = true;
+                setSigningOut(true);
                 try {
                   await signOutWithDraftProtection(
                     unsaved.current.form ||
@@ -156,14 +174,18 @@ export function BuyerInbox() {
                       window.confirm(
                         "Sign out and discard unsaved question, reply or preference edits?",
                       ),
-                    () => getSupabase().auth.signOut(),
+                    signOutCloud,
                   );
-                } catch {
-                  setError("Could not sign out. Try again.");
+                } catch (failure) {
+                  if (generation === authGeneration.current)
+                    setError(errorMessage(failure));
+                } finally {
+                  logoutPending.current = false;
+                  setSigningOut(false);
                 }
               }}
             >
-              Sign out
+              {signingOut ? "Signing out…" : "Sign out"}
             </button>
             <RequestOwner.Provider key={auth.user.id} value={auth.user.id}>
               <InboxWorkspace reportUnsaved={reportUnsaved} />

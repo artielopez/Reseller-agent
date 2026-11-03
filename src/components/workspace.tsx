@@ -26,6 +26,7 @@ import {
   type Item,
 } from "@/lib/domain";
 import { listItems, saveItem } from "@/lib/repository";
+import { signOutCloud, signOutWithDraftProtection } from "@/lib/buyer/session";
 import { RequestOwner } from "@/lib/use-request-lifetime";
 import { withRequestDeadline } from "@/lib/request-deadline";
 import { getSupabase } from "@/lib/supabase";
@@ -36,6 +37,8 @@ export function Workspace() {
   const [user, setUser] = useState<User | null>(null);
   const accountId = useRef<string | null>(null);
   const accountGeneration = useRef(0);
+  const logoutPending = useRef(false);
+  const [signingOut, setSigningOut] = useState(false);
   const pendingSaves = useRef(new Set<AbortController>());
   const [authReady, setAuthReady] = useState(demoMode);
   const [items, setItems] = useState<Item[]>([]);
@@ -157,19 +160,25 @@ export function Workspace() {
     window.scrollTo({ top: 0 });
   }
   async function signOut() {
-    if (editing && !window.confirm("Sign out and discard any unsaved changes?"))
-      return;
-    const { error } = await getSupabase().auth.signOut();
-    if (error) {
-      setError("Could not sign out. Please try again.");
-      return;
+    if (logoutPending.current) return;
+    const generation = accountGeneration.current;
+    logoutPending.current = true;
+    setSigningOut(true);
+    try {
+      await signOutWithDraftProtection(
+        !!editing,
+        () => window.confirm("Sign out and discard any unsaved changes?"),
+        signOutCloud,
+      );
+      // Auth events own session clearing. An old completion must not clear a
+      // newer account; a canceled discard prompt must not clear this one either.
+    } catch (failure) {
+      if (generation === accountGeneration.current)
+        setError(errorMessage(failure));
+    } finally {
+      logoutPending.current = false;
+      setSigningOut(false);
     }
-    setUser(null);
-    setItems([]);
-    setEditing(null);
-    setLoading(true);
-    setError("");
-    setMessage("");
   }
   const active = items.filter((item) => item.status !== "Sold");
   const ready = items.filter((item) => item.status === "Ready");
@@ -256,6 +265,8 @@ export function Workspace() {
                 className="icon-button"
                 title="Sign out"
                 aria-label="Sign out"
+                aria-busy={signingOut}
+                disabled={signingOut}
                 onClick={signOut}
               >
                 <LogOut size={18} />
@@ -303,6 +314,11 @@ export function Workspace() {
                   key={editing.id}
                   value={user?.id ?? null}
                 >
+                  {error && (
+                    <p className="error" role="alert">
+                      {error}
+                    </p>
+                  )}
                   <ItemEditor
                     initial={editing}
                     onSave={save}

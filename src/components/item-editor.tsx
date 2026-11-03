@@ -107,7 +107,8 @@ export function ItemEditor({
         throw new Error(`You can add up to ${MAX_PHOTOS} photos per item.`);
       const prepared = [];
       for (const file of Array.from(files))
-        prepared.push(await preparePhoto(file));
+        prepared.push(await preparePhoto(file, requestSignal()));
+      requestSignal().throwIfAborted();
       update({ photos: [...item.photos, ...prepared] });
     } catch (error) {
       setError(errorMessage(error));

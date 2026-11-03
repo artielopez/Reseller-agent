@@ -259,3 +259,48 @@ test("inventory navigation preserves edits until discard is confirmed", async ({
     page.getByRole("button", { name: "Edit Oak bedside table" }),
   ).toBeVisible();
 });
+
+test("stalled photo preparation preserves the item and existing photos, then permits a deliberate retry", async ({
+  page,
+}) => {
+  const photo = {
+    name: "sample.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  };
+  await page.goto("/");
+  await page.getByRole("button", { name: "Add item", exact: true }).click();
+  await page.getByLabel("Item title").fill("Photo recovery test");
+  await page.getByLabel("Upload photos").setInputFiles(photo);
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(1);
+  await page.evaluate(() => {
+    const original = HTMLImageElement.prototype.decode;
+    let first = true;
+    HTMLImageElement.prototype.decode = function () {
+      if (first) {
+        first = false;
+        return new Promise(() => {});
+      }
+      return original.call(this);
+    };
+  });
+  await page.clock.install();
+  await page.getByLabel("Upload photos").setInputFiles(photo);
+  await expect(page.getByText("Preparing…", { exact: true })).toBeVisible();
+  await page.clock.fastForward(30_001);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Photo preparation did not finish",
+  );
+  await expect(page.getByLabel("Item title")).toHaveValue(
+    "Photo recovery test",
+  );
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Save item", exact: true }),
+  ).toBeEnabled();
+  await page.getByLabel("Upload photos").setInputFiles(photo);
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(2);
+});
