@@ -71,3 +71,36 @@ manifest or GitHub commit alone does not update the hosted app.
 
 Signed-in cloud/physical-device acceptance remains separate from these synthetic
 adapter checks. Release provenance is recorded in the overnight ledger.
+
+## Follow-up patch and triage — 04:55 Manila
+
+The next compatible patch resolves fflate 0.7.4 to 0.7.5 and the recent esbuild
+copies used by Vite, tsx and Wrangler to 0.28.1. Range-scoped overrides preserve
+Drizzle's older build API; installed-tree inspection caught an initially retained
+0.28.0 copy before release. The full Sites audit now reports **23 moderate
+affected packages**, with no low/high/critical findings. Counts include dependent
+packages inheriting one underlying advisory; they are not 23 distinct defects.
+
+The remaining roots are:
+
+- **minimatch:** used by the lint toolchain with repository/configuration globs.
+  The app does not expose a buyer-supplied glob interface. The maintainer's
+  [advisory](https://github.com/isaacs/minimatch/security/advisories/GHSA-g3hv-75wg-m249)
+  identifies pattern amplification and a fix in 11.0.1. Existing lint plugins call
+  the legacy function export, so a global major override is not a reviewed fix.
+  Main-repository full audit also reports 16 moderate affected packages inherited
+  from this root; its production audit was clean. No main dependency was changed.
+- **legacy esbuild 0.18.20:** retained by Drizzle's old ESM loader. This app uses
+  Supabase SQL migrations and does not invoke Drizzle or esbuild's serving API.
+  The remaining advisory concerns that serving API. Keep preview servers owned,
+  local and temporary; do not force the legacy loader onto a different build API
+  solely to change an audit count. The newer Windows serving-path fix is applied
+  to the active modern build copies. [Maintainer advisory](https://github.com/evanw/esbuild/security/advisories/GHSA-g7r4-m6w7-qqqr).
+- **satori:** inherited from Vinext's ImageResponse support. The application has
+  no ImageResponse/OG-image route and does not render buyer text through Satori.
+  A later adapter upgrade can remove this finding, but requires reviewing the
+  matched React/RSC/plugin changes and repeating the adapter acceptance checks.
+
+These observations narrow the known paths; they do not waive the findings or
+prove all framework code is unreachable. No exploit was run, no dependency was
+hidden from the audit and no platform permission was changed.

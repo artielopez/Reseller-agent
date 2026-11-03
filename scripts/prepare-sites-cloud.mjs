@@ -76,6 +76,10 @@ manifest.overrides = {
   // Miniflare pins an older release; OpenAI's optional peer otherwise reuses it.
   undici: "7.30.1",
   ws: "8.21.0",
+  "fflate@>=0.7.0 <0.7.5": "0.7.5",
+  // Restrict this fix to the recent build API; Drizzle's legacy loader is separate.
+  "esbuild@>=0.27.3 <0.28.1": "0.28.1",
+  "esbuild@^0.28.0": "0.28.1",
   vinext: { ...manifest.overrides?.vinext, "image-size": "2.0.4" },
   miniflare: {
     ...manifest.overrides?.miniflare,

@@ -287,3 +287,24 @@ persists but requires normal build/verification and private-audience checks.
   its type check and supported Worker build. Production dependency audit is clean;
   26 full-tree moderate/low findings remain as documented. Actual-device/sign-in
   acceptance and permitted channel access remain unresolved.
+
+### Dependency follow-through — 04:55 Manila
+
+- Implementation `a0b9adc` passed GitHub Application run `41715693871`; release
+  documentation head `ccf0e40` passed run `41716238376`. Neither is merged.
+- Applied compatible fflate 0.7.5 and modern esbuild 0.28.1 patches in the retained
+  Sites source. Installed-tree inspection caught an initially retained 0.28.0
+  copy; a precise range override resolved it before publication. No forced major
+  toolchain replacement, template removal or normal OpenClaw change.
+- All 42 desktop/mobile adapter browser checks pass again with the final installed
+  tree. Main lint passes; application/worker code is unchanged from the previous
+  288-test build. Sites types/build are verified before the release receipt.
+- Full Sites audit now reports 23 moderate affected packages from three remaining
+  roots: lint minimatch, legacy Drizzle-loader esbuild and Satori image rendering.
+  The main full audit reports 16 moderate packages inherited from lint minimatch.
+  [Path/compatibility triage](sites-dependency-maintenance.md#follow-up-patch-and-triage--0455-manila)
+  records the limits; no clean-full-audit claim or waived advisory.
+- Next useful work: evaluate a compatible adapter upgrade in isolation, or return
+  to concrete app/worker reliability gaps if that upgrade needs platform changes.
+  No owner decision is needed for the current patch. Beeper is not due again
+  before 05:34 Manila; keep actual-device and permitted-channel gates open.
