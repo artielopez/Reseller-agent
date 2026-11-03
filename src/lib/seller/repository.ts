@@ -2,6 +2,7 @@ import { demoMode } from "../config";
 import { openDemoDb } from "../demo-db";
 import { listItems } from "../repository";
 import { getSupabase } from "../supabase";
+import { withRequestDeadline } from "../request-deadline";
 import {
   localSellerWorkspace,
   sellerCommandSchema,
@@ -14,8 +15,14 @@ export async function sellerWorkspace(
 ): Promise<SellerWorkspace> {
   const command = sellerCommandSchema.parse(input);
   if (!demoMode) {
-    const { data, error } = await getSupabase().rpc("seller_workspace", {
-      command,
+    const uncertain =
+      "Could not confirm the preferences operation. Reload settings before retrying; your edits are kept.";
+    const { data, error } = await withRequestDeadline(
+      (signal) =>
+        getSupabase().rpc("seller_workspace", { command }).abortSignal(signal),
+      uncertain,
+    ).catch(() => {
+      throw new Error(uncertain);
     });
     if (error)
       throw new Error(

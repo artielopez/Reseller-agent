@@ -1,8 +1,10 @@
 # Reseller Agent project plan
 
-Updated 3 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
+Updated 4 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
 ## Current assignment
+
+Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window.
 
 The owner approved autonomous work on worker health/recovery, the buyer-drafting workflow, privacy/cleanup previews, isolation checks and release preparation, with no merge. The [current increment](worker-health-workflow.md) implements advisory contact/job health, per-question draft requests and guarded reply reload, plus a read-only owner-scoped privacy preview. Local checks and independent review passed. Sites version 9 and the additive privacy migration are released; signed-in screen verification is blocked by disabled local browser use. PR #28 remains unmerged. [Execution plan](superpowers/plans/2026-11-03-worker-health-workflow.md) · [release map](release-review-map.md).
 

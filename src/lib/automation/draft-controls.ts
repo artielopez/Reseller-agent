@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getSupabase } from "../supabase";
+import { withRequestDeadline } from "../request-deadline";
 const uuid = z.uuid(),
   revision = z.string().regex(/^[1-9][0-9]*$/);
 const date = z.iso.datetime({ offset: true });
@@ -53,9 +54,10 @@ const commandSchema = z.discriminatedUnion("op", [
 ]);
 type Rpc = (
   command: Record<string, unknown>,
+  signal: AbortSignal,
 ) => Promise<{ data: unknown; error: { code?: string } | null }>;
-const defaultRpc: Rpc = async (command) =>
-  getSupabase().rpc("draft_queue", { command });
+const defaultRpc: Rpc = async (command, signal) =>
+  getSupabase().rpc("draft_queue", { command }).abortSignal(signal);
 const uncertain =
   "Could not confirm the operation. Reload worker settings before trying again. For a missing enrollment key, revoke the unexpected worker before creating another. Check your connection and the draft queue migration.";
 export function createQueueClient(rpc: Rpc = defaultRpc) {
@@ -70,7 +72,10 @@ export function createQueueClient(rpc: Rpc = defaultRpc) {
       );
     let response;
     try {
-      response = await rpc(parsed.data);
+      response = await withRequestDeadline(
+        (signal) => rpc(parsed.data, signal),
+        uncertain,
+      );
     } catch {
       throw new Error(uncertain);
     }

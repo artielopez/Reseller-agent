@@ -66,6 +66,9 @@ describe("owner draft controls boundary", () => {
     expect((await createQueueClient(rpc).enroll(" Mac ")).token).toHaveLength(
       64,
     );
-    expect(rpc).toHaveBeenCalledWith({ op: "enroll", label: "Mac" });
+    expect(rpc).toHaveBeenCalledWith(
+      { op: "enroll", label: "Mac" },
+      expect.any(AbortSignal),
+    );
   });
 });

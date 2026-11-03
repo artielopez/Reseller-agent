@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Overnight independent work — 4 November 2026
+
+The owner authorized seven hours of independent work while sleeping, ending 10:33:55 Manila. The bounded hourly heartbeat and [execution ledger](overnight-work-2026-11-04.md) preserve the no-merge/no-paid-call/no-automatic-sending constraints. PR #28's exact head `01e704d` passed GitHub checks and remains unmerged; the Beeper thread still has no response.
+
+The first increment on `codex/overnight-reliability` fixes indefinitely pending queue, buyer, seller and privacy RPC waits. Six regressions failed before implementation, then passed with a 15-second cancelable local deadline. Uncertain writes are not retried. Desktop/mobile checks confirm a lost enqueue acknowledgment releases controls, preserves unsaved text and reconciles one committed job. This does not yet bound inventory upload/save waits or establish physical-device/cloud acceptance. Release evidence follows in the overnight ledger.
+
 ## Worker-health release verified — 3 November 2026
 
 [PR #28](https://github.com/artielopez/Reseller-agent/pull/28) contains implementation `ee843e4`; no merge or auto-merge. Final checks: **258 tests passed**, six optional skips, **72 desktop/mobile browser checks** (52 ordinary + 20 synthetic cloud contracts), lint/types, Next and worker builds. Fresh independent review found no blocking issues.

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getSupabase } from "./supabase";
+import { withRequestDeadline } from "./request-deadline";
 const count = z.number().int().nonnegative().max(Number.MAX_SAFE_INTEGER);
 const windowDays = z.union([z.literal(30), z.literal(90), z.literal(180)]);
 const previewSchema = z.object({
@@ -16,18 +17,24 @@ const previewSchema = z.object({
   unlinked_photo_candidates: count,
 });
 export type PrivacyPreview = z.infer<typeof previewSchema>;
-type Rpc = (days: 30 | 90 | 180) => Promise<{ data: unknown; error: unknown }>;
-const defaultRpc: Rpc = async (days) =>
+type Rpc = (
+  days: 30 | 90 | 180,
+  signal: AbortSignal,
+) => Promise<{ data: unknown; error: unknown }>;
+const defaultRpc: Rpc = async (days, signal) =>
   getSupabase()
     .rpc("workspace_privacy_preview", { window_days: days })
-    .abortSignal(AbortSignal.timeout(15_000));
+    .abortSignal(signal);
 export function createPrivacyClient(rpc: Rpc = defaultRpc) {
   return {
     async preview(days: number): Promise<PrivacyPreview> {
       const window = windowDays.safeParse(days);
       if (!window.success) throw new Error("Choose 30, 90 or 180 days.");
       try {
-        const result = await rpc(window.data);
+        const result = await withRequestDeadline(
+          (signal) => rpc(window.data, signal),
+          "Privacy preview unavailable.",
+        );
         if (result.error) throw new Error();
         const parsed = previewSchema.parse(result.data);
         if (parsed.window_days !== days) throw new Error();

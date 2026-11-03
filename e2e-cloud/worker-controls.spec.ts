@@ -29,6 +29,8 @@ async function fixture(page: Page) {
     failEnrollment = false,
     failEnqueue: "before" | "after" | null = null,
     stalePause = false;
+  let enqueueDelay: Promise<void> | null = null;
+  let releaseEnqueue: (() => void) | null = null;
   const workers: Record<string, unknown>[] = [],
     jobs: Record<string, unknown>[] = [],
     operations: string[] = [],
@@ -225,6 +227,7 @@ async function fixture(page: Page) {
         failEnqueue = null;
         return respond({ code: "XX000" }, 500);
       }
+      if (enqueueDelay) await enqueueDelay;
       return respond({ id: c.id, status: "queued" });
     }
     if (c.op === "cancel") {
@@ -240,6 +243,15 @@ async function fixture(page: Page) {
   return {
     operations,
     queuedIds,
+    holdEnqueue: () => {
+      enqueueDelay = new Promise<void>((resolve) => {
+        releaseEnqueue = resolve;
+      });
+    },
+    releaseEnqueue: () => {
+      releaseEnqueue?.();
+      enqueueDelay = null;
+    },
     failEnqueue: (when: "before" | "after") => {
       failEnqueue = when;
     },
@@ -688,4 +700,49 @@ test("privacy preview is explicit, read-only and clears when the account changes
   await expect(
     page.getByText("Possibly unused photos: 1", { exact: true }),
   ).toHaveCount(0);
+});
+
+test("a stalled enqueue releases controls, preserves text and reconciles without duplicate work", async ({
+  page,
+}) => {
+  const state = await fixture(page);
+  state.enable();
+  state.holdEnqueue();
+  await page
+    .getByRole("button", {
+      name: "Is this available? · Open · Facebook Marketplace",
+      exact: true,
+    })
+    .click();
+  const panel = page.getByRole("region", {
+    name: "AI draft for this question",
+  });
+  await expect(
+    panel.getByRole("button", { name: "Request AI draft", exact: true }),
+  ).toBeEnabled();
+  await page
+    .getByLabel("Write a new reply")
+    .fill("Keep this draft through timeout");
+  await page.clock.install();
+  await panel
+    .getByRole("button", { name: "Request AI draft", exact: true })
+    .click();
+  await expect.poll(() => state.queuedIds.length).toBe(1);
+  await page.clock.fastForward(15_001);
+  await expect(panel.getByRole("alert")).toContainText("Could not confirm");
+  await expect(
+    panel.getByRole("button", { name: "Refresh draft status" }),
+  ).toBeEnabled();
+  await expect(
+    panel.getByRole("button", { name: "Request AI draft", exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByLabel("Write a new reply")).toHaveValue(
+    "Keep this draft through timeout",
+  );
+  state.releaseEnqueue();
+  await panel.getByRole("button", { name: "Refresh draft status" }).click();
+  await expect(
+    panel.getByText("Job status: queued", { exact: true }),
+  ).toBeVisible();
+  expect(state.queuedIds).toHaveLength(1);
 });

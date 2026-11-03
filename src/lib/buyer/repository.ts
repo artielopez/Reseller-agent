@@ -7,6 +7,7 @@ import {
 import { demoMode } from "../config";
 import { openDemoDb } from "../demo-db";
 import { getSupabase } from "../supabase";
+import { withRequestDeadline } from "../request-deadline";
 import { listItems } from "../repository";
 import type { Item } from "../domain";
 import {
@@ -20,12 +21,18 @@ import { localCommand } from "./local";
 async function execute(input: Command, signal?: AbortSignal): Promise<unknown> {
   const command = parseCommand(input);
   if (!demoMode) {
-    const request = getSupabase().rpc("buyer_workspace", {
-      command,
+    const uncertain =
+      "Could not confirm the inbox operation. Reload before retrying; check connection and the buyer inbox migration.";
+    const { data, error } = await withRequestDeadline(
+      (requestSignal) =>
+        getSupabase()
+          .rpc("buyer_workspace", { command })
+          .abortSignal(requestSignal),
+      uncertain,
+      signal,
+    ).catch(() => {
+      throw new Error(uncertain);
     });
-    const { data, error } = await (signal
-      ? request.abortSignal(signal)
-      : request);
     if (error) {
       if (["40001", "PT409"].includes(error.code))
         throw new Error(
