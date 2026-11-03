@@ -178,3 +178,18 @@ persists but requires normal build/verification and private-audience checks.
 - Next independent work: inspect sign-out failure/recovery and file-preparation
   waits; avoid claiming all app operations are cancellable. Physical devices,
   live provider allowance and channel access remain separate gates.
+
+### Third overnight cloud release — 04:13 Manila
+
+- Implementation `38e108671a301b9d016971e4a18504465773e120` is pushed on the
+  existing PR #29. Its CI run `41710125429` was in progress at publication.
+- Sites **version 12** deployed successfully from exact pushed source
+  `e01c3fa9679ee0eb262da7277cee8c85beda30d6`, deployment
+  `appgdep_6aea403d1d4c81919f68a50a7d7a7546`. Audience remains Artie owner/Janyl
+  viewer; no migration or runtime credential/configuration change.
+- The 281-test/96-browser/lint/type/build results above cover this implementation.
+  Signed-in actual-device/cloud visual checks remain unavailable until local
+  browser access is enabled; synthetic acceptance is not substituted for them.
+- No critical owner action or new support evidence in this run. Continue quietly
+  with remaining sign-out/photo-preparation recovery audits. Do not repeat the
+  unchanged full suite unless further changes or a real concern warrant it.
