@@ -393,3 +393,25 @@ persists but requires normal build/verification and private-audience checks.
   Prior heads `1a273c2` and `f5edb65` have successful CI (41720163731/41720304866).
   Next: package, check the compiled Worker browser runtime, and release the fix on
   the same draft PR #29. Signed-in/device acceptance and platform gates stay open.
+
+### Eighth overnight cloud release — 05:33 Manila
+
+- Implementation `6461df2648d1fe314e8aada253521ed3c10df511` is on draft PR #29;
+  CI run `41722419855` remains in progress. No merge or auto-merge.
+- Sites **version 17** succeeded from exact pushed source
+  `5cfb564b64dde820450c96c409b3a5d8e15abc24`, deployment
+  `appgdep_6aea52e5432081919f33fccb426a9897`. Read-back confirms the same
+  Artie-owner/Janyl-viewer audience and environment revision 1.
+- The packaged production Worker passes both HTML routes, anonymous generation
+  401/no-store and fresh anonymous Chromium rendering of both sign-in forms with
+  no page errors. No email was requested, personal browser state accessed, or
+  account/model call made. Intended public project configuration was verified;
+  synthetic test configuration is absent. Temporary Worker server stopped.
+- The isolated development parser failure remains recorded above; later passes
+  and production checks do not establish its root cause. Keep watching for a
+  reproducible adapter failure instead of silently adding retries.
+- Next independent work: examine keyboard focus/recovery when opening and closing
+  item or saved-question editors; reproduce an actual problem before changes.
+  Beeper next eligible check is 05:34 Manila, not checked early during this run.
+  Physical-device/cloud acceptance, channel permission and subscription usage
+  controls remain unresolved. No owner action requested during sleep.

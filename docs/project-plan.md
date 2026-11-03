@@ -8,12 +8,12 @@ Independent continuation: server-side listing cancellation and the separate Site
 dependency baseline are implemented, verified and deployed in Sites version 16.
 The patched adapter passes the synthetic cloud contracts directly.
 The remaining [moderate tooling findings](sites-dependency-maintenance.md) have
-explicit compatibility/path limits. Confirmed inbox save recovery is now locally verified: a failed optional list
-refresh cannot mislabel an acknowledged save. Package and verify the compiled
-runtime, then continue concrete recovery/accessibility review. Platform and
+explicit compatibility/path limits. Confirmed inbox save recovery is now deployed in Sites version 17: a failed
+optional list refresh cannot mislabel an acknowledged save. Compiled runtime
+checks passed. Continue concrete recovery/accessibility review. Platform and
 real-device gates stay open.
 
-Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window. The overnight changes are live in Sites version 16: bounded owner RPC/inventory save/read waits, recoverable sign-in, account-bound request cancellation, bounded listing/photo preparation, recoverable sign-out and guarded saved-question editing. Draft PR #29 remains unmerged.
+Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window. The overnight changes are live in Sites version 17: bounded owner RPC/inventory save/read waits, recoverable sign-in, account-bound request cancellation, bounded listing/photo preparation, recoverable sign-out and guarded saved-question editing. Draft PR #29 remains unmerged.
 
 The owner approved autonomous work on worker health/recovery, the buyer-drafting workflow, privacy/cleanup previews, isolation checks and release preparation, with no merge. The [current increment](worker-health-workflow.md) implements advisory contact/job health, per-question draft requests and guarded reply reload, plus a read-only owner-scoped privacy preview. Local checks and independent review passed. Sites version 9 and the additive privacy migration are released; signed-in screen verification is blocked by disabled local browser use. PR #28 remains unmerged. [Execution plan](superpowers/plans/2026-11-03-worker-health-workflow.md) · [release map](release-review-map.md).
 
