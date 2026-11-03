@@ -353,3 +353,20 @@ persists but requires normal build/verification and private-audience checks.
 - Publication is being prepared. Next work after the release receipt: inspect
   concrete application recovery/accessibility gaps, while retaining the documented
   build-tool limitations rather than forcing incompatible dependency changes.
+
+### Seventh overnight cloud release — 05:15 Manila
+
+- Implementation `1a273c2` is pushed on draft PR #29. CI run `41720163731`
+  was in progress at release. No merge or auto-merge.
+- Sites **version 16** deployed successfully from exact source
+  `39694f0837c9c4bdbbd0be321b911a796803827d`, deployment
+  `appgdep_6aea4ed1c9108191b6b728aef3101853`. Artie/Janyl audience and environment
+  revision 1 are unchanged. Packaged build inputs were checked for the intended
+  public project URL and absence of synthetic test settings.
+- The supported source helper rebuilt and packaged the upgraded adapter after
+  the application source commit. The local production Worker smoke test passed
+  before packaging; deployed signed-in/device acceptance is still separate.
+- Verified 44 adapter browser checks, two additional Next endpoint checks,
+  types/lint and Worker build. No app behavior, database schema, worker activation,
+  model call or external messaging changed. Remaining full-tree findings are the
+  20 moderate tooling packages documented above, not a finding-free audit.
