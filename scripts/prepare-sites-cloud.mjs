@@ -62,6 +62,26 @@ manifest.name = "reseller-agent-cloud";
 for (const name of ["@supabase/supabase-js", "openai", "zod", "lucide-react"]) {
   manifest.dependencies[name] = application.dependencies[name];
 }
+// Reviewed Sites compatibility baseline. Keep React/DOM/RSC on the same patch
+// and retain Vinext's integration; older starter pins have published advisories.
+// Refresh the Sites lockfile and run its supported installer after changing these.
+manifest.dependencies.next = "16.4.3";
+manifest.dependencies.react = "19.2.9";
+manifest.dependencies["react-dom"] = "19.2.9";
+manifest.devDependencies["eslint-config-next"] = "16.4.3";
+manifest.devDependencies["react-server-dom-webpack"] = "19.2.9";
+manifest.devDependencies.vite = "8.1.6";
+manifest.overrides = {
+  ...manifest.overrides,
+  // Miniflare pins an older release; OpenAI's optional peer otherwise reuses it.
+  undici: "7.30.1",
+  ws: "8.21.0",
+  vinext: { ...manifest.overrides?.vinext, "image-size": "2.0.4" },
+  miniflare: {
+    ...manifest.overrides?.miniflare,
+    sharp: "0.35.5",
+  },
+};
 writeFileSync(
   path.join(target, "package.json"),
   JSON.stringify(manifest, null, 2) + "\n",

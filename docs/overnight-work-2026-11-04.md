@@ -235,3 +235,37 @@ persists but requires normal build/verification and private-audience checks.
   is canceled during Auth/quota checks (no real model calls). Avoid claiming
   client cancellation alone cancels server/provider work. Continue other concrete
   validation/navigation issues only if inspection establishes them.
+
+### Server admission and Sites dependency review — 04:46 Manila
+
+- Prior head `a4f58f4` passed GitHub Application checks (run `41712685953`);
+  PR #29 remains draft/open with auto-merge null. Beeper was checked at 04:34
+  Manila and still contains only the original sent inquiry. Next check no earlier
+  than 05:34. No support email was sent.
+- Four failing regressions exposed server-side generation continuing after
+  caller cancellation during Auth/quota waits, a stalled provider, and a stalled
+  body reader. The handler now has a 35-second whole-operation deadline, cancels
+  its reader, passes the signal to quota/provider calls and checks cancellation
+  before each next stage. No model retry. Client disconnect propagation depends
+  on the host; cancellation cannot undo a committed quota reservation or prove
+  that a provider did not consume an attempt. The Auth SDK wait itself remains
+  non-cancellable, but its late result cannot admit generation.
+- Final main-repository lint/types, **288 tests** (six optional skips), production
+  and worker builds passed. The four new cases use synthetic dependencies only.
+- The separate Sites production audit exposed six affected packages despite the
+  main repository's clean production snapshot. Reviewed patches now yield zero
+  production advisories. Full audit additionally found the runtime RSC package
+  under development dependencies; its matched React/DOM/RSC patch is included.
+  The final full-tree result still has **26 findings: 24 moderate and two low,
+  no high/critical**. [Dependency maintenance](sites-dependency-maintenance.md)
+  records exact versions, evidence, compatible overrides and remaining work.
+- Sites types and supported Worker build passed. All **42 cloud-contract checks**
+  also passed against the patched **Vinext adapter**, using a new reusable local
+  config, synthetic Auth/RPC responses and desktop/mobile Chromium. This is
+  separate from the prior 100 Next browser checks and real-device acceptance.
+- Installer/lock updates were sequential; no forced audit fix, template replacement,
+  real browser access, model call or schema change. Publication is being prepared;
+  version 13 remains live until an exact successful receipt is recorded.
+- Next: release/CI follow-through, then assess remaining moderate adapter/tooling
+  advisories with compatible upgrades and targeted checks. Do not equate a clean
+  production-only audit with a clean Worker/runtime dependency graph.
