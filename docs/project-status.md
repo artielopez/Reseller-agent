@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Current handoff — 4 November 2026, 06:23 Manila
+
+Independent overnight work is complete within the permitted scope; the broader automation goal remains unfinished. [Completed work, exact verification and remaining gates](overnight-work-2026-11-04.md#final-independent-work-handoff--0623-manila). Sites **version 18** is live with Artie/Janyl access unchanged. Draft [PR #29](https://github.com/artielopez/Reseller-agent/pull/29) remains unmerged; all 21 earlier open PR heads are preserved. Implementation/test head `a39705f` passed CI run `41728415783` (**292 tests**, six optional skips, lint/types/builds and Next browser suites). Separate compiled-Worker checks pass **52/52**. No automatic intake/sending, model usage or worker activation was added.
+
+Next work depends on authorized real-device/account acceptance, fresh supervised subscription checks and permitted channel access. Janyl is already activated; do not resend invitations or request account setup again. No owner action is requested during the sleep window. The bounded heartbeat is **PAUSED**, confirmed by the scheduling tool and local read-back; the goal is not marked complete.
+
 ## Overnight independent work — 4 November 2026
 
 The owner authorized seven hours of independent work while sleeping, ending 10:33:55 Manila. The bounded 15-minute continuation heartbeat and [execution ledger](overnight-work-2026-11-04.md) preserve the no-merge/no-paid-call/no-automatic-sending constraints. PR #28's exact head `01e704d` passed GitHub checks and remains unmerged; the Beeper thread still has no response.

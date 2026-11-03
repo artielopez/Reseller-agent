@@ -12,7 +12,6 @@ The open GitHub requests #8–#29 all target `main` and preserve successive deve
 | Subscription drafting and workflow | #19–#22 | Hosted queue checks and bounded OpenClaw trial; optional SIWC timeout remains unresolved |
 | Photos and reliability | #23–#27 | Ten-photo limits, HTTP/concurrency/crash tests, PT409 fix, inventory CAS |
 | Worker health | #28, worker-health-workflow | Per-question queue/status/reload, advisory health, read-only privacy preview |
-
 | Current increment | #29, overnight-reliability | Request/save/session recovery, saved-question corrections and account-switch isolation |
 
 ## Release checks
@@ -28,9 +27,15 @@ The open GitHub requests #8–#29 all target `main` and preserve successive deve
 Released increment: [PR #28](https://github.com/artielopez/Reseller-agent/pull/28), implementation `ee843e4`; Sites version 9, source `2b7919c121c53d7cf08bc9bc825d94a687d60157`. The privacy migration and rollback-only hosted checks passed. Signed-in post-release UI check awaits local browser access. No merge/auto-merge.
 
 Current release: draft [PR #29](https://github.com/artielopez/Reseller-agent/pull/29),
-implementation `82c883c`; Sites version **13**, exact source
-`b592ec18bddd9073ce8100e894086a68e13c9d69`. Local checks: 284 tests (six optional
-skips), 100 browser checks, lint/types and builds. Prior isolated no-inference
-preflight and five installed-runtime synthetic checks passed without runtime
-changes in this increment. No new migration, model call or worker activation.
-Signed-in post-release UI acceptance still requires local browser access.
+application implementation `a81960b`, latest verified test head `a39705f`; Sites
+version **18**, source `c061f0a979cbdd41167a4a4cd101fec80c7556d6`.
+Latest CI run `41728415783` passed. Evidence includes 292 tests (six optional
+skips), lint/types/builds, 62 ordinary and 52 Next cloud browser checks, plus
+52 Sites development and 52 compiled-Worker checks. Physical-device/hosted
+account acceptance is separate; no new model call or worker activation.
+
+A 4 November read-only ancestry audit confirmed every current PR #8–#28 head
+is an ancestor of `a39705f` (21/21). GitHub reports PR #29 mergeable/clean, still
+draft/open with auto-merge null. This is preparation for a future owner decision,
+not permission to merge. Reverify the exact final head after that approval.
+[Final overnight handoff](overnight-work-2026-11-04.md#final-independent-work-handoff--0623-manila).

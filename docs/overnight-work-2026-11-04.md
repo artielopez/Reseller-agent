@@ -521,3 +521,65 @@ persists but requires normal build/verification and private-audience checks.
   Preserve real-device, hosted HTTP/Storage, subscription and permitted-channel
   gates. If useful independent work is exhausted, record the remaining summary
   and pause the heartbeat as instructed; do not mark the broader goal complete.
+
+## Final independent-work handoff — 06:23 Manila
+
+The concrete independent queue is complete within this window's permissions.
+Stopping before the deadline follows the explicit instruction to pause when
+useful independent work is exhausted. The broader project is **not complete**;
+no inference, platform access, device result or merge approval is inferred.
+
+Completed and available in the private cloud app (Sites **version 18**):
+
+- Bounded save/read/sign-in/sign-out/generation waits, with recovery guidance,
+  preserved unsaved text, account-switch cancellation and no blind write retries.
+- Saved-question correction, confirmed-save recovery, keyboard focus restoration,
+  inline draft controls, advisory worker health and read-only privacy preview.
+- Patched compatible Sites dependencies; production audit zero at the recorded
+  check, with **20 moderate tooling findings** still documented, not waived.
+- Reproducible production smoke and full compiled-artifact cloud contracts,
+  plus local in-flight owner-intervention acceptance with no inference replay.
+
+Verification and review:
+
+- Latest implementation/test head `a39705f829ee0072745c88250412cd19e443dcef`
+  passed GitHub Application checks: run **41728415783**. Main regression suite:
+  **292 passed, six optional skips**; lint/types/builds pass through CI.
+- Browser evidence: **62 ordinary + 52 Next cloud**, **52 Sites development**
+  and **52 compiled-Worker** checks. These are distinct runs against different
+  runtimes, not 218 unique test scenarios or physical-device proof.
+- Live version 18 source `c061f0a979cbdd41167a4a4cd101fec80c7556d6`, deployment
+  `appgdep_6aea55374da08191a3c1237c7df488ef`; Artie/Janyl access unchanged.
+- Read-only ancestry audit: all **21 heads of PRs #8–#28** remain ancestors of
+  PR #29. GitHub reports it mergeable/clean, draft/open, auto-merge null. No
+  snapshot was closed, rebased or merged. Final documentation changes follow
+  this verified source head; do not present their CI as already passed.
+
+Still required, in order:
+
+1. Authorized live-browser/device acceptance: Artie/Janyl reload/image decoding,
+   actual ten-photo cloud use, two-device stale saves, private clipboard and
+   cross-owner HTTP/Storage denial. Janyl is already activated with saved data.
+2. Owner-present, fresh allowance/account verification for another bounded
+   subscription trial; real provider/session-expiry and Mac sleep/restart
+   acceptance. Worker remains stopped/paused under the last verified state;
+   no unattended startup or cancellation/refund guarantee.
+3. Supported channel access before any reader/sender: Beeper reply/permissions,
+   separate Group-comment coverage and Carousell eligibility. Last Beeper read
+   **05:36 Manila** showed no reply; it was not checked early again. Carousell
+   email and OpenAI support report remain unsent.
+4. Multi-organization Supabase credential configuration/verification when the
+   owner is available. Preserve the working Artie's Projects connection.
+5. Owner approval of the exact cumulative PR before merge. Compatible fixes for
+   remaining tooling advisories can be assessed when available; no force upgrade.
+
+Known verification limit: one earlier development parser error was not reproduced
+in focused/full reruns or the compiled checks; its root cause remains unconfirmed.
+No additional source change is justified by that unreproduced symptom alone.
+The next session should read this handoff and the supervised checklist, then act
+on new participant/platform evidence rather than repeat unchanged synthetic tests.
+Heartbeat pause is the final scheduling step; the broader goal stays unresolved.
+
+Scheduling receipt: `automation_update` confirmed `reseller-agent-overnight-work`
+**PAUSED** on 4 November at 06:24 Manila. Local read-back confirms PAUSED and
+unchanged name, prompt, schedule and thread. No replacement schedule was created.

@@ -4,22 +4,18 @@ Updated 4 November 2026. [Status and evidence](project-status.md) · [Imported h
 
 ## Current assignment
 
-Independent continuation: server-side listing cancellation and the separate Sites
-dependency baseline are implemented, verified and deployed in Sites version 16.
-The patched adapter passes the synthetic cloud contracts directly.
-The remaining [moderate tooling findings](sites-dependency-maintenance.md) have
-explicit compatibility/path limits. Confirmed inbox save recovery is now deployed in Sites version 17: a failed
-optional list refresh cannot mislabel an acknowledged save. Compiled runtime
-checks passed. Keyboard focus recovery for item/question editors is deployed in Sites version
-18, verified across Next and Sites. Four local in-flight owner-change checks now
-verify late-output rejection without replay; this does not prove real provider
-cancellation. Compiled Sites anonymous browser acceptance is now reproducible
-and passed against version 18. All 52 synthetic cloud contracts now also pass
-against that compiled artifact with guarded HTTP access and invented identities.
-Next: reconcile the remaining acceptance/release gates and identify any concrete
-independent work; do not manufacture new scope to fill the window. Platform and real-device gates stay open.
+The independent overnight queue is complete within its permissions. Read the
+[final handoff](overnight-work-2026-11-04.md#final-independent-work-handoff--0623-manila)
+for exact evidence and remaining gates. Sites version **18** is live; cumulative
+draft PR **#29** is unmerged and preserves all 21 preceding open PR heads.
+Implementation/test head `a39705f` passed CI. No new model or automatic-message
+capability is activated by these releases.
 
-Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window. The overnight changes are live in Sites version 18: bounded owner RPC/inventory save/read waits, recoverable sign-in, account-bound request cancellation, bounded listing/photo preparation, recoverable sign-out and guarded saved-question editing. Draft PR #29 remains unmerged.
+Next work requires new evidence: authorized device/account acceptance, fresh
+supervised subscription checks, supported channel access, and the owner's exact
+merge decision. Janyl is already activated and has saved data. No owner input is
+requested during sleep. The bounded heartbeat is PAUSED as instructed; do not mark
+the broader goal complete or manufacture extra scope to fill the remaining time.
 
 The owner approved autonomous work on worker health/recovery, the buyer-drafting workflow, privacy/cleanup previews, isolation checks and release preparation, with no merge. The [current increment](worker-health-workflow.md) implements advisory contact/job health, per-question draft requests and guarded reply reload, plus a read-only owner-scoped privacy preview. Local checks and independent review passed. Sites version 9 and the additive privacy migration are released; signed-in screen verification is blocked by disabled local browser use. PR #28 remains unmerged. [Execution plan](superpowers/plans/2026-11-03-worker-health-workflow.md) · [release map](release-review-map.md).
 
@@ -127,7 +123,7 @@ Future implementation should branch from the latest `main` (for example `codex/b
 
 `docs/project-status.md` is the single shared status record. Update it after meaningful work, with date, actual branch/commit, check results, next action and owner dependencies. Keep historical handoff content unchanged. Mark tasks Done only with evidence; a plan is not a passing feature test. Read plans and repository instructions together before implementation.
 
-The bounded overnight heartbeat is active until the documented deadline or exhaustion of useful independent work. No Dot integration or external task assignment is established; do not imply broader automatic synchronization. Dependency/secret CI scanning is a separate proposed hardening task, not a prerequisite for this documentation handoff or an already-running protection.
+The bounded overnight heartbeat is closing after exhaustion of the concrete independent queue; its final state is recorded in the overnight ledger. No Dot integration or external task assignment is established; do not imply broader automatic synchronization. Dependency/secret CI scanning is a separate proposed hardening task, not a prerequisite for this documentation handoff or an already-running protection.
 
 The owner approved merge/deploy and a continuation goal on 30 October. PR #7 is merged; the updated private demo is deployed. New [agent drafting preparation](agent-drafting-stage.md) stays on a separate feature branch. Supabase connection/target and verified restricted runtime remain pending.
 
