@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Janyl invitation recovery — 3 November 2026
+
+The owner supplied a mobile screenshot showing the first-activation-required message. Read-only Auth evidence confirmed the original invitation remained unaccepted. Renewed the existing authorized app invitation through the Supabase dashboard; the original user ID was preserved and both invitation/send timestamps advanced to `2026-11-03T03:34:26.326698Z` (11:34 UTC+8). Resend visibly reports **Delivered** for the new invitation, message `01a19f78-fc76-79b5-8566-dab2f3586e65`. No duplicate account, manual email confirmation, public signup change or administrator access.
+
+Janyl must open the newest invitation email on her own device to activate; the normal sign-in form cannot renew an unaccepted invitation. The owner was given those steps. Delivery is verified; completed activation and private-inventory acceptance remain pending. No application code or cloud deployment changed.
+
 ## Carousell terms decision — 3 November 2026
 
 The owner declined sending the prepared inquiry and asked for a terms check. [Section 2](https://support.carousell.com/hc/en-us/articles/115011881808-Terms-of-Service) explicitly restricts automated access/monitoring and automated messaging. The [recorded decision](carousell-access-support-draft.md#owner-decision-and-terms-check--3-november-2026) is no custom Carousell reader/sender under current evidence. Native CarouBiz replies and manually reviewed/copied assistance remain distinct options; no plan was purchased or feature activated. The inquiry stays unsent and is no longer awaiting a sending decision. Beeper and the other channel/device gates are separate.
