@@ -4,6 +4,8 @@ Updated 3 November 2026. [Status and evidence](project-status.md) · [Imported h
 
 ## Current assignment
 
+The owner approved autonomous work on worker health/recovery, the buyer-drafting workflow, privacy/cleanup previews, isolation checks and release preparation, with no merge. The [current increment](worker-health-workflow.md) implements advisory contact/job health, per-question draft requests and guarded reply reload, plus a read-only owner-scoped privacy preview. Local checks passed; review and cloud publication are in progress. [Execution plan](superpowers/plans/2026-11-03-worker-health-workflow.md) · [release map](release-review-map.md).
+
 Janyl’s first app activation is now verified by her supplied mobile dashboard and Supabase Auth at 11:39 UTC+8 on 3 November. Next participant step: save/reload her own labelled test item and photos. Full two-owner HTTP/Storage isolation remains separate.
 
 Current shared-app increment: [inventory save conflicts](inventory-save-conflicts.md), protecting newer saved item/photo/listing data from an older device's editor. Includes safe handling of uncertain photo saves. Local checks and independent review passed; the coordinated database/client release is live in Sites version 8. Hosted SQL and signed-in two-tab stale-save checks passed. This advances two-device acceptance without claiming physical-device or second-user completion.

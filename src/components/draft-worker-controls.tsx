@@ -6,6 +6,8 @@ import {
   type Enrollment,
 } from "@/lib/automation/draft-controls";
 import type { Inquiry } from "@/lib/buyer/domain";
+import { WorkerHealthSummary } from "./worker-health-summary";
+import { jobRecovery } from "@/lib/automation/worker-health";
 const client = createQueueClient();
 export function DraftWorkerControls({ questions }: { questions: Inquiry[] }) {
   const [open, setOpen] = useState(false);
@@ -157,6 +159,7 @@ function Controls({ questions }: { questions: Inquiry[] }) {
       </div>
       {state ? (
         <>
+          <WorkerHealthSummary state={state} />
           <p>
             <strong>
               {state.paused ? "Drafting is paused." : "Drafting is enabled."}
@@ -344,12 +347,7 @@ function Controls({ questions }: { questions: Inquiry[] }) {
                   <span>
                     Updated {new Date(job.updated_at).toLocaleString()}
                   </span>
-                  {job.status === "failed" && (
-                    <span>
-                      No draft saved. Check the worker and question before
-                      deliberately queuing a new attempt.
-                    </span>
-                  )}
+                  <span>{jobRecovery(job)}</span>
                   {["queued", "leased"].includes(job.status) && (
                     <button
                       className="button secondary"

@@ -11,6 +11,8 @@ import { writeClipboard } from "@/lib/clipboard";
 import { SellerPreferencesPanel } from "./seller-preferences";
 import { termsContext, type Preferences } from "@/lib/seller/preferences";
 import { DraftWorkerControls } from "./draft-worker-controls";
+import { PrivacyPreviewPanel } from "./privacy-preview";
+import { QuestionDraftActions } from "./question-draft-actions";
 import { AuthPanel } from "./auth-panel";
 import { demoMode, configurationError } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
@@ -166,7 +168,8 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
       body: string;
       context: ReplyContext;
     } | null>(null),
-    [replyId, setReplyId] = useState("");
+    [replyId, setReplyId] = useState(""),
+    [replyReload, setReplyReload] = useState(0);
   const [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState(""),
@@ -287,6 +290,25 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
       setReady(true);
     });
   }
+  async function loadSavedReplies() {
+    if (
+      !thread ||
+      ((written?.body || editedDirty.current) &&
+        !window.confirm(
+          "Discard unsaved reply edits and load this question’s saved replies?",
+        ))
+    )
+      return;
+    await run(async () => {
+      const latest = await readThread(thread.inquiry.id);
+      if (!alive.current) return;
+      display(latest, true);
+      setReplyReload((value) => value + 1);
+      setNotice(
+        "Saved replies loaded. Review and approve the exact saved text before copying.",
+      );
+    });
+  }
   function saveQuestion() {
     if (
       (written?.body || editedDirty.current) &&
@@ -391,6 +413,7 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
             reportDirty={reportPreferencesDirty}
           />
           {!demoMode && <DraftWorkerControls questions={questions} />}
+          {!demoMode && <PrivacyPreviewPanel />}
           <section className="panel section-pad">
             <h2>Record a buyer question</h2>
             <form
@@ -526,6 +549,14 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
               </p>
               <p className="lab-question">{thread.inquiry.message}</p>
               <p>Question status: {thread.inquiry.status}</p>
+              {!demoMode && (
+                <QuestionDraftActions
+                  key={thread.inquiry.id}
+                  inquiry={thread.inquiry}
+                  disabled={busy}
+                  onLoadReplies={loadSavedReplies}
+                />
+              )}
               <div className="inbox-facts">
                 <strong>Current saved facts</strong>
                 <p>
@@ -616,7 +647,7 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
               )}
               {reply && (
                 <ReplyReview
-                  key={reply.id + ":" + reply.revision}
+                  key={reply.id + ":" + reply.revision + ":" + replyReload}
                   thread={thread}
                   replyId={reply.id}
                   busy={busy}

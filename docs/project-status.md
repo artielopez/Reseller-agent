@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Worker health, draft workflow and privacy preview — 3 November 2026
+
+Implemented on `codex/worker-health-workflow`, based on PR #27 head `e50e99d`. [Feature/recovery guide](worker-health-workflow.md) · [release review map](release-review-map.md). Saved private questions now have an inline AI request/status panel and guarded saved-reply reload. Worker contact is explicitly advisory, with failure-specific recovery guidance. The owner-scoped privacy RPC/panel previews older completed history and possibly unused photos, without deleting data or activating retention.
+
+Local lint/types, 257 tests (six optional skips), 52 ordinary desktop/mobile browser checks, 20 cloud-contract browser checks, Next production build and worker build passed. One fresh independent review found no blocking issues and independently passed the ten new health/privacy tests. A subsequent hosted rollback-script regression also passed (one additional test). Hosted migration and Sites publication are being prepared; the live release is still version 8 until a release receipt is recorded below. No live model call, worker activation, message sending or GitHub merge.
+
 ## Janyl activation verified — 3 November 2026
 
 The owner supplied a mobile screenshot of the signed-in empty inventory. Read-only Supabase Auth confirms Janyl completed email confirmation and signed in at `2026-11-03T03:39:03Z` (11:39 UTC+8). Her owned item count is zero, consistent with the screen. First invitation acceptance is complete; she must still save/reload a labelled test item with photos for her own persistence acceptance. The screenshot and Auth timestamps do not establish full cross-account HTTP/Storage isolation or all physical-device checks. No account was impersonated, privileges changed or application code deployed.

@@ -50,7 +50,9 @@ Apply [`20261102183945_ten_item_photos.sql`](supabase/migrations/20261102183945_
 
 Apply [`20261102202606_non_retryable_conflicts.sql`](supabase/migrations/20261102202606_non_retryable_conflicts.sql) next. It prevents stale business conflicts from triggering PostgREST transaction retry loops. The existing cloud project already has it; see [fix evidence](docs/non-retryable-conflicts.md).
 
-Apply [`202611030001_inventory_save_revision.sql`](supabase/migrations/202611030001_inventory_save_revision.sql) last, with the matching app version. It rejects stale inventory saves across devices and returns the saved revision atomically. Older open editors must reload before saving existing items. Check [deployment evidence](docs/inventory-save-conflicts.md) before changing the existing cloud project.
+Apply [`202611030001_inventory_save_revision.sql`](supabase/migrations/202611030001_inventory_save_revision.sql) next, with the matching app version. It rejects stale inventory saves across devices and returns the saved revision atomically. Older open editors must reload before saving existing items. Check [deployment evidence](docs/inventory-save-conflicts.md) before changing the existing cloud project.
+
+Apply [`20261103072649_workspace_privacy_preview.sql`](supabase/migrations/20261103072649_workspace_privacy_preview.sql) after the preceding migrations for the read-only privacy/history/photo preview. It grants no deletion capability and activates no retention policy. See [worker health and buyer workflow](docs/worker-health-workflow.md) and the [release review map](docs/release-review-map.md).
 
 ### 2. Configure sign-in for your account
 

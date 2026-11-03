@@ -27,10 +27,12 @@ async function fixture(page: Page) {
   let paused = true,
     revision = 1,
     failEnrollment = false,
+    failEnqueue: "before" | "after" | null = null,
     stalePause = false;
   const workers: Record<string, unknown>[] = [],
     jobs: Record<string, unknown>[] = [],
-    operations: string[] = [];
+    operations: string[] = [],
+    queuedIds: string[] = [];
   await page.addInitScript(
     (saved) =>
       localStorage.setItem(
@@ -72,6 +74,61 @@ async function fixture(page: Page) {
           as_of: timestamp,
         },
       });
+    if (
+      url.pathname === "/rest/v1/rpc/buyer_workspace" &&
+      route.request().postDataJSON().command.op === "get"
+    ) {
+      const inquiry = {
+        id: question,
+        item_id: "44444444-4444-4444-8444-444444444444",
+        channel: "marketplace",
+        surface: "dm",
+        buyer_name: "Synthetic buyer",
+        message: "Is this available?",
+        status: "Open",
+        received_at: timestamp,
+        updated_at: timestamp,
+        revision: "1",
+      };
+      const context = {
+        inquiry_id: question,
+        inquiry_revision: "1",
+        item_revision: "1",
+        channel: "marketplace",
+        surface: "dm",
+        message: inquiry.message,
+        item: {
+          id: inquiry.item_id,
+          title: "Synthetic lamp",
+          description: "Test only",
+          price: 900,
+          category: "Home & living",
+          condition: "Good",
+          status: "Listed",
+        },
+      };
+      return respond({
+        inquiry,
+        context,
+        replies: jobs.some((j) => j.status === "completed")
+          ? [
+              {
+                id: "88888888-8888-4888-8888-888888888888",
+                inquiry_id: question,
+                body: "Synthetic review draft",
+                source: "agent",
+                review_note: "Confirm availability",
+                status: "Draft",
+                revision: "1",
+                context,
+                created_at: timestamp,
+                updated_at: timestamp,
+                approved_at: null,
+              },
+            ]
+          : [],
+      });
+    }
     if (url.pathname === "/rest/v1/rpc/buyer_workspace")
       return respond([
         {
@@ -146,6 +203,11 @@ async function fixture(page: Page) {
       return respond({ revoked: true });
     }
     if (c.op === "enqueue") {
+      queuedIds.push(c.id);
+      if (failEnqueue === "before") {
+        failEnqueue = null;
+        return respond({ code: "XX000" }, 500);
+      }
       if (c.inquiry_id !== question) return respond({ code: "P0002" }, 400);
       jobs.push({
         id: c.id,
@@ -159,6 +221,10 @@ async function fixture(page: Page) {
         created_at: timestamp,
         updated_at: timestamp,
       });
+      if (failEnqueue === "after") {
+        failEnqueue = null;
+        return respond({ code: "XX000" }, 500);
+      }
       return respond({ id: c.id, status: "queued" });
     }
     if (c.op === "cancel") {
@@ -173,6 +239,16 @@ async function fixture(page: Page) {
   ).toBeVisible();
   return {
     operations,
+    queuedIds,
+    failEnqueue: (when: "before" | "after") => {
+      failEnqueue = when;
+    },
+    enable: () => {
+      paused = false;
+    },
+    complete: () => {
+      jobs[0].status = "completed";
+    },
     failEnrollment: () => {
       failEnrollment = true;
     },
@@ -231,6 +307,71 @@ test("owner can enroll, hide a key, queue a private question, cancel and revoke"
   expect(await page.evaluate(() => JSON.stringify(localStorage))).not.toContain(
     token,
   );
+});
+
+test("saved question offers a guarded draft request and preserves edits while loading replies", async ({
+  page,
+}) => {
+  const state = await fixture(page);
+  await page
+    .getByRole("button", {
+      name: "Is this available? · Open · Facebook Marketplace",
+      exact: true,
+    })
+    .click();
+  const panel = page.getByRole("region", {
+    name: "AI draft for this question",
+  });
+  await expect(
+    panel.getByText("Drafting is paused", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Request AI draft", exact: true }),
+  ).toBeDisabled();
+  state.enable();
+  await panel.getByRole("button", { name: "Refresh draft status" }).click();
+  await page
+    .getByRole("textbox", { name: "Buyer question", exact: true })
+    .fill("Keep unrelated unsaved question");
+  await panel
+    .getByRole("button", { name: "Request AI draft", exact: true })
+    .click();
+  await expect(
+    panel.getByText("Job status: queued", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByRole("button", { name: "Request AI draft", exact: true }),
+  ).toBeDisabled();
+  expect(state.operations.filter((op) => op === "enqueue")).toHaveLength(1);
+  state.complete();
+  await panel.getByRole("button", { name: "Refresh draft status" }).click();
+  await expect(panel.getByText(/Draft saved for your review/)).toBeVisible();
+  await page.getByLabel("Write a new reply").fill("Unsaved reply");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await panel.getByRole("button", { name: "Load saved replies" }).click();
+  await expect(page.getByLabel("Write a new reply")).toHaveValue(
+    "Unsaved reply",
+  );
+  page.once("dialog", (dialog) => dialog.accept());
+  await panel.getByRole("button", { name: "Load saved replies" }).click();
+  await expect(page.getByLabel("Write a new reply")).toHaveValue("");
+  await expect(
+    page.getByRole("textbox", { name: "Buyer question", exact: true }),
+  ).toHaveValue("Keep unrelated unsaved question");
+  await expect(page.getByLabel("Reply text")).toHaveValue(
+    "Synthetic review draft",
+  );
+  await page.getByLabel("Reply text").fill("Unsaved change to saved reply");
+  page.once("dialog", (dialog) => dialog.accept());
+  await panel.getByRole("button", { name: "Load saved replies" }).click();
+  await expect(page.getByLabel("Reply text")).toHaveValue(
+    "Synthetic review draft",
+  );
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeDisabled();
+  expect(state.operations.filter((op) => op === "enqueue")).toHaveLength(1);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
 });
 test("uncertain enrollment requires reload and never leaks server details or loses question text", async ({
   page,
@@ -403,4 +544,148 @@ test("preference edits protect sign-out and late saves cannot enter the next acc
   await response;
   await expect(page.getByLabel("General pickup area")).toHaveValue("");
   await expect(page.getByText(/Preferences saved/)).toHaveCount(0);
+});
+
+for (const when of ["before", "after"] as const) {
+  test(`uncertain inline enqueue ${when} commit requires refresh and keeps request identity`, async ({
+    page,
+  }) => {
+    const state = await fixture(page);
+    state.enable();
+    state.failEnqueue(when);
+    await page
+      .getByRole("button", {
+        name: "Is this available? · Open · Facebook Marketplace",
+        exact: true,
+      })
+      .click();
+    const panel = page.getByRole("region", {
+      name: "AI draft for this question",
+    });
+    await panel
+      .getByRole("button", { name: "Request AI draft", exact: true })
+      .click();
+    await expect(panel.getByRole("alert")).toContainText(
+      "Refresh draft status",
+    );
+    await expect(
+      panel.getByRole("button", { name: "Request AI draft", exact: true }),
+    ).toBeDisabled();
+    expect(state.queuedIds).toHaveLength(1);
+    await panel.getByRole("button", { name: "Refresh draft status" }).click();
+    if (when === "before") {
+      await panel
+        .getByRole("button", { name: "Request AI draft", exact: true })
+        .click();
+      await expect(
+        panel.getByText("Job status: queued", { exact: true }),
+      ).toBeVisible();
+      expect(state.queuedIds).toEqual([state.queuedIds[0], state.queuedIds[0]]);
+    } else {
+      await expect(
+        panel.getByRole("button", { name: "Request AI draft", exact: true }),
+      ).toBeDisabled();
+      expect(state.queuedIds).toHaveLength(1);
+    }
+  });
+}
+
+test("late draft status cannot enter the next signed-in workspace", async ({
+  page,
+}) => {
+  await fixture(page);
+  let release!: () => void, entered!: () => void;
+  const wait = new Promise<void>((resolve) => (release = resolve));
+  const requested = new Promise<void>((resolve) => (entered = resolve));
+  await page.route("**/rest/v1/rpc/draft_queue", async (route) => {
+    entered();
+    await wait;
+    await route.fulfill({
+      json: { paused: false, revision: "1", workers: [], jobs: [] },
+    });
+  });
+  await page
+    .getByRole("button", {
+      name: "Is this available? · Open · Facebook Marketplace",
+      exact: true,
+    })
+    .click();
+  await requested;
+  await page.evaluate((saved) => {
+    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
+    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
+    channel.postMessage({ event: "SIGNED_IN", session: saved });
+    channel.close();
+  }, session("66666666-6666-4666-8666-666666666666"));
+  await expect(
+    page.getByRole("region", { name: "AI draft for this question" }),
+  ).toHaveCount(0);
+  const response = page.waitForResponse("**/rest/v1/rpc/draft_queue");
+  release();
+  await response;
+  await expect(
+    page.getByRole("region", { name: "AI draft for this question" }),
+  ).toHaveCount(0);
+  await expect(
+    page.getByText("No active worker key", { exact: true }),
+  ).toHaveCount(0);
+});
+
+test("privacy preview is explicit, read-only and clears when the account changes", async ({
+  page,
+}) => {
+  await fixture(page);
+  const windows: number[] = [];
+  await page.route(
+    "**/rest/v1/rpc/workspace_privacy_preview",
+    async (route) => {
+      const days = route.request().postDataJSON().window_days;
+      windows.push(days);
+      await route.fulfill({
+        json: {
+          as_of: timestamp,
+          cutoff: "2026-09-30T12:00:00Z",
+          window_days: days,
+          items: 2,
+          photo_references: 8,
+          photo_objects: 9,
+          questions: 3,
+          replies: 1,
+          history_candidates: 1,
+          history_candidate_replies: 1,
+          unlinked_photo_candidates: 1,
+        },
+      });
+    },
+  );
+  expect(windows).toEqual([]);
+  await page
+    .getByRole("button", { name: "Privacy and stored data", exact: true })
+    .click();
+  const panel = page.getByRole("region", { name: "Privacy review" });
+  await panel.getByLabel("History preview window").selectOption("90");
+  expect(windows).toEqual([]);
+  await panel.getByRole("button", { name: "Preview stored data" }).click();
+  await expect(
+    panel.getByText("Possibly unused photos: 1", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    panel.getByText(/No automatic deletion is enabled/),
+  ).toBeVisible();
+  expect(windows).toEqual([90]);
+  await expect(panel.getByRole("button", { name: /delete/i })).toHaveCount(0);
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+  await page.evaluate((saved) => {
+    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
+    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
+    channel.postMessage({ event: "SIGNED_IN", session: saved });
+    channel.close();
+  }, session("66666666-6666-4666-8666-666666666666"));
+  await expect(panel).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Privacy and stored data", exact: true })
+    .click();
+  await expect(
+    page.getByText("Possibly unused photos: 1", { exact: true }),
+  ).toHaveCount(0);
 });
