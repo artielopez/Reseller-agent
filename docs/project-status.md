@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Channel access follow-up — 3 November 2026
+
+PR #27 head `bfa95f1` passed the full GitHub Application checks, including worker build, application check, desktop/mobile browsers and the cloud-contract browser suite. These are CI checks, not Janyl or physical-device acceptance.
+
+Prepared a separate [Carousell support inquiry](carousell-access-support-draft.md) with a verified official support destination and exact reviewable text. Its own support documentation directs chat escalation; the app publisher also lists a support email. The owner has been asked for permission to email the inquiry. It remains unsent. Native-reply documentation does not establish approved custom API access or account-specific pricing. No plan/account change or message collection occurred. Beeper's sent inquiry and the pending participant checks remain separate dependencies.
+
 ## Inventory save conflicts — 3 November 2026
 
 Reviewable delivery: [PR #27](https://github.com/artielopez/Reseller-agent/pull/27), implementation `da14cd4`, hosted release evidence `f08e8bc`. GitHub connector creation returned 403; the existing authorized CLI login created the PR successfully. No merge or auto-merge.
