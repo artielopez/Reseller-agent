@@ -308,3 +308,21 @@ persists but requires normal build/verification and private-audience checks.
   to concrete app/worker reliability gaps if that upgrade needs platform changes.
   No owner decision is needed for the current patch. Beeper is not due again
   before 05:34 Manila; keep actual-device and permitted-channel gates open.
+
+### Sixth overnight cloud release — 04:57 Manila
+
+- Implementation `da4f142471a961b9cce716d6bd908d89daf4138a` is on the same draft
+  PR #29; CI run `41717061258` was in progress when published.
+- Sites **version 15** deployed successfully from exact pushed source
+  `1af53df7bf83d9a48bf53cb5eb0a32986deb8cc9`, deployment
+  `appgdep_6aea4aa4a1d881919f1ea49d9b38bf9e`. Artie/Janyl audience and environment
+  revision 1 are unchanged. The final Worker build contains the intended public
+  project configuration and no synthetic browser-test configuration.
+- The final installed dependency graph passed 42 adapter browser checks, types,
+  supported build and main lint. No application/worker behavior or schema changed;
+  the preceding 288-test suite is not reported as rerun for this dependency-only
+  increment. No merge, model call, support email or owner interruption.
+- Continue with a bounded compatibility assessment of the remaining adapter
+  dependency upgrade; preserve the working release unless checks establish the
+  replacement. Do not force incompatible lint or Drizzle overrides merely to
+  suppress an audit finding.
