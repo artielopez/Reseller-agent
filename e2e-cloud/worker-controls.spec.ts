@@ -746,3 +746,100 @@ test("a stalled enqueue releases controls, preserves text and reconciles without
   ).toBeVisible();
   expect(state.queuedIds).toHaveLength(1);
 });
+
+test("stale question edits stay visible and protect sign-out", async ({
+  page,
+}) => {
+  await fixture(page);
+  await page
+    .getByRole("button", {
+      name: "Is this available? · Open · Facebook Marketplace",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page
+    .getByLabel("Saved question text")
+    .fill("Keep this corrected private question");
+  await page.route("**/rest/v1/rpc/buyer_workspace", async (route) => {
+    if (route.request().postDataJSON().command.op !== "saveInquiry")
+      return route.fallback();
+    await route.fulfill({
+      status: 409,
+      json: { code: "PT409", message: "private internal conflict" },
+    });
+  });
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "changed",
+  );
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Keep this corrected private question",
+  );
+  await expect(page.getByText("private internal conflict")).toHaveCount(0);
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Sign out", exact: true }).click();
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Keep this corrected private question",
+  );
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page
+    .getByRole("button", {
+      name: "Public comment · Open · Facebook Groups",
+      exact: true,
+    })
+    .click();
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Keep this corrected private question",
+  );
+});
+
+test("late question-save failure cannot affect the next account", async ({
+  page,
+}) => {
+  await fixture(page);
+  let release!: () => void, entered!: () => void;
+  const wait = new Promise<void>((resolve) => (release = resolve)),
+    requested = new Promise<void>((resolve) => (entered = resolve));
+  await page.route("**/rest/v1/rpc/buyer_workspace", async (route) => {
+    if (route.request().postDataJSON().command.op !== "saveInquiry")
+      return route.fallback();
+    entered();
+    await wait;
+    await route.fulfill({ status: 409, json: { code: "PT409" } });
+  });
+  await page
+    .getByRole("button", {
+      name: "Is this available? · Open · Facebook Marketplace",
+      exact: true,
+    })
+    .click();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page
+    .getByLabel("Saved question text")
+    .fill("Private former account correction");
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await requested;
+  await page.evaluate((saved) => {
+    localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
+    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
+    channel.postMessage({ event: "SIGNED_IN", session: saved });
+    channel.close();
+  }, session("66666666-6666-4666-8666-666666666666"));
+  await expect(page.getByLabel("Saved question text")).toHaveCount(0);
+  const response = page.waitForResponse("**/rest/v1/rpc/buyer_workspace");
+  release();
+  await response;
+  await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
+  await expect(page.getByText("Private former account correction")).toHaveCount(
+    0,
+  );
+});

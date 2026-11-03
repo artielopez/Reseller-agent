@@ -10,6 +10,7 @@ import {
   type Photo,
 } from "./domain";
 import { getSupabase } from "./supabase";
+import { withRequestDeadline } from "./request-deadline";
 
 const BUCKET = "item-photos";
 const staleSave = () =>
@@ -82,11 +83,19 @@ export async function listItems(): Promise<Item[]> {
   if (demoMode) {
     return demoInventory((items) => ({ items, result: items }));
   }
+  return withRequestDeadline(
+    readCloudItems,
+    "Could not finish loading inventory and private photos. Check your connection, then reload inventory.",
+  );
+}
+async function readCloudItems(signal: AbortSignal): Promise<Item[]> {
   const supabase = getSupabase();
   const { data, error } = await supabase
     .from("items")
     .select("*, item_photos(*), listings(*)")
-    .order("updated_at", { ascending: false });
+    .order("updated_at", { ascending: false })
+    .abortSignal(signal);
+  signal.throwIfAborted();
   if (error)
     throw new Error(
       "Could not load inventory. Check your connection and Supabase migration setup.",

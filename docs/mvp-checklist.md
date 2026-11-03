@@ -16,7 +16,7 @@ Implementation below describes the reviewable repository; [current release statu
 - [x] Supabase email-link authentication for pre-created accounts.
 - [x] Owner-isolated database tables, private image storage and atomic metadata saves.
 - [x] Buyer inquiry and suggested reply tables with owner isolation; no message access or sending.
-- [x] Manual saved buyer inbox, private/public destination labels, editable templates/manual drafts, explicit approval and revalidated clipboard copy.
+- [x] Manual saved buyer inbox, guarded saved-question corrections, private/public destination labels, editable templates/manual drafts, explicit approval and revalidated clipboard copy.
 - [x] Additive migration and demo storage upgrade; stale-context invalidation, guarded unsaved edits and separate Answered status.
 - [x] Draft-only owned queue, expiring worker enrollment, shared attempt cap and cloud controls.
 - [x] Per-question draft request/status, guarded result reload and advisory worker contact/recovery guidance.
@@ -63,7 +63,7 @@ Complete after setting up Supabase and optional OpenAI credentials:
 12. Approve a reply, change the linked item price/status on the other device, then verify copying is blocked until fresh drafting/review. Copying must leave the question Open.
 13. Verify clipboard fallback, canceled sign-out/navigation with unsaved edits, session expiration and account switching. Check older migrated records load and require new approval.
 
-Buyer inbox limits: latest 200 questions shown, no realtime updates or inquiry edit/delete UI; demo caps at 200 questions/2,000 drafts. Templates do not interpret questions. Public text requires seller review. The OpenClaw subscription adapter has one supervised real-question acceptance; Hermes, real inbox capture and automatic sending remain unimplemented. The durable outbox is an optional fake-delivery lab, not a live channel. Local database tests do not establish hosted Auth/PostgREST acceptance.
+Buyer inbox limits: latest 200 questions shown, no realtime updates or inquiry delete UI; demo caps at 200 questions/2,000 drafts. Templates do not interpret questions. Public text requires seller review. The OpenClaw subscription adapter has one supervised real-question acceptance; Hermes, real inbox capture and automatic sending remain unimplemented. The durable outbox is an optional fake-delivery lab, not a live channel. Local database tests do not establish hosted Auth/PostgREST acceptance.
 
 ## Restricted worker hosted acceptance (partially complete)
 

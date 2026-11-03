@@ -264,3 +264,94 @@ test("restores manual copy when browser clipboard never answers", async ({
     page.getByText("Question status: Open", { exact: true }),
   ).toBeVisible();
 });
+
+test("edits a saved question deliberately, invalidates approval and preserves canceled edits", async ({
+  page,
+}) => {
+  await question(page);
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await expect(
+    page.getByRole("button", { name: "Edit saved question", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page
+    .getByLabel("Saved question text")
+    .fill("Can you confirm the dimensions?");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page
+    .getByRole("button", { name: "Cancel question edits", exact: true })
+    .click();
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Can you confirm the dimensions?",
+  );
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Reload inbox", exact: true }).click();
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Can you confirm the dimensions?",
+  );
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Question status: Open", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText("Can you confirm the dimensions?", { exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await page
+    .getByRole("button", { name: /Can you confirm the dimensions\?/ })
+    .click();
+  await expect(
+    page.getByText("Can you confirm the dimensions?", { exact: true }),
+  ).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("correcting question source keeps answered status and prevents a public location on Marketplace", async ({
+  page,
+}) => {
+  await question(page);
+  await page
+    .getByRole("button", { name: "Mark answered", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page.getByLabel("Saved question channel").selectOption("groups");
+  await page
+    .getByLabel("Saved question location")
+    .selectOption("group_comment");
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Question status: Answered", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Facebook Groups · Public group comment", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page.getByLabel("Saved question channel").selectOption("marketplace");
+  await expect(page.getByLabel("Saved question location")).toHaveValue("dm");
+  await expect(
+    page.getByLabel("Saved question location").locator("option"),
+  ).toHaveCount(1);
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Question status: Answered", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Facebook Marketplace · Private message", { exact: true }),
+  ).toBeVisible();
+});

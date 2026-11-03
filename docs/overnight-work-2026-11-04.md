@@ -67,3 +67,25 @@ persists but requires normal build/verification and private-audience checks.
 - Final first-increment checks: **52 ordinary + 22 cloud-contract browser checks**,
   production build and worker build all passed. No cloud schema/source deployment
   changed yet; this is a reviewable local/feature-branch increment.
+
+### Second increment — 03:44 Manila
+
+- Inventory loading now has the same whole-operation deadline, including private
+  signed-photo URL loading. Two previously indefinite waits reproduced and pass.
+  A timed-out metadata read cannot start more photo requests afterward. Storage
+  URL calls already in flight may finish, but their result is discarded.
+- Added **Edit saved question** through the existing revision-guarded inbox RPC.
+  Correct message/name/channel/private-vs-public source; linked item, received
+  time and Open/Answered/Closed status stay unchanged. Saving invalidates old
+  reply approval. Drafting/reply controls are hidden during editing.
+- Unsaved question corrections protect reload, question switching, new-question
+  save, navigation and sign-out. Stale failures retain text; late failures cannot
+  enter another account. The first cloud test failure was an overbroad locator
+  matching Next's route announcer; scoping the alert to main fixed the test only.
+- Final combined local checks passed: lint/types, **269 tests** (six optional
+  skips), **56 ordinary + 26 cloud-contract browser checks**, Next production
+  and worker builds. No model calls or real buyer/platform mutations.
+- Initial deadline commit `e79ffd7` is in draft [PR #29](https://github.com/artielopez/Reseller-agent/pull/29).
+  Keep adding reviewable increments to this branch/PR; do not create one PR per
+  documentation update. Current publication is being prepared; live v9 remains
+  authoritative until a new receipt is recorded.
