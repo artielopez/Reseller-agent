@@ -4,6 +4,8 @@ Updated 3 November 2026. [Status and evidence](project-status.md) · [Imported h
 
 ## Current assignment
 
+Janyl’s first app activation is now verified by her supplied mobile dashboard and Supabase Auth at 11:39 UTC+8 on 3 November. Next participant step: save/reload her own labelled test item and photos. Full two-owner HTTP/Storage isolation remains separate.
+
 Current shared-app increment: [inventory save conflicts](inventory-save-conflicts.md), protecting newer saved item/photo/listing data from an older device's editor. Includes safe handling of uncertain photo saves. Local checks and independent review passed; the coordinated database/client release is live in Sites version 8. Hosted SQL and signed-in two-tab stale-save checks passed. This advances two-device acceptance without claiming physical-device or second-user completion.
 
 Current recovery increment: [worker parent-crash handling](worker-parent-crash-recovery.md). Actual synthetic SIGKILL tests exposed surviving subprocesses after caller or supervisor loss. A group known before target startup now lets either surviving process stop it. Review's Important finding was reproduced and fixed; final full tests and installed isolated-runtime checks passed. No unattended activation or provider-cancellation claim follows from local process cleanup.

@@ -1,5 +1,9 @@
 # Reseller Agent status
 
+## Janyl activation verified — 3 November 2026
+
+The owner supplied a mobile screenshot of the signed-in empty inventory. Read-only Supabase Auth confirms Janyl completed email confirmation and signed in at `2026-11-03T03:39:03Z` (11:39 UTC+8). Her owned item count is zero, consistent with the screen. First invitation acceptance is complete; she must still save/reload a labelled test item with photos for her own persistence acceptance. The screenshot and Auth timestamps do not establish full cross-account HTTP/Storage isolation or all physical-device checks. No account was impersonated, privileges changed or application code deployed.
+
 ## Janyl invitation recovery — 3 November 2026
 
 The owner supplied a mobile screenshot showing the first-activation-required message. Read-only Auth evidence confirmed the original invitation remained unaccepted. Renewed the existing authorized app invitation through the Supabase dashboard; the original user ID was preserved and both invitation/send timestamps advanced to `2026-11-03T03:34:26.326698Z` (11:34 UTC+8). Resend visibly reports **Delivered** for the new invitation, message `01a19f78-fc76-79b5-8566-dab2f3586e65`. No duplicate account, manual email confirmation, public signup change or administrator access.
