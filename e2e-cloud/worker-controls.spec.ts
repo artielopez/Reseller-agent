@@ -884,3 +884,97 @@ test("refreshing the same signed-in account does not cancel a pending enrollment
   release();
   await expect(page.getByLabel("One-time worker key")).toHaveValue(token);
 });
+
+for (const mode of ["new", "edited"] as const) {
+  test(`a confirmed ${mode} question stays saved when the following list refresh fails`, async ({
+    page,
+  }) => {
+    await fixture(page);
+    const item = {
+      id: "44444444-4444-4444-8444-444444444444",
+      title: "Synthetic saved lamp",
+      description: "Test only",
+      price: 900,
+      category: "Home & living",
+      condition: "Good",
+      status: "Listed",
+    };
+    await page.route("**/rest/v1/items?*", (route) =>
+      route.fulfill({
+        json: [
+          { ...item, updated_at: timestamp, item_photos: [], listings: [] },
+        ],
+      }),
+    );
+    await page.reload();
+    let saves = 0;
+    await page.route("**/rest/v1/rpc/buyer_workspace", async (route) => {
+      const command = route.request().postDataJSON().command;
+      if (command.op === "list" && saves)
+        return route.fulfill({ status: 503, json: { code: "XX000" } });
+      if (command.op !== "saveInquiry") return route.fallback();
+      saves++;
+      const inquiry = {
+        ...command.input,
+        revision: mode === "new" ? "1" : "2",
+        status: "Open",
+        updated_at: "2026-11-04T01:00:00Z",
+      };
+      return route.fulfill({
+        json: {
+          inquiry,
+          context: {
+            inquiry_id: inquiry.id,
+            inquiry_revision: inquiry.revision,
+            item_revision: "1",
+            channel: inquiry.channel,
+            surface: inquiry.surface,
+            message: inquiry.message,
+            item,
+          },
+          replies: [],
+        },
+      });
+    });
+    if (mode === "edited") {
+      await page
+        .getByRole("button", {
+          name: "Is this available? · Open · Facebook Marketplace",
+          exact: true,
+        })
+        .click();
+      await page
+        .getByRole("button", { name: "Edit saved question", exact: true })
+        .click();
+      await page
+        .getByLabel("Saved question text")
+        .fill("Confirmed saved correction");
+      await page
+        .getByRole("button", { name: "Save question changes", exact: true })
+        .click();
+    } else {
+      await page
+        .getByLabel("Buyer question", { exact: true })
+        .fill("Confirmed saved new question");
+      await page
+        .getByRole("button", { name: "Save question", exact: true })
+        .click();
+    }
+    await expect(
+      page.getByRole("status").filter({ hasText: "Your change was saved" }),
+    ).toContainText("Reload inbox");
+    await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
+    await expect(
+      page.getByRole("button", {
+        name: /Confirmed saved.* · Open · Facebook Marketplace/,
+      }),
+    ).toBeVisible();
+    await expect(
+      page.getByLabel("Buyer question", { exact: true }),
+    ).toHaveValue("");
+    await expect(
+      page.getByRole("button", { name: "Save question", exact: true }),
+    ).toBeEnabled();
+    expect(saves).toBe(1);
+  });
+}

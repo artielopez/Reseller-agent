@@ -370,3 +370,26 @@ persists but requires normal build/verification and private-audience checks.
   types/lint and Worker build. No app behavior, database schema, worker activation,
   model call or external messaging changed. Remaining full-tree findings are the
   20 moderate tooling packages documented above, not a finding-free audit.
+
+### Confirmed inbox save recovery — 05:31 Manila
+
+- Reproduced four desktop/mobile failures: a question save succeeds, but the
+  follow-up list read returns 503. The old UI reported an uncertain operation and
+  left the saved question text in its form, encouraging an unnecessary retry.
+- Retain the acknowledged inquiry in the list and isolate optional refresh errors
+  from mutation errors. A successful save clears its form and attempt ID; an
+  uncertain mutation still uses the existing conservative recovery behavior.
+- Fresh checks passed: lint/types, **288 tests** (six optional skips), **58 ordinary
+  + 48 Next cloud-contract browser checks**, and application/worker builds.
+  Four new regressions failed before implementation and passed after it.
+- First Sites run: 47/48 passed; the initial-session recovery test hit a development
+  `SyntaxError: Unexpected token '}'` before making its synthetic Auth request.
+  Its isolated desktop/mobile rerun passed 2/2 and a fresh full run passed 48/48.
+  No source/config change was used to hide the failure; root cause remains unknown.
+  Logs: `/tmp/reseller-confirmed-inbox-sites-browser.log`,
+  `/tmp/reseller-sites-session-recheck.log`,
+  `/tmp/reseller-confirmed-inbox-sites-recheck.log`.
+- Main logs: `/tmp/reseller-confirmed-inbox-{red,green,tests,cloud,browser,build}.log`.
+  Prior heads `1a273c2` and `f5edb65` have successful CI (41720163731/41720304866).
+  Next: package, check the compiled Worker browser runtime, and release the fix on
+  the same draft PR #29. Signed-in/device acceptance and platform gates stay open.

@@ -323,8 +323,26 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     const next = await mutateThread(command, requestSignal());
     if (!alive.current) return;
     display(next, command.op === "draft" || command.op === "saveInquiry");
-    const q = await listInquiries(requestSignal());
-    if (alive.current) setQuestions(q);
+    // The mutation is confirmed. Preserve its returned row even if the optional
+    // list refresh fails; a failed read must not turn a saved change into a retry.
+    setQuestions((current) =>
+      [next.inquiry, ...current.filter((q) => q.id !== next.inquiry.id)]
+        .sort(
+          (a, b) =>
+            Date.parse(b.updated_at) - Date.parse(a.updated_at) ||
+            a.id.localeCompare(b.id),
+        )
+        .slice(0, 200),
+    );
+    try {
+      const q = await listInquiries(requestSignal());
+      if (alive.current) setQuestions(q);
+    } catch {
+      if (alive.current)
+        setNotice(
+          "Your change was saved, but the question list could not refresh. Use Reload inbox to check other changes; do not submit the saved change again.",
+        );
+    }
   }
   async function reload() {
     if (

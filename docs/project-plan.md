@@ -8,8 +8,10 @@ Independent continuation: server-side listing cancellation and the separate Site
 dependency baseline are implemented, verified and deployed in Sites version 16.
 The patched adapter passes the synthetic cloud contracts directly.
 The remaining [moderate tooling findings](sites-dependency-maintenance.md) have
-explicit compatibility/path limits. Continue concrete application recovery and
-accessibility review; platform and real-device gates stay open.
+explicit compatibility/path limits. Confirmed inbox save recovery is now locally verified: a failed optional list
+refresh cannot mislabel an acknowledged save. Package and verify the compiled
+runtime, then continue concrete recovery/accessibility review. Platform and
+real-device gates stay open.
 
 Active seven-hour independent work window: see the [overnight work queue and evidence](overnight-work-2026-11-04.md). Finish concrete reliability/workflow gaps without waiting for participant or platform responses; preserve the external acceptance boundaries. No merge or owner interruptions during the sleep window. The overnight changes are live in Sites version 16: bounded owner RPC/inventory save/read waits, recoverable sign-in, account-bound request cancellation, bounded listing/photo preparation, recoverable sign-out and guarded saved-question editing. Draft PR #29 remains unmerged.
 
