@@ -269,3 +269,21 @@ persists but requires normal build/verification and private-audience checks.
 - Next: release/CI follow-through, then assess remaining moderate adapter/tooling
   advisories with compatible upgrades and targeted checks. Do not equate a clean
   production-only audit with a clean Worker/runtime dependency graph.
+
+### Fifth overnight cloud release — 04:49 Manila
+
+- Implementation `a0b9adcb7dc2d626dc7b9ea02fcab0ec67ddcece` is pushed on draft
+  PR #29. Its GitHub Application run is `41715693871`; no merge or auto-merge.
+- Sites **version 14** deployed successfully from exact pushed source
+  `6c213521cc79097a257c2635d6794d96a5bd1a4a`, deployment
+  `appgdep_6aea48bd8e0c8191a161ff583894cf4b`. Artie owner/Janyl viewer access
+  and environment revision 1 are unchanged. No schema or credential change.
+- Source publication required one routine expired-credential renewal through the
+  Sites tool. The helper then built, pushed and packaged the exact source; no
+  credential was printed or written to source. Build inputs were checked for the
+  intended public project URL and absence of synthetic test configuration.
+- Verified evidence: 288 main tests/six optional skips, lint/types and app/worker
+  builds; 42 synthetic desktop/mobile checks against the patched Sites adapter,
+  its type check and supported Worker build. Production dependency audit is clean;
+  26 full-tree moderate/low findings remain as documented. Actual-device/sign-in
+  acceptance and permitted channel access remain unresolved.
