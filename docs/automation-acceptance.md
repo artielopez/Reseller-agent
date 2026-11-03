@@ -60,5 +60,5 @@ These pilots have not started. No automatic sending release is approved. Beeper 
 
 - **Owner/participants:** Janyl activation, actual iPhone/Windows checks and native feature eligibility where only mobile UI exposes it. A request for Janyl's sign-in/test item is pending.
 - **Owner credential step:** securely configure a scoped multi-org token through the documented process; never paste it into chat. Preserve the working single-org connector.
-- **External evidence:** Beeper's permission/coverage answer; the prepared Carousell inquiry awaits permission to send, and Group access remains separate. The unrelated OpenAI support report remains an unsent draft by owner choice.
+- **External evidence:** Beeper's permission/coverage answer; the owner declined the Carousell inquiry and current terms leave its custom connector unavailable; Group access remains separate. The unrelated OpenAI support report remains an unsent draft by owner choice.
 - **Engineering:** maintain the tested manual workflow; finish applicable hosted race/runtime acceptance, implement adapters only after their access checkpoint, and preserve reviewable changes. No merge or unattended activation while those gates are unresolved.

@@ -10,7 +10,7 @@ Current recovery increment: [worker parent-crash handling](worker-parent-crash-r
 
 Latest reliability fix: [non-retryable business conflicts](non-retryable-conflicts.md), deployed in Sites version 7 with the matching database migration. Hosted control races uncovered PostgREST looping on custom `40001`; the tested incremental database fix uses `PT409`, and client adapters preserve actionable reload guidance. Guards/permissions remain unchanged. PR #25 is open for review. This advances real recovery acceptance without enabling channel intake/sending.
 
-Current channel checkpoint: [Carousell inquiry](carousell-access-support-draft.md) prepared with a verified support destination; owner sending instruction is pending. Beeper has been contacted separately. No platform integration is inferred from native-reply documentation.
+Current channel checkpoint: the owner declined sending the [Carousell inquiry](carousell-access-support-draft.md). The requested current terms check confirms explicit restrictions on automated access and messaging; custom Carousell integration stays unavailable under this evidence. Native/manual assistance is separate. Beeper has been contacted separately.
 
 Current Task 6 artifacts: [acceptance register](automation-acceptance.md) and [operating guide](automation-operations.md). The register tracks the full original scope and explicitly separates implemented manual assistance, tested synthetic boundaries and unresolved live automation gates. No whole-task completion or automatic release is inferred from these documents.
 

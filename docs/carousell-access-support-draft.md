@@ -1,6 +1,6 @@
-# Carousell PH access inquiry — unsent draft
+# Carousell PH access inquiry — retained unsent; owner declined sending
 
-Prepared 3 November 2026. Sending requires the owner's explicit instruction; Beeper inquiry approval does not authorize this separate message. No buyer messages, credentials, account identifiers, attachments or subscription commitment are included.
+Prepared 3 November 2026. The owner subsequently said not to send and requested a terms check first. The inquiry remains unsent; do not send after completing research without a new explicit instruction. Beeper inquiry approval does not authorize this separate message. No buyer messages, credentials, account identifiers, attachments or subscription commitment are included.
 
 ## Verified destination and evidence
 
@@ -32,3 +32,9 @@ Thank you.
 ## Decision rule
 
 A response about native auto-replies alone does not approve a custom connector. Record permitted read/write operations and actual coverage independently. Any plan purchase/account conversion needs a separate owner decision. Missing coverage remains explicitly manual; no scraping, private endpoints or automated browser messaging as a substitute.
+
+## Owner decision and terms check — 3 November 2026
+
+The owner declined sending the inquiry. Current [Terms of Service, section 2](https://support.carousell.com/hc/en-us/articles/115011881808-Terms-of-Service) prohibit automated means of accessing, acquiring, copying or monitoring the service/content and prohibit automated, unsolicited or unauthorized messaging. No personal-account exception for a third-party sales assistant was found in those clauses. Computer-use automation would still be automated access; owning the account does not establish an exception. The separate native CarouBiz reply guide documents the platform's own reply functionality, not third-party API authorization.
+
+Engineering decision: no custom Carousell reader/sender under the current evidence; no email/chat support submission. Preserve the manual assisted workflow and evaluate native tools only under their published eligibility/terms and a separate cost/activation decision. This does not establish that asking support a question is itself prohibited; it establishes that the proposed custom automation lacks a supported access basis. Revisit only with a documented applicable approved integration or changed owner instruction, never a scraping/browser workaround.
