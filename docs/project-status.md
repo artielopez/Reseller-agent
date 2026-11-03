@@ -2,6 +2,8 @@
 
 ## Inventory save conflicts — 3 November 2026
 
+Reviewable delivery: [PR #27](https://github.com/artielopez/Reseller-agent/pull/27), implementation `da14cd4`, hosted release evidence `f08e8bc`. GitHub connector creation returned 403; the existing authorized CLI login created the PR successfully. No merge or auto-merge.
+
 Two-device acceptance exposed an unguarded inventory overwrite: an older editor could replace newer item details, photos and copy. [The revision guard](inventory-save-conflicts.md) now rejects those stale writes and preserves unsaved editor text. The demo uses one atomic IndexedDB transaction; the cloud client uses an invoker RPC returning the exact saved revision. Unknown save responses also retain uploads, because a missing metadata row does not rule out a delayed commit. Regression failures were reproduced before the fixes. Local lint/types, 247 tests (six optional skips), all 52 desktop/mobile browser checks and the production build passed. Independent review found no blocking issues. The migration is applied and matching Sites version **8** is live; hosted rollback-only SQL and signed-in two-tab conflict acceptance passed. The synthetic test item retained its saved price and existing photo rows. Artie/Janyl access is unchanged; no GitHub merge. Latest read-only follow-up still shows Janyl unactivated with no app items, and the approved Beeper inquiry has no reply.
 
 ## Active subprocess crash recovery — 3 November 2026
