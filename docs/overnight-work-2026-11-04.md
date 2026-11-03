@@ -131,3 +131,22 @@ persists but requires normal build/verification and private-audience checks.
 - Next independent audit: remaining account-bound asynchronous mutations and
   listing-generation waits; inspect before adding tests or changing behavior.
   Do not equate a cancelled request with a rolled-back server transaction.
+
+### Second overnight cloud release — 04:01 Manila
+
+- Implementation `d4263a9cceaf282cdedf0f6889f2eac3ddf3699d` is pushed to the
+  same draft PR #29. No merge or auto-merge. Its GitHub Application checks were
+  still running at publication; check run `41708307887` on continuation.
+- Sites **version 11** successfully deployed from exact source
+  `b57512b4a2339ef7f59fa7ada50c67ef80f35630`, deployment
+  `appgdep_6aea3d55958081919775495982d2f822`. Same private Artie/Janyl audience.
+- Verified local total: **275 tests**, six optional skips, **92 browser checks**
+  (56 ordinary + 36 cloud-contract), lint/types and production/worker builds.
+  Separately, five installed-runtime synthetic checks passed. No schema change.
+- The signed-in deployed UI remains unverified because local browser use is
+  disabled. No browser-permission bypass or owner interruption.
+- Continuation: audit sign-out/listing generation and other owner-bound pending
+  mutations, especially seller-preference/enrollment Auth-lock account changes.
+  Require evidence of a defect before changing code. Keep all increments on
+  `codex/overnight-reliability` and PR #29. Check Beeper no earlier than 04:34
+  Manila (last check 03:34); no support email or model call.

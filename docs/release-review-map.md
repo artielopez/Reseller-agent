@@ -26,3 +26,10 @@ The open GitHub requests #8–#29 all target `main` and preserve successive deve
 - Channel integration remains gated by permitted access. The Carousell inquiry stays unsent; the Beeper inquiry is awaiting its response. Group comments require separate coverage.
 
 Released increment: [PR #28](https://github.com/artielopez/Reseller-agent/pull/28), implementation `ee843e4`; Sites version 9, source `2b7919c121c53d7cf08bc9bc825d94a687d60157`. The privacy migration and rollback-only hosted checks passed. Signed-in post-release UI check awaits local browser access. No merge/auto-merge.
+
+Current release: draft [PR #29](https://github.com/artielopez/Reseller-agent/pull/29),
+implementation `d4263a9`; Sites version **11**, exact source
+`b57512b4a2339ef7f59fa7ada50c67ef80f35630`. Local checks: 275 tests (six optional
+skips), 92 browser checks, lint/types and builds; five separate installed-runtime
+synthetic checks. No new migration, model call or worker activation. Signed-in
+post-release UI acceptance still requires local browser access.
