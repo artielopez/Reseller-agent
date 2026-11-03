@@ -19,6 +19,8 @@ Implementation below describes the reviewable repository; [current release statu
 - [x] Manual saved buyer inbox, private/public destination labels, editable templates/manual drafts, explicit approval and revalidated clipboard copy.
 - [x] Additive migration and demo storage upgrade; stale-context invalidation, guarded unsaved edits and separate Answered status.
 - [x] Draft-only owned queue, expiring worker enrollment, shared attempt cap and cloud controls.
+- [x] Per-question draft request/status, guarded result reload and advisory worker contact/recovery guidance.
+- [x] Read-only, owner-scoped history and possibly unused-photo preview; no deletion or active retention policy.
 - [x] Restricted foreground Mac/OpenClaw worker, one-use model endpoint, check/once/watch commands and synthetic end-to-end acceptance. One supervised subscription-backed real-question trial completed through owner approval and owner-reported manual reply; the question is Answered. Subscription mode is once-only; watch applies only to the separate API configuration.
 - [x] Clearly labeled credential-free demo with persistent browser data and template generation.
 - [x] Environment examples, setup/deployment instructions and GitHub Actions checks.
@@ -34,7 +36,7 @@ Implementation below describes the reviewable repository; [current release statu
 - Item facts and listing copy are separate. Regenerate or edit channel copy after changing price, condition or description. All three variants must be reviewed.
 - Up to ten photos per item. HEIC is unsupported; export as JPEG first. There is no drag-to-reorder; the first photo is the cover. Removing the cover promotes the next photo.
 - Demo data stays on one browser and can be removed by browser storage cleanup. There is no demo-to-cloud import, export/backup UI or item-delete UI yet.
-- Inventory saves use last-write-wins; buyer saves/approvals use revision checks. Avoid editing the same item on two devices at the same time. Database saves are atomic, but Storage operations are separate; interrupted uploads/cleanup can leave unused objects. Periodically compare bucket paths against `item_photos.path` before manually removing any orphan files.
+- Inventory saves and buyer saves/approvals use revision checks; stale editors are rejected and retain unsaved text. Database saves are atomic, but Storage operations are separate; uncertain saves retain uploads. The privacy preview identifies older unlinked objects as candidates only, not safe deletions. No automated cleanup is enabled.
 - Saved photo URLs expire after 24 hours. Refresh the page to request new signed URLs.
 - One record per channel per item. Facebook Groups stores one combined channel record, not a separate record for every group.
 - Statuses and URLs are manual records, not externally verified. Marking an item sold or a channel removed does not change the actual marketplace listing.
@@ -46,7 +48,7 @@ Implementation below describes the reviewable repository; [current release statu
 
 Complete after setting up Supabase and optional OpenAI credentials:
 
-1. Confirm the seven required application migrations (initial, buyer inbox, draft queue, seller preferences, ten-item photos, non-retryable conflicts and inventory save revision) completed and the `item-photos` bucket is **private**. Match the inventory revision migration with its client release; see the deployment evidence before changing the existing owner project.
+1. Confirm the eight required application migrations (initial, buyer inbox, draft queue, seller preferences, ten-item photos, non-retryable conflicts, inventory save revision and workspace privacy preview) completed and the `item-photos` bucket is **private**. Match the inventory revision migration with its client release; see the deployment evidence before changing the existing owner project.
 2. Disable public signups, create/invite your account, and verify email-link sign-in and sign-out on desktop and iPhone.
 3. Add an item with two photos, reload, and sign in on the other device; confirm fields and photos sync.
 4. Use a second test account to verify the first account's inventory and images are inaccessible.
@@ -79,3 +81,5 @@ Hosted synthetic and one supervised real-question trial are recorded in [current
 Existing PGlite, fake HTTP/provider and Chromium tests do not satisfy this checklist. Actual platform account intake/send integration remains a separate permission and feasibility decision.
 
 The optional `202610300003_delivery_simulation.sql` migration supports a [durable fake-delivery engineering lab](durable-delivery-simulation.md). Local synthetic tests are separate from any live sending claim; it is not connected to the app UI or Mac draft worker.
+
+The latest signed-in UI acceptance for the version 9 health/drafting/privacy panels awaits re-enabling local browser use in Codex Work settings. Hosted SQL and automated browser contracts passed; those are distinct evidence.
