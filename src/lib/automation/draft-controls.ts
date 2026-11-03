@@ -60,7 +60,10 @@ const defaultRpc: Rpc = async (command, signal) =>
   getSupabase().rpc("draft_queue", { command }).abortSignal(signal);
 const uncertain =
   "Could not confirm the operation. Reload worker settings before trying again. For a missing enrollment key, revoke the unexpected worker before creating another. Check your connection and the draft queue migration.";
-export function createQueueClient(rpc: Rpc = defaultRpc) {
+export function createQueueClient(
+  rpc: Rpc = defaultRpc,
+  parent?: () => AbortSignal,
+) {
   async function execute<T>(
     input: z.input<typeof commandSchema>,
     schema: z.ZodType<T>,
@@ -75,6 +78,7 @@ export function createQueueClient(rpc: Rpc = defaultRpc) {
       response = await withRequestDeadline(
         (signal) => rpc(parsed.data, signal),
         uncertain,
+        parent?.(),
       );
     } catch {
       throw new Error(uncertain);

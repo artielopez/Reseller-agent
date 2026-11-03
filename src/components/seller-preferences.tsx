@@ -1,4 +1,5 @@
 "use client";
+import { useRequestLifetime } from "@/lib/use-request-lifetime";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { errorMessage } from "@/lib/domain";
 import {
@@ -19,6 +20,7 @@ export function SellerPreferencesPanel({
   onPreferences: (p: Preferences) => void;
   reportDirty: (dirty: boolean) => void;
 }) {
+  const requestSignal = useRequestLifetime();
   const [saved, setSaved] = useState<Preferences | null>(null),
     [values, setValues] = useState<PreferencesInput | null>(null),
     [view, setView] = useState<SellerWorkspace | null>(null);
@@ -63,7 +65,7 @@ export function SellerPreferencesPanel({
       const request = ++generation.current,
         editsAtStart = editVersion.current;
       try {
-        const next = await sellerWorkspace({ op: "get" });
+        const next = await sellerWorkspace({ op: "get" }, requestSignal());
         if (!alive.current || request !== generation.current) return;
         setView(next);
         onPreferences(next.preferences);
@@ -80,7 +82,7 @@ export function SellerPreferencesPanel({
           setError(errorMessage(e));
       }
     },
-    [onPreferences],
+    [onPreferences, requestSignal],
   );
   useEffect(() => {
     void Promise.resolve().then(() => load());
@@ -98,7 +100,7 @@ export function SellerPreferencesPanel({
     setError("");
     setNotice("");
     try {
-      const next = await sellerWorkspace(command);
+      const next = await sellerWorkspace(command, requestSignal());
       if (!alive.current) return;
       setSaved(next.preferences);
       setValues(preferenceValues(next.preferences));

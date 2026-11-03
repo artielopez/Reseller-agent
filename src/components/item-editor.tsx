@@ -33,7 +33,8 @@ import {
   type Listing,
 } from "@/lib/domain";
 import { demoMode } from "@/lib/config";
-import { getSupabase } from "@/lib/supabase";
+import { requestListingCopy } from "@/lib/listing-generation";
+import { useRequestLifetime } from "@/lib/use-request-lifetime";
 import { preparePhoto } from "@/lib/photos";
 
 export function ItemEditor({
@@ -45,6 +46,7 @@ export function ItemEditor({
   onSave: (item: Item) => Promise<void>;
   onClose: () => void;
 }) {
+  const requestSignal = useRequestLifetime();
   const [item, setItem] = useState<Item>(initial);
   const [price, setPrice] = useState(String(initial.price));
   const [channel, setChannel] = useState<Channel>("carousell");
@@ -130,25 +132,7 @@ export function ItemEditor({
       if (demoMode) {
         result = { source: "template", copy: generateTemplate(facts) };
       } else {
-        const token = (await getSupabase().auth.getSession()).data.session
-          ?.access_token;
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify(itemInputSchema.parse(facts)),
-        });
-        result = await response.json();
-        if (!response.ok) {
-          const failure = z.object({ error: z.string() }).safeParse(result);
-          throw new Error(
-            failure.success
-              ? failure.data.error
-              : "Generation failed. Please try again.",
-          );
-        }
+        result = await requestListingCopy(facts, requestSignal());
       }
       const { copy, source } = z
         .object({

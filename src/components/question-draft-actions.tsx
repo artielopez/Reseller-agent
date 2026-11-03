@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRequestLifetime } from "@/lib/use-request-lifetime";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Inquiry } from "@/lib/buyer/domain";
 import {
   createQueueClient,
@@ -8,7 +9,6 @@ import {
 import { jobRecovery, questionJob } from "@/lib/automation/worker-health";
 import { WorkerHealthSummary } from "./worker-health-summary";
 
-const client = createQueueClient();
 export function QuestionDraftActions({
   inquiry,
   disabled,
@@ -18,6 +18,11 @@ export function QuestionDraftActions({
   disabled: boolean;
   onLoadReplies: () => Promise<void>;
 }) {
+  const requestSignal = useRequestLifetime();
+  const client = useMemo(
+    () => createQueueClient(undefined, requestSignal),
+    [requestSignal],
+  );
   const [state, setState] = useState<QueueState | null>(null);
   const [busy, setBusy] = useState(true),
     [error, setError] = useState(""),
@@ -50,7 +55,7 @@ export function QuestionDraftActions({
       current = false;
       alive.current = false;
     };
-  }, []);
+  }, [client]);
   const job = state && questionJob(state.jobs, inquiry.id);
   const inProgress = job?.status === "queued" || job?.status === "leased";
   const eligible = inquiry.status === "Open" && inquiry.surface === "dm";

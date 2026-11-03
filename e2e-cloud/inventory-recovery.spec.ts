@@ -196,3 +196,38 @@ test("a lost sign-in-email response releases the form without automatically rese
   expect(requests).toBe(1);
   release();
 });
+
+test("stalled listing generation preserves item facts and can recover without another model request", async ({
+  page,
+}) => {
+  await inventory(page);
+  let requests = 0,
+    release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/api/generate", async (route) => {
+    requests++;
+    await held;
+    await route
+      .fulfill({ status: 500, json: { error: "Synthetic failure" } })
+      .catch(() => {});
+  });
+  await page.clock.install();
+  await page
+    .getByRole("button", { name: "Generate listing copy", exact: true })
+    .click();
+  await expect.poll(() => requests).toBe(1);
+  await page.clock.fastForward(45_001);
+  await expect(
+    page.getByRole("button", { name: "Save item", exact: true }),
+  ).toBeEnabled();
+  await expect(page.getByLabel("Item title", { exact: true })).toHaveValue(
+    "Private previous account lamp",
+  );
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Generation did not finish",
+  );
+  expect(requests).toBe(1);
+  release();
+});

@@ -150,3 +150,31 @@ persists but requires normal build/verification and private-audience checks.
   Require evidence of a defect before changing code. Keep all increments on
   `codex/overnight-reliability` and PR #29. Check Beeper no earlier than 04:34
   Manila (last check 03:34); no support email or model call.
+
+### Account-bound requests and listing recovery — 04:12 Manila
+
+- Prior PR head `6b69597` passed GitHub Application checks (run `41708723450`).
+- Three new failing cancellation regressions exposed pending seller, queue and
+  buyer operations without an account-lifetime signal. Account-keyed components
+  now cancel synchronously on an Auth owner change, as well as on unmount.
+  Same-owner token refresh continues safely. This bounds local admission and
+  discards old responses; an already dispatched server write is not rolled back.
+- Added a shared lifecycle hook and optional parent signals; no schema change or
+  credential storage. Queue commands, seller writes and buyer mutations use it.
+  The hook observes only the user ID and never reads credentials.
+- Listing generation now bounds Auth/API/response decoding to 45 seconds, keeps
+  item facts on failure, and never automatically repeats a request. A delayed
+  session lookup cannot send facts after owner cancellation. Missing sessions
+  stop before the generation endpoint. No actual model call was made.
+- Account cancellation exposed a React Strict Mode initial-read race: an aborted
+  earlier setup could leave a false inbox error after replay. A per-effect latch
+  now ignores that earlier result; both account-switch browser cases pass.
+- Strengthened four browser isolation cases to require actual request abort,
+  while retaining their private-state assertions. One attempted test run overlapped
+  the preceding runner and was rejected because port 3018 was occupied; it was
+  rerun only after that runner exited. No owner service was stopped.
+- Final checks passed: lint/types, **281 tests** (six optional skips), **96 browser
+  checks** (56 ordinary + 40 cloud-contract), production and worker builds.
+- Next independent work: inspect sign-out failure/recovery and file-preparation
+  waits; avoid claiming all app operations are cancellable. Physical devices,
+  live provider allowance and channel access remain separate gates.

@@ -12,6 +12,7 @@ import {
 } from "./workspace";
 export async function sellerWorkspace(
   input: SellerCommand,
+  parent?: AbortSignal,
 ): Promise<SellerWorkspace> {
   const command = sellerCommandSchema.parse(input);
   if (!demoMode) {
@@ -21,6 +22,7 @@ export async function sellerWorkspace(
       (signal) =>
         getSupabase().rpc("seller_workspace", { command }).abortSignal(signal),
       uncertain,
+      parent,
     ).catch(() => {
       throw new Error(uncertain);
     });

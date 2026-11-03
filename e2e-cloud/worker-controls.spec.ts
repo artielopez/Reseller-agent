@@ -480,6 +480,9 @@ test("late enrollment cannot reveal a previous account's key", async ({
   await page.getByLabel("Worker name").fill("Slow enrollment");
   await page.getByRole("button", { name: "Create worker key" }).click();
   await requested;
+  const canceled = page.waitForEvent("requestfailed", (request) =>
+    request.url().includes("/rpc/draft_queue"),
+  );
   await page.evaluate((saved) => {
     localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
     const channel = new BroadcastChannel("sb-reseller-test-auth-token");
@@ -489,9 +492,8 @@ test("late enrollment cannot reveal a previous account's key", async ({
   await expect(
     page.getByRole("button", { name: "Worker settings", exact: true }),
   ).toBeVisible();
-  const response = page.waitForResponse("**/rest/v1/rpc/draft_queue");
+  await canceled;
   release();
-  await response;
   await page
     .getByRole("button", { name: "Worker settings", exact: true })
     .click();
@@ -542,6 +544,9 @@ test("preference edits protect sign-out and late saves cannot enter the next acc
     .getByRole("button", { name: "Save preferences", exact: true })
     .click();
   await requested;
+  const canceled = page.waitForEvent("requestfailed", (request) =>
+    request.url().includes("/rpc/seller_workspace"),
+  );
   await page.evaluate((saved) => {
     localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
     const channel = new BroadcastChannel("sb-reseller-test-auth-token");
@@ -551,9 +556,8 @@ test("preference edits protect sign-out and late saves cannot enter the next acc
   await expect(page.getByLabel("General pickup area")).not.toBeVisible();
   await page.getByText("Seller terms and reminder", { exact: true }).click();
   await expect(page.getByLabel("General pickup area")).toHaveValue("");
-  const response = page.waitForResponse("**/rest/v1/rpc/seller_workspace");
+  await canceled;
   release();
-  await response;
   await expect(page.getByLabel("General pickup area")).toHaveValue("");
   await expect(page.getByText(/Preferences saved/)).toHaveCount(0);
 });
@@ -623,6 +627,9 @@ test("late draft status cannot enter the next signed-in workspace", async ({
     })
     .click();
   await requested;
+  const canceled = page.waitForEvent("requestfailed", (request) =>
+    request.url().includes("/rpc/draft_queue"),
+  );
   await page.evaluate((saved) => {
     localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
     const channel = new BroadcastChannel("sb-reseller-test-auth-token");
@@ -632,9 +639,8 @@ test("late draft status cannot enter the next signed-in workspace", async ({
   await expect(
     page.getByRole("region", { name: "AI draft for this question" }),
   ).toHaveCount(0);
-  const response = page.waitForResponse("**/rest/v1/rpc/draft_queue");
+  await canceled;
   release();
-  await response;
   await expect(
     page.getByRole("region", { name: "AI draft for this question" }),
   ).toHaveCount(0);
@@ -828,6 +834,9 @@ test("late question-save failure cannot affect the next account", async ({
     .getByRole("button", { name: "Save question changes", exact: true })
     .click();
   await requested;
+  const canceled = page.waitForEvent("requestfailed", (request) =>
+    request.url().includes("/rpc/buyer_workspace"),
+  );
   await page.evaluate((saved) => {
     localStorage.setItem("sb-reseller-test-auth-token", JSON.stringify(saved));
     const channel = new BroadcastChannel("sb-reseller-test-auth-token");
@@ -835,11 +844,43 @@ test("late question-save failure cannot affect the next account", async ({
     channel.close();
   }, session("66666666-6666-4666-8666-666666666666"));
   await expect(page.getByLabel("Saved question text")).toHaveCount(0);
-  const response = page.waitForResponse("**/rest/v1/rpc/buyer_workspace");
+  await canceled;
   release();
-  await response;
   await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
   await expect(page.getByText("Private former account correction")).toHaveCount(
     0,
   );
+});
+
+test("refreshing the same signed-in account does not cancel a pending enrollment", async ({
+  page,
+}) => {
+  await fixture(page);
+  let release!: () => void,
+    requested = false;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route("**/rest/v1/rpc/draft_queue", async (route) => {
+    if (route.request().postDataJSON().command.op !== "enroll")
+      return route.fallback();
+    requested = true;
+    await held;
+    await route.fulfill({
+      json: { id: worker, token, expires_at: "2099-01-01T00:00:00Z" },
+    });
+  });
+  await page
+    .getByRole("button", { name: "Worker settings", exact: true })
+    .click();
+  await page.getByLabel("Worker name").fill("Refresh-safe test worker");
+  await page.getByRole("button", { name: "Create worker key" }).click();
+  await expect.poll(() => requested).toBe(true);
+  await page.evaluate((saved) => {
+    const channel = new BroadcastChannel("sb-reseller-test-auth-token");
+    channel.postMessage({ event: "TOKEN_REFRESHED", session: saved });
+    channel.close();
+  }, session());
+  release();
+  await expect(page.getByLabel("One-time worker key")).toHaveValue(token);
 });

@@ -1,4 +1,5 @@
 "use client";
+import { RequestOwner, useRequestLifetime } from "@/lib/use-request-lifetime";
 import { withRequestDeadline } from "@/lib/request-deadline";
 import {
   useCallback,
@@ -164,13 +165,16 @@ export function BuyerInbox() {
             >
               Sign out
             </button>
-            <InboxWorkspace key={auth.user.id} reportUnsaved={reportUnsaved} />
+            <RequestOwner.Provider key={auth.user.id} value={auth.user.id}>
+              <InboxWorkspace reportUnsaved={reportUnsaved} />
+            </RequestOwner.Provider>
           </>
         ))}
     </main>
   );
 }
 function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
+  const requestSignal = useRequestLifetime();
   const [items, setItems] = useState<Item[]>([]),
     [questions, setQuestions] = useState<Inquiry[]>([]),
     [thread, setThread] = useState<Thread | null>(null);
@@ -199,22 +203,24 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     } | null>(null),
     draftIds = useRef(new Map<string, string>());
   useEffect(() => {
+    let current = true;
     alive.current = true;
-    Promise.all([listItems(), listInquiries()])
+    Promise.all([listItems(), listInquiries(requestSignal())])
       .then(([i, q]) => {
-        if (!alive.current) return;
+        if (!current) return;
         setItems(i);
         setItemId(i[0]?.id || "");
         setQuestions(q);
         setReady(true);
       })
       .catch((e) => {
-        if (alive.current) setError(errorMessage(e));
+        if (current) setError(errorMessage(e));
       });
     return () => {
+      current = false;
       alive.current = false;
     };
-  }, []);
+  }, [requestSignal]);
   const reportPreferencesDirty = useCallback(
     (dirty: boolean) => reportUnsaved("preferences", dirty),
     [reportUnsaved],
@@ -292,10 +298,10 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
       )
     )
       return;
-    const next = await mutateThread(command);
+    const next = await mutateThread(command, requestSignal());
     if (!alive.current) return;
     display(next, command.op === "draft" || command.op === "saveInquiry");
-    const q = await listInquiries();
+    const q = await listInquiries(requestSignal());
     if (alive.current) setQuestions(q);
   }
   async function reload() {
@@ -305,7 +311,10 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     )
       return;
     await run(async () => {
-      const [i, q] = await Promise.all([listItems(), listInquiries()]);
+      const [i, q] = await Promise.all([
+        listItems(),
+        listInquiries(requestSignal()),
+      ]);
       if (!alive.current) return;
       setItems(i);
       setQuestions(q);
@@ -326,7 +335,7 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     )
       return;
     await run(async () => {
-      const latest = await readThread(thread.inquiry.id);
+      const latest = await readThread(thread.inquiry.id, requestSignal());
       if (!alive.current) return;
       display(latest, true);
       setReplyReload((value) => value + 1);
@@ -554,7 +563,10 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
                         )
                           return;
                         void run(async () =>
-                          display(await readThread(q.id), true),
+                          display(
+                            await readThread(q.id, requestSignal()),
+                            true,
+                          ),
                         );
                       }}
                     >

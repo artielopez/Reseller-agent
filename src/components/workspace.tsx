@@ -26,6 +26,7 @@ import {
   type Item,
 } from "@/lib/domain";
 import { listItems, saveItem } from "@/lib/repository";
+import { RequestOwner } from "@/lib/use-request-lifetime";
 import { withRequestDeadline } from "@/lib/request-deadline";
 import { getSupabase } from "@/lib/supabase";
 import { AuthPanel } from "./auth-panel";
@@ -298,12 +299,16 @@ export function Workspace() {
                 </div>
               )}
               {editing ? (
-                <ItemEditor
+                <RequestOwner.Provider
                   key={editing.id}
-                  initial={editing}
-                  onSave={save}
-                  onClose={() => setEditing(null)}
-                />
+                  value={user?.id ?? null}
+                >
+                  <ItemEditor
+                    initial={editing}
+                    onSave={save}
+                    onClose={() => setEditing(null)}
+                  />
+                </RequestOwner.Provider>
               ) : (
                 <>
                   <div className="page-heading">

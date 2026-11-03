@@ -99,16 +99,17 @@ async function execute(input: Command, signal?: AbortSignal): Promise<unknown> {
     db.close();
   }
 }
-export async function listInquiries() {
-  return z.array(inquirySchema).parse(await execute({ op: "list" }));
+export async function listInquiries(signal?: AbortSignal) {
+  return z.array(inquirySchema).parse(await execute({ op: "list" }, signal));
 }
-export async function readThread(id: string) {
-  return threadSchema.parse(await execute({ op: "get", id }));
+export async function readThread(id: string, signal?: AbortSignal) {
+  return threadSchema.parse(await execute({ op: "get", id }, signal));
 }
 export async function mutateThread(
   command: Exclude<Command, { op: "list" } | { op: "get" } | { op: "copy" }>,
+  signal?: AbortSignal,
 ) {
-  return threadSchema.parse(await execute(command));
+  return threadSchema.parse(await execute(command, signal));
 }
 export async function approvedText(id: string, expected_revision: string) {
   const controller = new AbortController();

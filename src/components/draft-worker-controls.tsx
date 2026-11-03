@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useRequestLifetime } from "@/lib/use-request-lifetime";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   createQueueClient,
   type QueueState,
@@ -8,7 +9,6 @@ import {
 import type { Inquiry } from "@/lib/buyer/domain";
 import { WorkerHealthSummary } from "./worker-health-summary";
 import { jobRecovery } from "@/lib/automation/worker-health";
-const client = createQueueClient();
 export function DraftWorkerControls({ questions }: { questions: Inquiry[] }) {
   const [open, setOpen] = useState(false);
   return (
@@ -26,6 +26,11 @@ export function DraftWorkerControls({ questions }: { questions: Inquiry[] }) {
   );
 }
 function Controls({ questions }: { questions: Inquiry[] }) {
+  const requestSignal = useRequestLifetime();
+  const client = useMemo(
+    () => createQueueClient(undefined, requestSignal),
+    [requestSignal],
+  );
   const [state, setState] = useState<QueueState | null>(null),
     [enrollment, setEnrollment] = useState<Enrollment | null>(null),
     [name, setName] = useState(""),
@@ -63,7 +68,7 @@ function Controls({ questions }: { questions: Inquiry[] }) {
       current = false;
       active.current = false;
     };
-  }, []);
+  }, [client]);
   async function run(
     action?: () => Promise<unknown>,
     success = "Settings refreshed.",
