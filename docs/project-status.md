@@ -6,7 +6,7 @@ The owner explicitly requested “Merge and deploy everything.” Cumulative [PR
 
 [Reseller Agent](https://reseller-agent-cloud.pandabur.chatgpt.site) is deployed as **Sites version 19**, exact source `963295ceef8e75a8ff0177b7deb727bfdd2c33db`, deployment `appgdep_6af8a529d0308191be00bca72a8ebc34` (**succeeded**). It was prepared from the merged GitHub source, rebuilt with the supported Sites helper, and passed types/build plus **52 compiled production desktop/mobile checks**. Output was checked for intended public project configuration and absence of synthetic test settings. Artie/Janyl audience and environment revision 1 are unchanged. No database changes or new model calls were needed.
 
-The merged tree is identical to the previously passing PR head `b52af0a` (CI `41730402429`: 292 tests, six optional skips, lint/types/builds and Next browser checks). Fresh merge CI `43625370624` was still running at publication; its result should not be inferred from the earlier run. [Release receipt](releases/2026-11-15-merged-cloud.md).
+The merged tree is identical to the previously passing PR head `b52af0a` (CI `41730402429`: 292 tests, six optional skips, lint/types/builds and Next browser checks). Fresh merge CI `43625370624` subsequently passed at 18:17:03 UTC, including the full check/build and both Next browser suites. [Release receipt](releases/2026-11-15-merged-cloud.md).
 
 This integrates all completed implementation. Actual-device/cloud access acceptance, fresh supervised subscription checks, supported automatic messaging and multi-organization Supabase verification remain in the acceptance register. Worker activation and automatic reading/sending are not part of this merge/deploy action. The overnight heartbeat remains paused.
 

@@ -20,7 +20,8 @@ no-merge restriction for the completed cumulative work and this release record.
 
 The exact feature head passed GitHub checks (run `41730402429`: 292 tests with
 six optional skips, lint/types, builds and Next browser suites). Merge CI run
-`43625370624` was running when the cloud publication completed.
+`43625370624` passed at 2026-11-14 18:17:03 UTC after publication, including
+application checks/builds and both Next browser suites.
 
 Prepared from merged main with the existing source-copy script and supported
 Sites 1.1.6 workflow. Dependency inputs and application source were unchanged
