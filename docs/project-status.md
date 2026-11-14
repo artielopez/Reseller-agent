@@ -1,5 +1,15 @@
 # Reseller Agent status
 
+## Merged and deployed — 15 November 2026
+
+The owner explicitly requested “Merge and deploy everything.” Cumulative [PR #29](https://github.com/artielopez/Reseller-agent/pull/29) is merged into `main` as `a2e0d73db216a9f6d7db2383ed8b11f1c2391718`. GitHub also records every included PR #8–#28 as merged; all 21 prior heads were verified as ancestors before integration. No development work was discarded and no direct push to `main` was used.
+
+[Reseller Agent](https://reseller-agent-cloud.pandabur.chatgpt.site) is deployed as **Sites version 19**, exact source `963295ceef8e75a8ff0177b7deb727bfdd2c33db`, deployment `appgdep_6af8a529d0308191be00bca72a8ebc34` (**succeeded**). It was prepared from the merged GitHub source, rebuilt with the supported Sites helper, and passed types/build plus **52 compiled production desktop/mobile checks**. Output was checked for intended public project configuration and absence of synthetic test settings. Artie/Janyl audience and environment revision 1 are unchanged. No database changes or new model calls were needed.
+
+The merged tree is identical to the previously passing PR head `b52af0a` (CI `41730402429`: 292 tests, six optional skips, lint/types/builds and Next browser checks). Fresh merge CI `43625370624` was still running at publication; its result should not be inferred from the earlier run. [Release receipt](releases/2026-11-15-merged-cloud.md).
+
+This integrates all completed implementation. Actual-device/cloud access acceptance, fresh supervised subscription checks, supported automatic messaging and multi-organization Supabase verification remain in the acceptance register. Worker activation and automatic reading/sending are not part of this merge/deploy action. The overnight heartbeat remains paused.
+
 ## Current handoff — 4 November 2026, 06:23 Manila
 
 Independent overnight work is complete within the permitted scope; the broader automation goal remains unfinished. [Completed work, exact verification and remaining gates](overnight-work-2026-11-04.md#final-independent-work-handoff--0623-manila). Sites **version 18** is live with Artie/Janyl access unchanged. Draft [PR #29](https://github.com/artielopez/Reseller-agent/pull/29) remains unmerged; all 21 earlier open PR heads are preserved. Implementation/test head `a39705f` passed CI run `41728415783` (**292 tests**, six optional skips, lint/types/builds and Next browser suites). Separate compiled-Worker checks pass **52/52**. No automatic intake/sending, model usage or worker activation was added.
