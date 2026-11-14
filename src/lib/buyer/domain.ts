@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sellerTermsSchema } from "../seller/preferences";
 import { channels, itemInputSchema, formatPHP, type Item } from "../domain";
 const uuid = z.uuid(),
   revision = z.string().regex(/^[1-9][0-9]*$/);
@@ -27,6 +28,7 @@ export const inquirySchema = inquiryInputSchema
   })
   .strip();
 export const contextSchema = z.object({
+  seller_terms: sellerTermsSchema.optional(),
   inquiry_id: uuid,
   inquiry_revision: revision,
   item_revision: revision,
@@ -43,7 +45,8 @@ export const replySchema = z.object({
   id: uuid,
   inquiry_id: uuid,
   body: z.string(),
-  source: z.enum(["manual", "template"]),
+  source: z.enum(["manual", "template", "agent"]),
+  review_note: z.string().max(500).nullable().optional(),
   status: z.enum(["Draft", "Approved", "Dismissed"]),
   revision,
   context: contextSchema.nullable(),
@@ -151,6 +154,19 @@ export function templateReply(c: ReplyContext) {
     stock +
     "\n" +
     c.item.description +
+    (c.seller_terms
+      ? [
+          c.seller_terms.pickup_area &&
+            "Pickup area: " + c.seller_terms.pickup_area,
+          c.seller_terms.delivery_notes &&
+            "Delivery: " + c.seller_terms.delivery_notes,
+          c.seller_terms.payment_notes &&
+            "Payment: " + c.seller_terms.payment_notes,
+        ]
+          .filter(Boolean)
+          .map((t) => "\n" + t)
+          .join("")
+      : "") +
     "\nThanks for your question. Let me confirm any other details."
   );
 }

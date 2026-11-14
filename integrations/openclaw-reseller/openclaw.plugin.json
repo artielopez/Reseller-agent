@@ -1,0 +1,24 @@
+{
+  "id": "reseller-draft",
+  "name": "Reseller draft completion",
+  "description": "OAuth-only text completion for saved buyer questions; no tools, channels or automatic sending.",
+  "cliCommands": [
+    {
+      "name": "reseller-draft",
+      "description": "Restricted buyer-draft completion",
+      "hasSubcommands": true
+    }
+  ],
+  "activation": { "onStartup": false, "onCommands": ["reseller-draft"] },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "liveEnabled": { "type": "boolean", "default": false },
+      "profileId": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9][A-Za-z0-9._:@-]{0,199}$"
+      }
+    }
+  }
+}

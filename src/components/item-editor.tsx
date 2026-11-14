@@ -1,5 +1,8 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { writeClipboard } from "@/lib/clipboard";
+import { listingPriceReview } from "@/lib/listing-price-review";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import { z } from "zod";
 import {
   ArrowLeft,
   Check,
@@ -18,6 +21,7 @@ import {
   channels,
   conditions,
   errorMessage,
+  formatPHP,
   generateTemplate,
   generatedCopySchema,
   itemInputSchema,
@@ -29,7 +33,8 @@ import {
   type Listing,
 } from "@/lib/domain";
 import { demoMode } from "@/lib/config";
-import { getSupabase } from "@/lib/supabase";
+import { requestListingCopy } from "@/lib/listing-generation";
+import { useRequestLifetime } from "@/lib/use-request-lifetime";
 import { preparePhoto } from "@/lib/photos";
 
 export function ItemEditor({
@@ -41,6 +46,11 @@ export function ItemEditor({
   onSave: (item: Item) => Promise<void>;
   onClose: () => void;
 }) {
+  const requestSignal = useRequestLifetime();
+  const heading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    heading.current?.focus();
+  }, []);
   const [item, setItem] = useState<Item>(initial);
   const [price, setPrice] = useState(String(initial.price));
   const [channel, setChannel] = useState<Channel>("carousell");
@@ -50,6 +60,7 @@ export function ItemEditor({
   const [copied, setCopied] = useState("");
   const [dirty, setDirty] = useState(false);
   const listing = item.listings.find((entry) => entry.channel === channel)!;
+  const priceReview = listingPriceReview(listing, price);
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
       if (dirty) event.preventDefault();
@@ -100,7 +111,8 @@ export function ItemEditor({
         throw new Error(`You can add up to ${MAX_PHOTOS} photos per item.`);
       const prepared = [];
       for (const file of Array.from(files))
-        prepared.push(await preparePhoto(file));
+        prepared.push(await preparePhoto(file, requestSignal()));
+      requestSignal().throwIfAborted();
       update({ photos: [...item.photos, ...prepared] });
     } catch (error) {
       setError(errorMessage(error));
@@ -121,27 +133,18 @@ export function ItemEditor({
     setBusy("generate");
     try {
       const facts = currentItem();
-      let result;
+      let result: unknown;
       if (demoMode) {
         result = { source: "template", copy: generateTemplate(facts) };
       } else {
-        const token = (await getSupabase().auth.getSession()).data.session
-          ?.access_token;
-        const response = await fetch("/api/generate", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          },
-          body: JSON.stringify(itemInputSchema.parse(facts)),
-        });
-        result = await response.json();
-        if (!response.ok)
-          throw new Error(
-            result.error || "Generation failed. Please try again.",
-          );
+        result = await requestListingCopy(facts, requestSignal());
       }
-      const copy = generatedCopySchema.parse(result.copy);
+      const { copy, source } = z
+        .object({
+          source: z.enum(["ai", "template"]),
+          copy: generatedCopySchema,
+        })
+        .parse(result);
       update({
         listings: item.listings.map((entry) => ({
           ...entry,
@@ -149,7 +152,7 @@ export function ItemEditor({
         })),
       });
       setNotice(
-        result.source === "ai"
+        source === "ai"
           ? "AI drafts are ready. Check all details before posting, then save your changes."
           : "Template drafts are ready — no AI was used. Review the copy and save your changes.",
       );
@@ -165,7 +168,7 @@ export function ItemEditor({
         kind === "post"
           ? `${listing.title}\n\n${listing.description}`
           : listing[kind];
-      await navigator.clipboard.writeText(text);
+      await writeClipboard(text);
       setCopied(kind);
       setNotice(
         "Copied. Paste into your listing, then save its URL here after posting.",
@@ -202,7 +205,7 @@ export function ItemEditor({
       <div className="page-heading">
         <div>
           <span className="eyebrow">MAKE ROOM FOR SOMETHING NEW</span>
-          <h1>
+          <h1 ref={heading} tabIndex={-1}>
             {initial.title
               ? "Your item, ready to go."
               : "Give it a second life."}
@@ -271,8 +274,8 @@ export function ItemEditor({
               )}
             </div>
             <p className="field-hint">
-              Up to 6 photos · JPEG, PNG or WebP · 10 MB each. Photos are
-              resized before saving. Export iPhone HEIC photos as JPEG.
+              Up to {MAX_PHOTOS} photos · JPEG, PNG or WebP · 10 MB each. Photos
+              are resized before saving. Export iPhone HEIC photos as JPEG.
             </p>
             <div className="space-y-5 mt-6">
               <label className="field">
@@ -474,6 +477,27 @@ export function ItemEditor({
                 placeholder="Your editable listing copy will appear here."
               />
             </label>
+            <div
+              role="status"
+              aria-label="Listing price review"
+              className={
+                priceReview.hasDifferentAmount ? "error" : "posting-note"
+              }
+            >
+              <strong>
+                {priceReview.price === null
+                  ? "Enter a valid asking price before posting."
+                  : `Current asking price: ${formatPHP(priceReview.price)}`}
+              </strong>
+              <p>
+                {priceReview.hasDifferentAmount
+                  ? "Check the amounts in this copy: at least one peso amount differs from your asking price. It may be an old price, shipping fee or discount. Edit the copy if needed. "
+                  : ""}
+                Listing copy does not update automatically when item details
+                change. Review all details before copying or updating a
+                published post.
+              </p>
+            </div>
             <div className="copy-actions">
               {(["title", "description", "post"] as const).map((kind) => (
                 <button

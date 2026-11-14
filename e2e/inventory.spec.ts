@@ -1,4 +1,74 @@
 import { test, expect } from "@playwright/test";
+test("a stale second editor preserves its edits and cannot overwrite a newer inventory save", async ({
+  page,
+  context,
+}) => {
+  await page.goto("/");
+  const other = await context.newPage();
+  await other.goto("/");
+  for (const tab of [page, other])
+    await tab
+      .getByRole("button", { name: "Edit Sony WH-1000XM4 headphones" })
+      .click();
+  await page.getByLabel("Price (PHP)").fill("6600");
+  await page.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Your inventory" }),
+  ).toBeVisible();
+  await other.getByLabel("Price (PHP)").fill("100");
+  await other.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    other.getByRole("alert").filter({ hasText: /changed.*reload/i }),
+  ).toBeVisible();
+  await expect(other.getByLabel("Price (PHP)")).toHaveValue("100");
+  await page.reload();
+  await page
+    .getByRole("button", { name: "Edit Sony WH-1000XM4 headphones" })
+    .click();
+  await expect(page.getByLabel("Price (PHP)")).toHaveValue("6600");
+});
+test("ten photos survive saving and reload; oversized selections preserve existing photos", async ({
+  page,
+}) => {
+  const files = Array.from({ length: 11 }, (_, index) => ({
+    name: `photo-${index}.png`,
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  }));
+  await page.goto("/");
+  await page.getByRole("button", { name: "Add item", exact: true }).click();
+  await page.getByLabel("Item title").fill("Ten-photo test item");
+  await page.getByLabel("Price (PHP)").fill("850");
+  await page.getByLabel("Upload photos").setInputFiles(files);
+  await expect(
+    page.getByRole("alert").filter({ hasText: "up to 10 photos" }),
+  ).toBeVisible();
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(0);
+  await page.getByLabel("Upload photos").setInputFiles(files.slice(0, 9));
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(9);
+  await page.getByLabel("Upload photos").setInputFiles(files.slice(9));
+  await expect(
+    page.getByRole("alert").filter({ hasText: "up to 10 photos" }),
+  ).toBeVisible();
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(9);
+  await page.getByLabel("Upload photos").setInputFiles(files.slice(9, 10));
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(10);
+  await expect(page.getByLabel("Upload photos")).toHaveCount(0);
+  await page.getByRole("button", { name: "Save item", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Your inventory" }),
+  ).toBeVisible();
+  await page.reload();
+  await page.getByRole("button", { name: "Edit Ten-photo test item" }).click();
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(10);
+  await page
+    .getByRole("button", { name: "Remove photo 10", exact: true })
+    .click();
+  await expect(page.getByLabel("Upload photos")).toBeVisible();
+});
 test("demo generation works without a backend or paid API", async ({
   page,
 }) => {
@@ -188,4 +258,49 @@ test("inventory navigation preserves edits until discard is confirmed", async ({
   await expect(
     page.getByRole("button", { name: "Edit Oak bedside table" }),
   ).toBeVisible();
+});
+
+test("stalled photo preparation preserves the item and existing photos, then permits a deliberate retry", async ({
+  page,
+}) => {
+  const photo = {
+    name: "sample.png",
+    mimeType: "image/png",
+    buffer: Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII=",
+      "base64",
+    ),
+  };
+  await page.goto("/");
+  await page.getByRole("button", { name: "Add item", exact: true }).click();
+  await page.getByLabel("Item title").fill("Photo recovery test");
+  await page.getByLabel("Upload photos").setInputFiles(photo);
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(1);
+  await page.evaluate(() => {
+    const original = HTMLImageElement.prototype.decode;
+    let first = true;
+    HTMLImageElement.prototype.decode = function () {
+      if (first) {
+        first = false;
+        return new Promise(() => {});
+      }
+      return original.call(this);
+    };
+  });
+  await page.clock.install();
+  await page.getByLabel("Upload photos").setInputFiles(photo);
+  await expect(page.getByText("Preparing…", { exact: true })).toBeVisible();
+  await page.clock.fastForward(30_001);
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Photo preparation did not finish",
+  );
+  await expect(page.getByLabel("Item title")).toHaveValue(
+    "Photo recovery test",
+  );
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(1);
+  await expect(
+    page.getByRole("button", { name: "Save item", exact: true }),
+  ).toBeEnabled();
+  await page.getByLabel("Upload photos").setInputFiles(photo);
+  await expect(page.getByRole("img", { name: /^Item photo/ })).toHaveCount(2);
 });

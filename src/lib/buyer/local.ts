@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sellerTermsSchema, type SellerTerms } from "../seller/preferences";
 import type { Item } from "../domain";
 import {
   contextMatches,
@@ -28,6 +29,7 @@ export function localCommand(
   items: Item[],
   command: Command,
   now = new Date().toISOString(),
+  sellerTerms?: SellerTerms,
 ): { state: LocalState; result: unknown } {
   const state = stateSchema.parse(
     raw === undefined ? initialBuyerState() : raw,
@@ -41,6 +43,9 @@ export function localCommand(
     const i = items.find((i) => i.id === q.item_id);
     if (!i) throw new Error("Item unavailable. Reload inventory.");
     return {
+      ...(sellerTerms
+        ? { seller_terms: sellerTermsSchema.parse(sellerTerms) }
+        : {}),
       inquiry_id: q.id,
       inquiry_revision: q.revision,
       item_revision: i.replyContextRevision || "1",

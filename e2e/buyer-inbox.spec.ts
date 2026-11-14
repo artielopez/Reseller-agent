@@ -190,3 +190,168 @@ test("preserves written drafts during other saves and protects unsaved saved-rep
     "Keep my unsaved edit.",
   );
 });
+test("labels persisted agent drafts and keeps copying gated on explicit review", async ({
+  page,
+}) => {
+  await question(page);
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await expect(page.getByLabel("Reply text")).toBeVisible();
+  // Synthetic saved result: no model or cloud connection is used by this fixture.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve, reject) => {
+        const open = indexedDB.open("reseller-agent-demo", 2);
+        open.onerror = () => reject(open.error);
+        open.onsuccess = () => {
+          const db = open.result,
+            tx = db.transaction("buyer", "readwrite"),
+            store = tx.objectStore("buyer");
+          const request = store.get("state");
+          request.onsuccess = () => {
+            const state = request.result as {
+              replies: Array<{ source: string; review_note?: string }>;
+            };
+            state.replies[0].source = "agent";
+            state.replies[0].review_note =
+              "Synthetic test: check the saved price.";
+            store.put(state, "state");
+          };
+          tx.oncomplete = () => {
+            db.close();
+            resolve();
+          };
+          tx.onerror = () => {
+            db.close();
+            reject(tx.error);
+          };
+        };
+      }),
+  );
+  await page.reload();
+  await page.getByRole("button", { name: /How much/ }).click();
+  await expect(page.getByText(/Agent draft — review required/)).toBeVisible();
+  await expect(
+    page.getByText("Review note: Synthetic test: check the saved price."),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeDisabled();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeEnabled();
+});
+
+test("restores manual copy when browser clipboard never answers", async ({
+  page,
+}) => {
+  await page.addInitScript(() =>
+    Object.defineProperty(navigator, "clipboard", {
+      value: { writeText: () => new Promise<void>(() => {}) },
+    }),
+  );
+  await question(page);
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await page.getByRole("button", { name: "Copy approved reply" }).click();
+  await expect(page.getByLabel("Approved text to copy manually")).toHaveValue(
+    /6,500.00/,
+  );
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply" }),
+  ).toBeEnabled();
+  await expect(
+    page.getByText("Question status: Open", { exact: true }),
+  ).toBeVisible();
+});
+
+test("edits a saved question deliberately, invalidates approval and preserves canceled edits", async ({
+  page,
+}) => {
+  await question(page);
+  await page.getByRole("button", { name: "Prepare template draft" }).click();
+  await page.getByRole("button", { name: "Approve saved reply" }).click();
+  await expect(
+    page.getByRole("button", { name: "Edit saved question", exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page
+    .getByLabel("Saved question text")
+    .fill("Can you confirm the dimensions?");
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page
+    .getByRole("button", { name: "Cancel question edits", exact: true })
+    .click();
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Can you confirm the dimensions?",
+  );
+  page.once("dialog", (dialog) => dialog.dismiss());
+  await page.getByRole("button", { name: "Reload inbox", exact: true }).click();
+  await expect(page.getByLabel("Saved question text")).toHaveValue(
+    "Can you confirm the dimensions?",
+  );
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Question status: Open", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "Copy approved reply", exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByText("Can you confirm the dimensions?", { exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await page
+    .getByRole("button", { name: /Can you confirm the dimensions\?/ })
+    .click();
+  await expect(
+    page.getByText("Can you confirm the dimensions?", { exact: true }),
+  ).toBeVisible();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
+});
+
+test("correcting question source keeps answered status and prevents a public location on Marketplace", async ({
+  page,
+}) => {
+  await question(page);
+  await page
+    .getByRole("button", { name: "Mark answered", exact: true })
+    .click();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page.getByLabel("Saved question channel").selectOption("groups");
+  await page
+    .getByLabel("Saved question location")
+    .selectOption("group_comment");
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Question status: Answered", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Facebook Groups · Public group comment", { exact: true }),
+  ).toBeVisible();
+  await page
+    .getByRole("button", { name: "Edit saved question", exact: true })
+    .click();
+  await page.getByLabel("Saved question channel").selectOption("marketplace");
+  await expect(page.getByLabel("Saved question location")).toHaveValue("dm");
+  await expect(
+    page.getByLabel("Saved question location").locator("option"),
+  ).toHaveCount(1);
+  await page
+    .getByRole("button", { name: "Save question changes", exact: true })
+    .click();
+  await expect(
+    page.getByText("Question status: Answered", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Facebook Marketplace · Private message", { exact: true }),
+  ).toBeVisible();
+});

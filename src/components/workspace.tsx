@@ -26,6 +26,9 @@ import {
   type Item,
 } from "@/lib/domain";
 import { listItems, saveItem } from "@/lib/repository";
+import { signOutCloud, signOutWithDraftProtection } from "@/lib/buyer/session";
+import { RequestOwner } from "@/lib/use-request-lifetime";
+import { withRequestDeadline } from "@/lib/request-deadline";
 import { getSupabase } from "@/lib/supabase";
 import { AuthPanel } from "./auth-panel";
 import { ItemEditor } from "./item-editor";
@@ -33,36 +36,46 @@ import { ItemEditor } from "./item-editor";
 export function Workspace() {
   const [user, setUser] = useState<User | null>(null);
   const accountId = useRef<string | null>(null);
+  const accountGeneration = useRef(0);
+  const logoutPending = useRef(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const pendingSaves = useRef(new Set<AbortController>());
   const [authReady, setAuthReady] = useState(demoMode);
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [editing, setEditing] = useState<Item | null>(null);
+  const dashboardHeading = useRef<HTMLHeadingElement>(null);
+  const wasEditing = useRef(false);
+  useEffect(() => {
+    // A full editor replaces its opener. Restore a stable dashboard landmark
+    // after save/cancel, without stealing focus on ordinary inventory updates.
+    if (wasEditing.current && !editing) dashboardHeading.current?.focus();
+    wasEditing.current = !!editing;
+  }, [editing]);
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState("All items");
   const [reload, setReload] = useState(0);
 
   useEffect(() => {
     if (demoMode || configurationError) return;
+    let active = true,
+      events = 0;
+    const invalidatePendingSaves = () => {
+      accountGeneration.current++;
+      for (const pending of pendingSaves.current) pending.abort();
+      pendingSaves.current.clear();
+    };
     const supabase = getSupabase();
-    supabase.auth
-      .getSession()
-      .then(({ data, error }) => {
-        if (error)
-          setError("Could not restore your session. Please sign in again.");
-        setUser(data.session?.user ?? null);
-        setAuthReady(true);
-      })
-      .catch(() => {
-        setError("Could not check your session. Please refresh.");
-        setAuthReady(true);
-      });
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      events++;
+      if (!active) return;
       const nextId = session?.user.id ?? null;
       if (accountId.current !== nextId) {
+        invalidatePendingSaves();
         accountId.current = nextId;
         setItems([]);
         setEditing(null);
@@ -73,7 +86,28 @@ export function Workspace() {
       setUser(session?.user ?? null);
       setAuthReady(true);
     });
-    return () => subscription.unsubscribe();
+    withRequestDeadline(
+      () => supabase.auth.getSession(),
+      "Could not check your session. Please refresh.",
+    )
+      .then(({ data, error }) => {
+        if (!active || events) return;
+        if (error)
+          setError("Could not restore your session. Please sign in again.");
+        accountId.current = data.session?.user.id ?? null;
+        setUser(data.session?.user ?? null);
+        setAuthReady(true);
+      })
+      .catch(() => {
+        if (!active || events) return;
+        setError("Could not check your session. Please refresh.");
+        setAuthReady(true);
+      });
+    return () => {
+      active = false;
+      invalidatePendingSaves();
+      subscription.unsubscribe();
+    };
   }, []);
   useEffect(() => {
     if (!demoMode && !user) return;
@@ -97,10 +131,22 @@ export function Workspace() {
     };
   }, [user, reload]);
   async function save(item: Item) {
-    const result = await saveItem(
-      item,
-      items.find((entry) => entry.id === item.id),
-    );
+    const generation = accountGeneration.current;
+    const controller = new AbortController();
+    pendingSaves.current.add(controller);
+    let result: Item;
+    try {
+      result = await saveItem(
+        item,
+        items.find((entry) => entry.id === item.id),
+        controller.signal,
+      );
+    } finally {
+      pendingSaves.current.delete(controller);
+    }
+    // The old owner may have saved successfully, but its result must never be
+    // rendered in a new account (including a switch away and back).
+    if (generation !== accountGeneration.current) return;
     setItems((current) => [
       result,
       ...current.filter((entry) => entry.id !== result.id),
@@ -122,19 +168,25 @@ export function Workspace() {
     window.scrollTo({ top: 0 });
   }
   async function signOut() {
-    if (editing && !window.confirm("Sign out and discard any unsaved changes?"))
-      return;
-    const { error } = await getSupabase().auth.signOut();
-    if (error) {
-      setError("Could not sign out. Please try again.");
-      return;
+    if (logoutPending.current) return;
+    const generation = accountGeneration.current;
+    logoutPending.current = true;
+    setSigningOut(true);
+    try {
+      await signOutWithDraftProtection(
+        !!editing,
+        () => window.confirm("Sign out and discard any unsaved changes?"),
+        signOutCloud,
+      );
+      // Auth events own session clearing. An old completion must not clear a
+      // newer account; a canceled discard prompt must not clear this one either.
+    } catch (failure) {
+      if (generation === accountGeneration.current)
+        setError(errorMessage(failure));
+    } finally {
+      logoutPending.current = false;
+      setSigningOut(false);
     }
-    setUser(null);
-    setItems([]);
-    setEditing(null);
-    setLoading(true);
-    setError("");
-    setMessage("");
   }
   const active = items.filter((item) => item.status !== "Sold");
   const ready = items.filter((item) => item.status === "Ready");
@@ -221,6 +273,8 @@ export function Workspace() {
                 className="icon-button"
                 title="Sign out"
                 aria-label="Sign out"
+                aria-busy={signingOut}
+                disabled={signingOut}
                 onClick={signOut}
               >
                 <LogOut size={18} />
@@ -239,7 +293,14 @@ export function Workspace() {
               Checking your session…
             </div>
           ) : !demoMode && !user ? (
-            <AuthPanel />
+            <>
+              {error && (
+                <p className="error" role="alert">
+                  {error}
+                </p>
+              )}
+              <AuthPanel />
+            </>
           ) : (
             <>
               {demoMode && (
@@ -257,12 +318,21 @@ export function Workspace() {
                 </div>
               )}
               {editing ? (
-                <ItemEditor
+                <RequestOwner.Provider
                   key={editing.id}
-                  initial={editing}
-                  onSave={save}
-                  onClose={() => setEditing(null)}
-                />
+                  value={user?.id ?? null}
+                >
+                  {error && (
+                    <p className="error" role="alert">
+                      {error}
+                    </p>
+                  )}
+                  <ItemEditor
+                    initial={editing}
+                    onSave={save}
+                    onClose={() => setEditing(null)}
+                  />
+                </RequestOwner.Provider>
               ) : (
                 <>
                   <div className="page-heading">
@@ -270,7 +340,7 @@ export function Workspace() {
                       <span className="eyebrow">
                         A FRESH START FOR YOUR PRELOVED THINGS
                       </span>
-                      <h1>
+                      <h1 ref={dashboardHeading} tabIndex={-1}>
                         A little space.
                         <br className="mobile-break" /> A lot of possibility.
                       </h1>

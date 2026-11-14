@@ -1,12 +1,13 @@
 import { PGlite } from "@electric-sql/pglite";
 import { readFileSync, readdirSync } from "node:fs";
-import { beforeAll, afterAll, expect, it } from "vitest";
+import { beforeAll, beforeEach, afterAll, expect, it } from "vitest";
 const db = new PGlite();
 const alice = "11111111-1111-4111-8111-111111111111";
 const bob = "22222222-2222-4222-8222-222222222222";
 const itemId = "33333333-3333-4333-8333-333333333333";
 const payload = {
   id: itemId,
+  saveRevision: null as string | null,
   title: "Lamp",
   description: "Scratch on base.",
   price: 500,
@@ -50,6 +51,16 @@ beforeAll(async () => {
 }, 30000);
 afterAll(async () => {
   await db.close();
+});
+beforeEach(async () => {
+  await asUser(alice);
+  const row = (
+    await db.query<{ save_revision: string }>(
+      "select save_revision from public.items where id=$1",
+      [itemId],
+    )
+  ).rows[0];
+  payload.saveRevision = row?.save_revision ?? null;
 });
 it("atomically saves an item with three channels and isolates another owner", async () => {
   await asUser(alice);
@@ -135,6 +146,48 @@ it("enforces private storage folders for reads and writes", async () => {
   expect((await db.query("select * from storage.objects")).rows).toHaveLength(
     0,
   );
+});
+it("saves ten ordered photos and rejects an eleventh without changing the item", async () => {
+  await asUser(alice);
+  const photos = Array.from({ length: 11 }, () => {
+    const id = crypto.randomUUID();
+    return { id, path: `${alice}/${itemId}/${id}.jpg` };
+  });
+  await db.query("select public.save_inventory_item($1::jsonb)", [
+    JSON.stringify({ ...payload, photos: photos.slice(0, 10) }),
+  ]);
+  const saved = await db.query(
+    "select id, path, position from public.item_photos order by position",
+  );
+  expect(saved.rows).toEqual(
+    photos.slice(0, 10).map((photo, position) => ({ ...photo, position })),
+  );
+  await expect(
+    db.query("select public.save_inventory_item($1::jsonb)", [
+      JSON.stringify({ ...payload, title: "Must not save", photos }),
+    ]),
+  ).rejects.toThrow("Invalid photos");
+  expect(
+    (
+      await db.query(
+        "select id, path, position from public.item_photos order by position",
+      )
+    ).rows,
+  ).toEqual(saved.rows);
+  expect(
+    (await db.query<{ title: string }>("select title from public.items"))
+      .rows[0].title,
+  ).toBe("Lamp");
+  await expect(
+    db.query(
+      "insert into public.item_photos (id, item_id, owner_id, path, position) values ($1, $2, $3, $4, 10)",
+      [photos[10].id, itemId, alice, photos[10].path],
+    ),
+  ).rejects.toThrow();
+  await asUser(bob);
+  expect(
+    (await db.query("select * from public.item_photos")).rows,
+  ).toHaveLength(0);
 });
 it("limits AI requests durably and prevents users resetting their usage", async () => {
   await asUser(alice);

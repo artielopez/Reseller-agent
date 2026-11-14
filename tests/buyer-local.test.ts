@@ -68,3 +68,64 @@ it("refuses corrupt local data rather than replacing saved conversations", () =>
     }),
   ).toThrow();
 });
+it("invalidates local approval when saved terms change while retaining the original draft text and context", () => {
+  const inventory = demoItems();
+  let state = initialBuyerState();
+  let terms: import("../src/lib/seller/preferences").SellerTerms | undefined =
+    undefined;
+  const run = (command: Command) => {
+    const out = localCommand(
+      state,
+      inventory,
+      parseCommand(command),
+      "2026-10-31T01:00:00Z",
+      terms,
+    );
+    state = out.state;
+    return out.result as Thread;
+  };
+  let t = run({
+    op: "saveInquiry",
+    expected_revision: null,
+    input: {
+      id: qid,
+      item_id: inventory[0].id,
+      channel: "marketplace",
+      surface: "dm",
+      buyer_name: "",
+      message: "Pickup?",
+      received_at: "2026-10-31T00:00:00Z",
+    },
+  });
+  t = run({
+    op: "draft",
+    id: rid,
+    inquiry_id: qid,
+    body: "Original private draft",
+    source: "manual",
+    context: t.context,
+  });
+  t = run({
+    op: "approve",
+    id: rid,
+    expected_revision: t.replies[0].revision,
+    context: t.context,
+  });
+  const approved = t.replies[0];
+  terms = {
+    revision: "1",
+    pickup_area: "Quezon City",
+    delivery_notes: "",
+    payment_notes: "",
+  };
+  expect(() =>
+    run({ op: "copy", id: rid, expected_revision: approved.revision }),
+  ).toThrow();
+  t = run({ op: "get", id: qid });
+  expect(t.context.seller_terms).toEqual(terms);
+  expect(t.replies[0]).toMatchObject({
+    status: "Draft",
+    body: "Original private draft",
+    context: approved.context,
+  });
+});

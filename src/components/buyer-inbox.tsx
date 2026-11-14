@@ -1,6 +1,21 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { RequestOwner, useRequestLifetime } from "@/lib/use-request-lifetime";
+import { withRequestDeadline } from "@/lib/request-deadline";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import type { User } from "@supabase/supabase-js";
+import { writeClipboard } from "@/lib/clipboard";
+import { SellerPreferencesPanel } from "./seller-preferences";
+import { termsContext, type Preferences } from "@/lib/seller/preferences";
+import { DraftWorkerControls } from "./draft-worker-controls";
+import { InquiryEditor } from "./inquiry-editor";
+import { PrivacyPreviewPanel } from "./privacy-preview";
+import { QuestionDraftActions } from "./question-draft-actions";
 import { AuthPanel } from "./auth-panel";
 import { demoMode, configurationError } from "@/lib/config";
 import { getSupabase } from "@/lib/supabase";
@@ -26,11 +41,23 @@ import {
   type ReplyContext,
   type Thread,
 } from "@/lib/buyer/domain";
-import { signOutWithDraftProtection } from "@/lib/buyer/session";
-type ReportUnsaved = (part: "form" | "reply", dirty: boolean) => void;
+import { signOutCloud, signOutWithDraftProtection } from "@/lib/buyer/session";
+type ReportUnsaved = (
+  part: "form" | "reply" | "preferences" | "question",
+  dirty: boolean,
+) => void;
 type Mutation = Parameters<typeof mutateThread>[0];
 export function BuyerInbox() {
-  const unsaved = useRef({ form: false, reply: false });
+  const authIdentity = useRef<string | null>(null),
+    authGeneration = useRef(0),
+    logoutPending = useRef(false);
+  const [signingOut, setSigningOut] = useState(false);
+  const unsaved = useRef({
+    form: false,
+    reply: false,
+    preferences: false,
+    question: false,
+  });
   const reportUnsaved = useCallback<ReportUnsaved>((part, dirty) => {
     unsaved.current[part] = dirty;
   }, []);
@@ -43,22 +70,37 @@ export function BuyerInbox() {
     if (demoMode || configurationError) return;
     let active = true,
       events = 0;
+    const observeOwner = (id: string | null) => {
+      if (authIdentity.current !== id) {
+        authIdentity.current = id;
+        authGeneration.current++;
+      }
+    };
     const client = getSupabase();
     const {
       data: { subscription },
     } = client.auth.onAuthStateChange((_event, session) => {
       events++;
-      if (active) setAuth({ ready: true, user: session?.user ?? null });
+      if (active) {
+        observeOwner(session?.user.id ?? null);
+        setError("");
+        setAuth({ ready: true, user: session?.user ?? null });
+      }
     });
-    client.auth
-      .getSession()
+    withRequestDeadline(
+      () => client.auth.getSession(),
+      "Could not check sign-in. Reload and try again.",
+    )
       .then(({ data, error }) => {
         if (!active || events) return;
+        observeOwner(data.session?.user.id ?? null);
         if (error) setError("Could not restore sign-in. Reload and try again.");
         setAuth({ ready: true, user: data.session?.user ?? null });
       })
       .catch(() => {
-        if (active) setError("Could not check sign-in. Reload and try again.");
+        if (!active || events) return;
+        setError("Could not check sign-in. Reload and try again.");
+        setAuth({ ready: true, user: null });
       });
     return () => {
       active = false;
@@ -95,7 +137,8 @@ export function BuyerInbox() {
             </>
           )}{" "}
           Nothing is read from Facebook or Carousell, and nothing is sent
-          automatically. Templates use saved facts; no AI service is called.
+          automatically. Templates use saved facts; worker drafts require
+          separate setup and review.
         </span>
       </div>
       {(configurationError || error) && (
@@ -114,30 +157,46 @@ export function BuyerInbox() {
           <>
             <button
               className="button secondary"
+              disabled={signingOut}
+              aria-busy={signingOut}
               onClick={async () => {
+                if (logoutPending.current) return;
+                const generation = authGeneration.current;
+                logoutPending.current = true;
+                setSigningOut(true);
                 try {
                   await signOutWithDraftProtection(
-                    unsaved.current.form || unsaved.current.reply,
+                    unsaved.current.form ||
+                      unsaved.current.reply ||
+                      unsaved.current.preferences ||
+                      unsaved.current.question,
                     () =>
                       window.confirm(
-                        "Sign out and discard unsaved question or reply text?",
+                        "Sign out and discard unsaved question, reply or preference edits?",
                       ),
-                    () => getSupabase().auth.signOut(),
+                    signOutCloud,
                   );
-                } catch {
-                  setError("Could not sign out. Try again.");
+                } catch (failure) {
+                  if (generation === authGeneration.current)
+                    setError(errorMessage(failure));
+                } finally {
+                  logoutPending.current = false;
+                  setSigningOut(false);
                 }
               }}
             >
-              Sign out
+              {signingOut ? "Signing out…" : "Sign out"}
             </button>
-            <InboxWorkspace key={auth.user.id} reportUnsaved={reportUnsaved} />
+            <RequestOwner.Provider key={auth.user.id} value={auth.user.id}>
+              <InboxWorkspace reportUnsaved={reportUnsaved} />
+            </RequestOwner.Provider>
           </>
         ))}
     </main>
   );
 }
 function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
+  const requestSignal = useRequestLifetime();
   const [items, setItems] = useState<Item[]>([]),
     [questions, setQuestions] = useState<Inquiry[]>([]),
     [thread, setThread] = useState<Thread | null>(null);
@@ -150,7 +209,16 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
       body: string;
       context: ReplyContext;
     } | null>(null),
-    [replyId, setReplyId] = useState("");
+    [replyId, setReplyId] = useState(""),
+    [replyReload, setReplyReload] = useState(0),
+    [editingQuestion, setEditingQuestion] = useState(false);
+  const reviewHeading = useRef<HTMLHeadingElement>(null);
+  const wasEditingQuestion = useRef(false);
+  useEffect(() => {
+    if (wasEditingQuestion.current && !editingQuestion)
+      reviewHeading.current?.focus();
+    wasEditingQuestion.current = editingQuestion;
+  }, [editingQuestion]);
   const [busy, setBusy] = useState(false),
     [ready, setReady] = useState(false),
     [error, setError] = useState(""),
@@ -164,22 +232,46 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
     } | null>(null),
     draftIds = useRef(new Map<string, string>());
   useEffect(() => {
+    let current = true;
     alive.current = true;
-    Promise.all([listItems(), listInquiries()])
+    Promise.all([listItems(), listInquiries(requestSignal())])
       .then(([i, q]) => {
-        if (!alive.current) return;
+        if (!current) return;
         setItems(i);
         setItemId(i[0]?.id || "");
         setQuestions(q);
         setReady(true);
       })
       .catch((e) => {
-        if (alive.current) setError(errorMessage(e));
+        if (current) setError(errorMessage(e));
       });
     return () => {
+      current = false;
       alive.current = false;
     };
+  }, [requestSignal]);
+  const reportPreferencesDirty = useCallback(
+    (dirty: boolean) => reportUnsaved("preferences", dirty),
+    [reportUnsaved],
+  );
+  const onPreferences = useCallback((p: Preferences) => {
+    setThread((current) =>
+      current
+        ? {
+            ...current,
+            context: { ...current.context, seller_terms: termsContext(p) },
+          }
+        : current,
+    );
   }, []);
+  const editedQuestionDirty = useRef(false);
+  const reportQuestionDirty = useCallback(
+    (dirty: boolean) => {
+      editedQuestionDirty.current = dirty;
+      reportUnsaved("question", dirty);
+    },
+    [reportUnsaved],
+  );
   const editedDirty = useRef(false);
   const reportReplyDirty = useCallback(
     (dirty: boolean) => {
@@ -222,6 +314,7 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
   function display(t: Thread, clearWritten = false) {
     if (!alive.current) return;
     setThread(t);
+    setEditingQuestion(false);
     setReplyId(t.replies[0]?.id || "");
     if (clearWritten) setWritten(null);
   }
@@ -234,33 +327,76 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
       )
     )
       return;
-    const next = await mutateThread(command);
+    const next = await mutateThread(command, requestSignal());
     if (!alive.current) return;
     display(next, command.op === "draft" || command.op === "saveInquiry");
-    const q = await listInquiries();
-    if (alive.current) setQuestions(q);
+    // The mutation is confirmed. Preserve its returned row even if the optional
+    // list refresh fails; a failed read must not turn a saved change into a retry.
+    setQuestions((current) =>
+      [next.inquiry, ...current.filter((q) => q.id !== next.inquiry.id)]
+        .sort(
+          (a, b) =>
+            Date.parse(b.updated_at) - Date.parse(a.updated_at) ||
+            a.id.localeCompare(b.id),
+        )
+        .slice(0, 200),
+    );
+    try {
+      const q = await listInquiries(requestSignal());
+      if (alive.current) setQuestions(q);
+    } catch {
+      if (alive.current)
+        setNotice(
+          "Your change was saved, but the question list could not refresh. Use Reload inbox to check other changes; do not submit the saved change again.",
+        );
+    }
   }
   async function reload() {
     if (
-      (dirty || editedDirty.current) &&
+      (dirty || editedDirty.current || editedQuestionDirty.current) &&
       !window.confirm("Reload and discard unsaved question or draft text?")
     )
       return;
     await run(async () => {
-      const [i, q] = await Promise.all([listItems(), listInquiries()]);
+      const [i, q] = await Promise.all([
+        listItems(),
+        listInquiries(requestSignal()),
+      ]);
       if (!alive.current) return;
       setItems(i);
       setQuestions(q);
       setThread(null);
+      setEditingQuestion(false);
       setWritten(null);
       setMessage("");
       setReady(true);
     });
   }
+  async function loadSavedReplies() {
+    if (
+      !thread ||
+      ((written?.body || editedDirty.current || editedQuestionDirty.current) &&
+        !window.confirm(
+          "Discard unsaved reply edits and load this question’s saved replies?",
+        ))
+    )
+      return;
+    await run(async () => {
+      const latest = await readThread(thread.inquiry.id, requestSignal());
+      if (!alive.current) return;
+      display(latest, true);
+      setReplyReload((value) => value + 1);
+      setNotice(
+        "Saved replies loaded. Review and approve the exact saved text before copying.",
+      );
+    });
+  }
   function saveQuestion() {
     if (
-      (written?.body || editedDirty.current) &&
-      !window.confirm("Discard unsaved reply text and open the new question?")
+      (written?.body || editedDirty.current || editedQuestionDirty.current) &&
+      !window.confirm(
+        "Discard unsaved question or reply edits and open the new question?",
+      )
     )
       return;
     void run(async () => {
@@ -355,6 +491,13 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
         </p>
       ) : (
         <>
+          <SellerPreferencesPanel
+            refresh={questions}
+            onPreferences={onPreferences}
+            reportDirty={reportPreferencesDirty}
+          />
+          {!demoMode && <DraftWorkerControls questions={questions} />}
+          {!demoMode && <PrivacyPreviewPanel />}
           <section className="panel section-pad">
             <h2>Record a buyer question</h2>
             <form
@@ -458,14 +601,19 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
                       disabled={busy}
                       onClick={() => {
                         if (
-                          (written?.body || editedDirty.current) &&
+                          (written?.body ||
+                            editedDirty.current ||
+                            editedQuestionDirty.current) &&
                           !window.confirm(
-                            "Discard the unsaved draft and open this question?",
+                            "Discard unsaved question or reply edits and open this question?",
                           )
                         )
                           return;
                         void run(async () =>
-                          display(await readThread(q.id), true),
+                          display(
+                            await readThread(q.id, requestSignal()),
+                            true,
+                          ),
                         );
                       }}
                     >
@@ -479,167 +627,217 @@ function InboxWorkspace({ reportUnsaved }: { reportUnsaved: ReportUnsaved }) {
           </section>
           {thread && (
             <section className="panel section-pad">
-              <h2>Review this question</h2>
-              <p>
-                <strong>
-                  {channelNames[thread.inquiry.channel]} ·{" "}
-                  {thread.inquiry.surface === "dm"
-                    ? "Private message"
-                    : "Public group comment"}
-                </strong>
-              </p>
-              <p className="lab-question">{thread.inquiry.message}</p>
-              <p>Question status: {thread.inquiry.status}</p>
-              <div className="inbox-facts">
-                <strong>Current saved facts</strong>
-                <p>
-                  {thread.context.item.title} ·{" "}
-                  {formatPHP(thread.context.item.price)} ·{" "}
-                  {thread.context.item.condition} · {thread.context.item.status}
-                </p>
-                <p className="lab-question">
-                  {thread.context.item.description}
-                </p>
-              </div>
-              <p>
-                Confirm availability, discounts, delivery, payment and meeting
-                details yourself. Public replies are visible to the group;
-                review them for private information.
-              </p>
-              <fieldset
-                disabled={busy || thread.inquiry.status !== "Open"}
-                className="lab-form"
-              >
-                <button
-                  className="button secondary"
-                  onClick={() => {
-                    if (
-                      written?.body &&
-                      !window.confirm(
-                        "Discard the written draft and prepare a template?",
-                      )
+              <h2 ref={reviewHeading} tabIndex={-1}>
+                Review this question
+              </h2>
+              {editingQuestion ? (
+                <InquiryEditor
+                  key={thread.inquiry.id + ":" + thread.inquiry.revision}
+                  inquiry={thread.inquiry}
+                  busy={busy}
+                  onDirtyChange={reportQuestionDirty}
+                  onCancel={() => setEditingQuestion(false)}
+                  onSave={(input) =>
+                    run(() =>
+                      apply({
+                        op: "saveInquiry",
+                        input,
+                        expected_revision: thread.inquiry.revision,
+                      }),
                     )
-                      return;
-                    draft(
-                      templateReply(thread.context),
-                      "template",
-                      thread.context,
-                    );
-                  }}
-                >
-                  Prepare template draft
-                </button>
-                <label className="field">
-                  Write a new reply
-                  <textarea
-                    maxLength={10000}
-                    value={written?.body || ""}
-                    onChange={(e) =>
-                      setWritten({
-                        body: e.target.value,
-                        context: written?.context || thread.context,
-                      })
-                    }
-                  />
-                </label>
-                <button
-                  className="button secondary"
-                  disabled={!written?.body.trim()}
-                  onClick={() =>
-                    written && draft(written.body, "manual", written.context)
                   }
-                >
-                  Save written draft
-                </button>
-              </fieldset>
-              {thread.replies.length > 0 && (
-                <label className="field inbox-draft-select">
-                  Saved draft
-                  <select
-                    value={replyId}
+                />
+              ) : (
+                <>
+                  <button
+                    className="button secondary"
                     disabled={busy}
-                    onChange={(e) => {
+                    onClick={() => {
                       if (
-                        editedDirty.current &&
+                        (written?.body || editedDirty.current) &&
                         !window.confirm(
-                          "Discard unsaved reply edits and switch drafts?",
+                          "Discard unsaved reply edits before editing the saved question?",
                         )
                       )
                         return;
-                      setReplyId(e.target.value);
+                      setWritten(null);
+                      setEditingQuestion(true);
                     }}
                   >
-                    {thread.replies.map((r, index) => (
-                      <option key={r.id} value={r.id}>
-                        Draft {thread.replies.length - index} · {r.source} ·{" "}
-                        {r.status}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                    Edit saved question
+                  </button>
+                  <p>
+                    <strong>
+                      {channelNames[thread.inquiry.channel]} ·{" "}
+                      {thread.inquiry.surface === "dm"
+                        ? "Private message"
+                        : "Public group comment"}
+                    </strong>
+                  </p>
+                  <p className="lab-question">{thread.inquiry.message}</p>
+                  <p>Question status: {thread.inquiry.status}</p>
+                  {!demoMode && (
+                    <QuestionDraftActions
+                      key={thread.inquiry.id}
+                      inquiry={thread.inquiry}
+                      disabled={busy}
+                      onLoadReplies={loadSavedReplies}
+                    />
+                  )}
+                  <div className="inbox-facts">
+                    <strong>Current saved facts</strong>
+                    <p>
+                      {thread.context.item.title} ·{" "}
+                      {formatPHP(thread.context.item.price)} ·{" "}
+                      {thread.context.item.condition} ·{" "}
+                      {thread.context.item.status}
+                    </p>
+                    <p className="lab-question">
+                      {thread.context.item.description}
+                    </p>
+                  </div>
+                  <p>
+                    Confirm availability, discounts, delivery, payment and
+                    meeting details yourself. Public replies are visible to the
+                    group; review them for private information.
+                  </p>
+                  <fieldset
+                    disabled={busy || thread.inquiry.status !== "Open"}
+                    className="lab-form"
+                  >
+                    <button
+                      className="button secondary"
+                      onClick={() => {
+                        if (
+                          written?.body &&
+                          !window.confirm(
+                            "Discard the written draft and prepare a template?",
+                          )
+                        )
+                          return;
+                        draft(
+                          templateReply(thread.context),
+                          "template",
+                          thread.context,
+                        );
+                      }}
+                    >
+                      Prepare template draft
+                    </button>
+                    <label className="field">
+                      Write a new reply
+                      <textarea
+                        maxLength={10000}
+                        value={written?.body || ""}
+                        onChange={(e) =>
+                          setWritten({
+                            body: e.target.value,
+                            context: written?.context || thread.context,
+                          })
+                        }
+                      />
+                    </label>
+                    <button
+                      className="button secondary"
+                      disabled={!written?.body.trim()}
+                      onClick={() =>
+                        written &&
+                        draft(written.body, "manual", written.context)
+                      }
+                    >
+                      Save written draft
+                    </button>
+                  </fieldset>
+                  {thread.replies.length > 0 && (
+                    <label className="field inbox-draft-select">
+                      Saved draft
+                      <select
+                        value={replyId}
+                        disabled={busy}
+                        onChange={(e) => {
+                          if (
+                            editedDirty.current &&
+                            !window.confirm(
+                              "Discard unsaved reply edits and switch drafts?",
+                            )
+                          )
+                            return;
+                          setReplyId(e.target.value);
+                        }}
+                      >
+                        {thread.replies.map((r, index) => (
+                          <option key={r.id} value={r.id}>
+                            Draft {thread.replies.length - index} · {r.source} ·{" "}
+                            {r.status}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  )}
+                  {reply && (
+                    <ReplyReview
+                      key={reply.id + ":" + reply.revision + ":" + replyReload}
+                      thread={thread}
+                      replyId={reply.id}
+                      busy={busy}
+                      onApply={(command) => run(() => apply(command))}
+                      onError={setError}
+                      alive={alive}
+                      onDirtyChange={reportReplyDirty}
+                    />
+                  )}
+                  <div className="lab-actions inbox-toolbar">
+                    <button
+                      className="button secondary"
+                      disabled={busy || thread.inquiry.status === "Answered"}
+                      onClick={() =>
+                        void run(() =>
+                          apply({
+                            op: "status",
+                            id: thread.inquiry.id,
+                            status: "Answered",
+                            expected_revision: thread.inquiry.revision,
+                          }),
+                        )
+                      }
+                    >
+                      Mark answered
+                    </button>
+                    <button
+                      className="button secondary"
+                      disabled={busy || thread.inquiry.status === "Closed"}
+                      onClick={() =>
+                        void run(() =>
+                          apply({
+                            op: "status",
+                            id: thread.inquiry.id,
+                            status: "Closed",
+                            expected_revision: thread.inquiry.revision,
+                          }),
+                        )
+                      }
+                    >
+                      Close question
+                    </button>
+                    <button
+                      className="button secondary"
+                      disabled={busy || thread.inquiry.status === "Open"}
+                      onClick={() =>
+                        void run(() =>
+                          apply({
+                            op: "status",
+                            id: thread.inquiry.id,
+                            status: "Open",
+                            expected_revision: thread.inquiry.revision,
+                          }),
+                        )
+                      }
+                    >
+                      Reopen question
+                    </button>
+                  </div>
+                </>
               )}
-              {reply && (
-                <ReplyReview
-                  key={reply.id + ":" + reply.revision}
-                  thread={thread}
-                  replyId={reply.id}
-                  busy={busy}
-                  onApply={(command) => run(() => apply(command))}
-                  onError={setError}
-                  alive={alive}
-                  onDirtyChange={reportReplyDirty}
-                />
-              )}
-              <div className="lab-actions inbox-toolbar">
-                <button
-                  className="button secondary"
-                  disabled={busy || thread.inquiry.status === "Answered"}
-                  onClick={() =>
-                    void run(() =>
-                      apply({
-                        op: "status",
-                        id: thread.inquiry.id,
-                        status: "Answered",
-                        expected_revision: thread.inquiry.revision,
-                      }),
-                    )
-                  }
-                >
-                  Mark answered
-                </button>
-                <button
-                  className="button secondary"
-                  disabled={busy || thread.inquiry.status === "Closed"}
-                  onClick={() =>
-                    void run(() =>
-                      apply({
-                        op: "status",
-                        id: thread.inquiry.id,
-                        status: "Closed",
-                        expected_revision: thread.inquiry.revision,
-                      }),
-                    )
-                  }
-                >
-                  Close question
-                </button>
-                <button
-                  className="button secondary"
-                  disabled={busy || thread.inquiry.status === "Open"}
-                  onClick={() =>
-                    void run(() =>
-                      apply({
-                        op: "status",
-                        id: thread.inquiry.id,
-                        status: "Open",
-                        expected_revision: thread.inquiry.revision,
-                      }),
-                    )
-                  }
-                >
-                  Reopen question
-                </button>
-              </div>
             </section>
           )}
         </>
@@ -678,6 +876,15 @@ function ReplyReview({
   }, []);
   const changed = body !== reply.body,
     stale = !contextMatches(reply.context, thread.context);
+  const eligible =
+    !changed &&
+    !stale &&
+    reply.status === "Approved" &&
+    thread.inquiry.status === "Open";
+  const copyEligibility = useRef({ context: thread.context, eligible });
+  useLayoutEffect(() => {
+    copyEligibility.current = { context: thread.context, eligible };
+  }, [thread.context, eligible]);
   useEffect(() => {
     onDirtyChange(changed);
     return () => {
@@ -694,19 +901,26 @@ function ReplyReview({
     return () => window.removeEventListener("beforeunload", warn);
   }, [changed]);
   async function copy() {
+    const requestedContext = thread.context;
+    const stillEligible = () =>
+      alive.current &&
+      mounted.current &&
+      copyEligibility.current.eligible &&
+      contextMatches(requestedContext, copyEligibility.current.context);
+    if (!stillEligible()) return;
     setCopying(true);
     onError("");
     setNotice("");
     setCopyText("");
     try {
       const current = await approvedText(reply.id, reply.revision);
-      if (!alive.current || !mounted.current) return;
+      if (!stillEligible()) return;
       try {
-        await navigator.clipboard.writeText(current.body);
-        if (alive.current && mounted.current)
+        await writeClipboard(current.body);
+        if (stillEligible())
           setNotice("Copied. Send it yourself on the original platform.");
       } catch {
-        if (alive.current && mounted.current) {
+        if (stillEligible()) {
           setCopyText(current.body);
           setNotice(
             "Clipboard unavailable. Select the approved text below and copy it manually.",
@@ -714,7 +928,7 @@ function ReplyReview({
         }
       }
     } catch (e) {
-      if (alive.current && mounted.current) onError(errorMessage(e));
+      if (stillEligible()) onError(errorMessage(e));
     } finally {
       if (mounted.current) setCopying(false);
     }
@@ -725,8 +939,11 @@ function ReplyReview({
         Reply status: {reply.status} ·{" "}
         {reply.source === "template"
           ? "Template — no AI used"
-          : "Written by you"}
+          : reply.source === "agent"
+            ? "Agent draft — review required"
+            : "Written by you"}
       </p>
+      {reply.review_note && <p>Review note: {reply.review_note}</p>}
       {stale && (
         <p role="status">
           Saved facts changed. Prepare a fresh draft before approval or copying.
@@ -793,8 +1010,8 @@ function ReplyReview({
           </button>
         </div>
       </fieldset>
-      {notice && <p role="status">{notice}</p>}
-      {copyText && (
+      {eligible && notice && <p role="status">{notice}</p>}
+      {eligible && copyText && (
         <label className="field">
           Approved text to copy manually
           <textarea
