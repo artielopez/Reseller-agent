@@ -1,21 +1,20 @@
 # Reseller Agent project plan
 
-Updated 4 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
+Updated 15 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
 ## Current assignment
 
-The independent overnight queue is complete within its permissions. Read the
-[final handoff](overnight-work-2026-11-04.md#final-independent-work-handoff--0623-manila)
-for exact evidence and remaining gates. Sites version **18** is live; cumulative
-draft PR **#29** is unmerged and preserves all 21 preceding open PR heads.
-Implementation/test head `a39705f` passed CI. No new model or automatic-message
-capability is activated by these releases.
+The owner approved merging and deploying all completed work on 15 November.
+PR #29 and its 21 included development snapshots are merged into `main`; Sites
+version **19** is deployed for Artie and Janyl. Read the
+[release receipt](releases/2026-11-15-merged-cloud.md) for exact source, deployment
+and verification evidence. The earlier overnight handoff below remains historical.
 
-Next work requires new evidence: authorized device/account acceptance, fresh
-supervised subscription checks, supported channel access, and the owner's exact
-merge decision. Janyl is already activated and has saved data. No owner input is
-requested during sleep. The bounded heartbeat is PAUSED as instructed; do not mark
-the broader goal complete or manufacture extra scope to fill the remaining time.
+Next work requires authorized real-device/account acceptance, fresh supervised
+subscription checks and supported channel access. Janyl is already activated and
+has saved data. Multi-organization Supabase verification is still separate. The
+bounded heartbeat remains PAUSED; no continuous worker or automatic messaging was
+activated. The broader automation goal is not complete.
 
 The owner approved autonomous work on worker health/recovery, the buyer-drafting workflow, privacy/cleanup previews, isolation checks and release preparation, with no merge. The [current increment](worker-health-workflow.md) implements advisory contact/job health, per-question draft requests and guarded reply reload, plus a read-only owner-scoped privacy preview. Local checks and independent review passed. Sites version 9 and the additive privacy migration are released; signed-in screen verification is blocked by disabled local browser use. PR #28 remains unmerged. [Execution plan](superpowers/plans/2026-11-03-worker-health-workflow.md) · [release map](release-review-map.md).
 
