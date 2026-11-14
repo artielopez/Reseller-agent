@@ -6,12 +6,17 @@ self.addEventListener("install", (event) => {
     (async () => {
       const response = await fetch(offlinePath, {
         cache: "reload",
-        redirect: "error",
+        redirect: "follow",
       });
+      // Cloudflare static assets canonicalize /offline.html to /offline.
+      // A hosting sign-in redirect must never become our cached fallback.
+      const finalUrl = response.url ? new URL(response.url) : null;
       if (
         !response.ok ||
-        response.redirected ||
-        (response.url && new URL(response.url).pathname !== offlinePath) ||
+        (finalUrl &&
+          (finalUrl.origin !== self.location.origin ||
+            ![offlinePath, "/offline"].includes(finalUrl.pathname) ||
+            finalUrl.search)) ||
         !response.headers.get("Content-Type")?.includes("text/html") ||
         !(await response.clone().text()).includes('data-reseller-offline="v1"')
       ) {

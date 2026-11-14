@@ -72,6 +72,37 @@ describe("private-workspace service worker", () => {
     await expect(pending).rejects.toThrow();
     expect(w.put).not.toHaveBeenCalled();
   });
+  it("accepts only the owned static page after the hosting canonical redirect", async () => {
+    for (const [url, allowed] of [
+      ["https://app.example.test/offline", true],
+      ["https://app.example.test/login", false],
+      ["https://other.example.test/offline", false],
+      ["https://app.example.test/offline?code=private", false],
+    ] as const) {
+      const response = new Response(
+        '<html data-reseller-offline="v1">Offline</html>',
+        { headers: { "Content-Type": "text/html" } },
+      );
+      Object.defineProperties(response, {
+        url: { value: url },
+        redirected: { value: true },
+      });
+      const w = worker(vi.fn(async () => response));
+      let pending: Promise<unknown> = Promise.resolve();
+      w.handlers.install({
+        waitUntil: (p: Promise<unknown>) => {
+          pending = p;
+        },
+      });
+      if (allowed) {
+        await pending;
+        expect(w.put).toHaveBeenCalledOnce();
+      } else {
+        await expect(pending).rejects.toThrow();
+        expect(w.put).not.toHaveBeenCalled();
+      }
+    }
+  });
   it("never handles auth callbacks, data, photos, external requests or writes", () => {
     const w = worker();
     for (const [url, method, mode] of [
