@@ -2,7 +2,7 @@
 
 ## Phone app increment — 15 November 2026
 
-The owner approved PWA implementation after the completed stack was merged. Keep the existing design and private inventory model. Add Home Screen metadata/icons, standalone safe-area layout, online/offline guidance and a generic offline fallback, plus an unused-email-link verification option for iPhone's separate Home Screen session storage. Do not add an offline write queue, private-data cache, push notifications or automatic platform access/sending. No new recurring service or database change is required. [Installation/device acceptance guide](phone-app.md). Keep this increment reviewable in its own PR; physical iPhone acceptance remains a separate gate from synthetic browser checks.
+The owner approved PWA implementation after the completed stack was merged. Home Screen metadata/icons, standalone safe-area layout, online/offline guidance, a generic offline fallback and an unused-email-link verification option are now published in **Sites version 20**. The existing design and private inventory model are preserved. No offline write queue, private-data cache, push notifications or automatic platform access/sending were added; no new recurring service or database change was required. [Installation/device acceptance guide](phone-app.md). [PR #31](https://github.com/artielopez/Reseller-agent/pull/31) remains open and unmerged; physical iPhone acceptance remains a separate gate from synthetic browser checks.
 
 Updated 15 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
