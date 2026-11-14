@@ -1,8 +1,12 @@
 "use client";
-import { useState, useSyncExternalStore, type FormEvent } from "react";
+import { useRef, useState, useSyncExternalStore, type FormEvent } from "react";
 import { ArrowRight, Mail } from "lucide-react";
 import { getSupabase } from "@/lib/supabase";
 import { withRequestDeadline } from "@/lib/request-deadline";
+import { parseSignInLink } from "@/lib/pwa-auth";
+import { supabaseUrl } from "@/lib/config";
+const verificationTimeout =
+  "Could not confirm sign-in yet. Check whether your inventory opens before requesting another link.";
 const emailTimeout =
   "Could not confirm the sign-in email request. Check your inbox before requesting another link; the email may already have been sent.";
 import { authFailureMessage, authRedirectMessage } from "@/lib/auth-feedback";
@@ -21,6 +25,9 @@ export function AuthPanel() {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [pastedLink, setPastedLink] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const verificationPending = useRef(false);
   const linkError = useSyncExternalStore(
     subscribeToUrlChanges,
     redirectMessage,
@@ -58,6 +65,52 @@ export function AuthPanel() {
       setBusy(false);
     }
   }
+  async function signInHere(event: FormEvent) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+    let params: ReturnType<typeof parseSignInLink>;
+    try {
+      params = parseSignInLink(pastedLink, supabaseUrl);
+    } catch {
+      setPastedLink("");
+      setError(
+        "Copy the unused sign-in or invitation link from your newest Reseller Agent email.",
+      );
+      return;
+    }
+    setPastedLink("");
+    if (verificationPending.current) {
+      setError(verificationTimeout);
+      return;
+    }
+    verificationPending.current = true;
+    setVerifying(true);
+    try {
+      const { data, error } = await withRequestDeadline(
+        () =>
+          getSupabase()
+            .auth.verifyOtp(params)
+            .finally(() => {
+              verificationPending.current = false;
+            }),
+        verificationTimeout,
+      );
+      if (error || !data.session) {
+        setError(
+          error?.code === "otp_expired"
+            ? "This link has expired or was already used. Request a fresh sign-in email, then copy its link without opening it."
+            : "Could not verify this link. Use the unused link from your newest Reseller Agent email and check your connection.",
+        );
+      } else {
+        setMessage("Signed in. Opening your inventory…");
+      }
+    } catch {
+      setError(verificationTimeout);
+    } finally {
+      setVerifying(false);
+    }
+  }
   return (
     <section className="auth-panel panel">
       <span className="eyebrow">YOUR PERSONAL RESALE WORKSPACE</span>
@@ -85,11 +138,41 @@ export function AuthPanel() {
             />
           </div>
         </label>
-        <button className="button primary w-full" disabled={busy}>
+        <button className="button primary w-full" disabled={busy || verifying}>
           {busy ? "Sending link…" : "Email me a sign-in link"}
           <ArrowRight size={17} />
         </button>
       </form>
+      <details className="app-sign-in">
+        <summary>Sign in inside this app</summary>
+        <p>
+          If an email link opens Safari instead of this Home Screen app, request
+          a fresh email above. In the email, press and hold its sign-in link and
+          copy it without opening it. Paste it below. You can also use an unused
+          invitation link.
+        </p>
+        <form onSubmit={signInHere} className="space-y-5">
+          <label className="field">
+            <span>Unused sign-in link</span>
+            <input
+              type="password"
+              autoComplete="off"
+              spellCheck={false}
+              required
+              maxLength={8192}
+              value={pastedLink}
+              onChange={(event) => setPastedLink(event.target.value)}
+            />
+          </label>
+          <button className="button primary" disabled={busy || verifying}>
+            {verifying ? "Verifying link…" : "Sign in here"}
+          </button>
+        </form>
+        <p className="text-sm muted">
+          Treat this link like a password. It is cleared when submitted and
+          verified directly with our sign-in service. Never share it in chat.
+        </p>
+      </details>
       {message && (
         <p role="status" className="notice">
           {message}

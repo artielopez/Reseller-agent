@@ -8,6 +8,10 @@ Built with Next.js App Router, TypeScript, Tailwind CSS, Supabase and the server
 
 See the [current status](docs/project-status.md), [project plan](docs/project-plan.md), and [buyer reply implementation plan](docs/superpowers/plans/2026-10-28-buyer-replies.md). The [imported handoff](docs/project-handoff.md) is a historical reference. The browser-local [buyer reply lab](docs/buyer-lab.md) now tests sample questions, review rules and simulated delivery at `/buyer-lab`. The [saved buyer inbox](docs/shared-inbox-stage.md) at `/inbox` supports manually entered questions and reviewed clipboard replies in demo or Supabase mode. Live capture and a delivery queue are not implemented. A separate Mac worker can draft explicitly queued saved private questions after cloud/runtime setup. Pull requests remain unmerged until the owner approves.
 
+## Install on your phone
+
+Open the [cloud workspace](https://reseller-agent-cloud.pandabur.chatgpt.site) in iPhone Safari, then choose **Share → Add to Home Screen** and enable **Open as Web App** if offered. Open its icon and sign in there. If the email opens Safari instead, use **Sign in inside this app** with an unused email link. See the [phone guide](docs/phone-app.md) for instructions and device checks. Inventory and photos still require internet; offline writes are not queued.
+
 ## Try it in demo mode
 
 **Hosted demo:** [Open Reseller Agent on ChatGPT Sites](https://reseller-agent-demo.pandabur.chatgpt.site). Sign in with the same ChatGPT account that owns the Site. This link works across computers and phones, but inventory/photos remain in each browser's storage and do not sync. Drafts are deterministic templates; there is no paid AI or Supabase connection in this demo.

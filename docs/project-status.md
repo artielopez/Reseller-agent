@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Phone app implementation — 15 November 2026
+
+The owner approved fixing the iPhone PWA experience. Branch `codex/phone-pwa` adds standalone installation metadata, original phone icons, safe-area spacing, installation guidance, a connection notice and a static offline recovery screen. The worker caches only that generic screen, never app/data/photo/Auth responses, and does not queue writes or force reloads. The manifest explicitly uses hosting credentials for the private Sites access gate.
+
+An optional **Sign in inside this app** form verifies an unused Supabase confirmation link in the current browser storage, addressing iPhone Safari/Home Screen session separation. It accepts only the configured project's email/invite verification links, clears input, ignores redirects, sanitizes errors and prevents another verification while a timed-out SDK request remains pending. Existing invitation-only access, accounts and email templates are unchanged. [Phone setup and acceptance guide](phone-app.md).
+
+Initial verification: new unit coverage began with missing-implementation failures, then all 16 new checks passed; full suite **308 passed, six optional skips**, lint/types and Next production build passed. Four actual-service-worker desktop/mobile checks passed, including offline recovery and cache inspection. Six synthetic email verification checks passed after fixing test fixtures to expose the provider's API-version header; no real email, credentials or model calls were used. All 62 ordinary desktop/mobile regressions also passed, including ten-photo persistence and accessibility. Final compiled Sites checks and publication evidence will follow below. A physical iPhone installation, real installed-app sign-in and ten-photo acceptance remain unverified. No merge is authorized for this new feature by the earlier completed stack's merge request.
+
 ## Merged and deployed — 15 November 2026
 
 The owner explicitly requested “Merge and deploy everything.” Cumulative [PR #29](https://github.com/artielopez/Reseller-agent/pull/29) is merged into `main` as `a2e0d73db216a9f6d7db2383ed8b11f1c2391718`. GitHub also records every included PR #8–#28 as merged; all 21 prior heads were verified as ancestors before integration. No development work was discarded and no direct push to `main` was used.
