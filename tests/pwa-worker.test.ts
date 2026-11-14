@@ -97,6 +97,8 @@ describe("private-workspace service worker", () => {
       if (allowed) {
         await pending;
         expect(w.put).toHaveBeenCalledOnce();
+        // Redirected responses cannot satisfy a manual-redirect navigation.
+        expect((w.put.mock.calls[0][1] as Response).redirected).toBe(false);
       } else {
         await expect(pending).rejects.toThrow();
         expect(w.put).not.toHaveBeenCalled();

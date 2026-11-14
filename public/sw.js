@@ -22,7 +22,15 @@ self.addEventListener("install", (event) => {
       ) {
         throw new Error("Static offline page unavailable");
       }
-      await (await caches.open(offlineCache)).put(offlinePath, response);
+      // A redirected Response cannot satisfy a navigation whose redirect mode
+      // is manual. Cache a fresh response containing only our verified HTML.
+      const offline = new Response(await response.text(), {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "Cache-Control": "no-store",
+        },
+      });
+      await (await caches.open(offlineCache)).put(offlinePath, offline);
     })(),
   );
 });
