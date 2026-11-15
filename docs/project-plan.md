@@ -1,5 +1,9 @@
 # Reseller Agent project plan
 
+## Correct the PWA sign-in experience — 16 November 2026
+
+Use emailed one-time codes as the primary sign-in flow, verified inside the app where the user started. The link-copy workaround remains only for old emails/invitations. Implementation and synthetic tests are ready in PR #31. Next: save/read back the prepared Magic Link email template in Supabase, verify code delivery, build/test the matching Sites artifact, publish with the same audience, then ask for one actual iPhone code sign-in/reopen test. Dashboard access currently needs the Mac unlocked and local browser use enabled. Keep Sites version 20 live until the email and UI can be released together. Preserve existing signup restrictions, OTP security settings, SMTP and account access.
+
 ## Phone app increment — 15 November 2026
 
 Operational acceptance update: the first phone sign-in retry exposed an inactive Supabase project, restored and verified healthy on 15 November. Future release readiness must include a live, read-only project/Auth health check alongside synthetic browser/build checks. Do not infer backend availability from a successful Sites deployment. No paid upgrade or keepalive automation is authorized by this recovery.

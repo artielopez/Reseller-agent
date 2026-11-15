@@ -53,7 +53,7 @@ try {
         timeout: 15_000,
       });
       await page
-        .getByRole("button", { name: "Email me a sign-in link", exact: true })
+        .getByRole("button", { name: "Email me a sign-in code", exact: true })
         .waitFor();
       assert.deepEqual(
         unexpected,

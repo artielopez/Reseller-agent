@@ -10,7 +10,7 @@ See the [current status](docs/project-status.md), [project plan](docs/project-pl
 
 ## Install on your phone
 
-Open the [cloud workspace](https://reseller-agent-cloud.pandabur.chatgpt.site) in iPhone Safari, then choose **Share → Add to Home Screen** and enable **Open as Web App** if offered. Open its icon and sign in there. If the email opens Safari instead, use **Sign in inside this app** with an unused email link. See the [phone guide](docs/phone-app.md) for instructions and device checks. Inventory and photos still require internet; offline writes are not queued.
+Open the [cloud workspace](https://reseller-agent-cloud.pandabur.chatgpt.site) in iPhone Safari, then choose **Share → Add to Home Screen** and enable **Open as Web App** if offered. Open its icon and sign in there. The next code-entry update is prepared but awaits the Supabase email-template change; the published app still offers **Sign in inside this app** for an unused email link. See the [phone guide](docs/phone-app.md) for instructions and device checks. Inventory and photos still require internet; offline writes are not queued.
 
 ## Try it in demo mode
 

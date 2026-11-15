@@ -8,7 +8,7 @@ import { supabaseUrl } from "@/lib/config";
 const verificationTimeout =
   "Could not confirm sign-in yet. Check whether your inventory opens before requesting another link.";
 const emailTimeout =
-  "Could not confirm the sign-in email request. Check your inbox before requesting another link; the email may already have been sent.";
+  "Could not confirm the sign-in email request. Check your inbox before requesting another code; the email may already have been sent.";
 import { authFailureMessage, authRedirectMessage } from "@/lib/auth-feedback";
 function subscribeToUrlChanges(notify: () => void) {
   window.addEventListener("hashchange", notify);
@@ -26,6 +26,7 @@ export function AuthPanel() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [pastedLink, setPastedLink] = useState("");
+  const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   const verificationPending = useRef(false);
   const linkError = useSyncExternalStore(
@@ -53,7 +54,7 @@ export function AuthPanel() {
       );
       if (error) throw error;
       setMessage(
-        "Check your email for a sign-in link. Open it on this device to continue.",
+        "Check your newest email. Enter the code below to sign in here.",
       );
     } catch (error) {
       setError(
@@ -63,6 +64,48 @@ export function AuthPanel() {
       );
     } finally {
       setBusy(false);
+    }
+  }
+  async function verifyCode(event: FormEvent) {
+    event.preventDefault();
+    setError("");
+    setMessage("");
+    const token = code.trim();
+    const address = email.trim();
+    if (!address || !/^[0-9]{6,10}$/.test(token)) {
+      setError("Enter your email address and the code from your newest email.");
+      return;
+    }
+    setCode("");
+    if (verificationPending.current) {
+      setError(verificationTimeout);
+      return;
+    }
+    verificationPending.current = true;
+    setVerifying(true);
+    try {
+      const { data, error } = await withRequestDeadline(
+        () =>
+          getSupabase()
+            .auth.verifyOtp({ email: address, token, type: "email" })
+            .finally(() => {
+              verificationPending.current = false;
+            }),
+        verificationTimeout,
+      );
+      if (error || !data.session) {
+        setError(
+          error?.code === "otp_expired"
+            ? "This code is invalid, expired or already used. Request a new code and enter it here."
+            : "Could not verify this code. Check the email address and use the code from your newest email.",
+        );
+      } else {
+        setMessage("Signed in. Opening your inventory…");
+      }
+    } catch {
+      setError(verificationTimeout);
+    } finally {
+      setVerifying(false);
     }
   }
   async function signInHere(event: FormEvent) {
@@ -132,24 +175,56 @@ export function AuthPanel() {
               type="email"
               autoComplete="email"
               required
+              disabled={busy || verifying}
               value={email}
-              onChange={(event) => setEmail(event.target.value)}
+              onChange={(event) => {
+                setEmail(event.target.value);
+                setCode("");
+                setMessage("");
+                setError("");
+              }}
               placeholder="you@example.com"
             />
           </div>
         </label>
         <button className="button primary w-full" disabled={busy || verifying}>
-          {busy ? "Sending link…" : "Email me a sign-in link"}
+          {busy ? "Sending code…" : "Email me a sign-in code"}
           <ArrowRight size={17} />
+        </button>
+      </form>
+      <form onSubmit={verifyCode} className="space-y-5 mt-6">
+        <label className="field">
+          <span>Email sign-in code</span>
+          <input
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]{6,10}"
+            minLength={6}
+            maxLength={10}
+            required
+            aria-describedby="code-help"
+            value={code}
+            disabled={busy || verifying}
+            onChange={(event) => setCode(event.target.value)}
+          />
+        </label>
+        <p id="code-help" className="text-sm muted">
+          Enter the code from your email here. You can read the email on any
+          device; return to this app to finish signing in.
+        </p>
+        <button
+          className="button primary w-full"
+          disabled={busy || verifying || !email.trim()}
+        >
+          {verifying ? "Verifying…" : "Verify code and sign in"}
         </button>
       </form>
       <details className="app-sign-in">
         <summary>Sign in inside this app</summary>
         <p>
-          If an email link opens Safari instead of this Home Screen app, request
-          a fresh email above. In the email, press and hold its sign-in link and
-          copy it without opening it. Paste it below. You can also use an unused
-          invitation link.
+          For an older sign-in email or an unused invitation, press and hold its
+          link and copy it without opening it. Paste it below.
         </p>
         <form onSubmit={signInHere} className="space-y-5">
           <label className="field">
@@ -184,9 +259,10 @@ export function AuthPanel() {
         </p>
       )}
       <p className="text-sm muted">
-        First time here? Open your invitation email to activate your account.
-        Use this form for later sign-ins. Invitations that expire must be resent
-        by the workspace owner.
+        Private workspace. Your account must already be invited. Use an unused
+        invitation to activate a new account; for later sign-ins, enter your
+        email code above. Expired invitations must be resent by the workspace
+        owner.
       </p>
     </section>
   );

@@ -74,6 +74,6 @@ test("offline reload recovers online and caches no private routes or responses",
   await context.setOffline(false);
   await page.getByRole("link", { name: "Try again" }).click();
   await expect(
-    page.getByRole("button", { name: "Email me a sign-in link" }),
+    page.getByRole("button", { name: "Email me a sign-in code" }),
   ).toBeVisible();
 });

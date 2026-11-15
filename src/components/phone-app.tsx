@@ -42,9 +42,8 @@ export function PhoneApp() {
           option.
         </p>
         <p>
-          Open the new icon while online and sign in there. If your email opens
-          Safari, use “Sign in inside this app” on the sign-in screen. Inventory
-          and photos need an internet connection.
+          Open the new icon while online, request a sign-in code and enter it in
+          the app. Inventory and photos need an internet connection.
         </p>
       </details>
     </>

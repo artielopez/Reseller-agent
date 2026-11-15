@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## In-app email codes prepared — 16 November 2026
+
+The owner reported that email links still open a browser instead of the installed PWA. The previous link-paste fallback did not resolve the desired simple sign-in experience. PR #31's next increment adds **Email me a sign-in code** and **Verify code and sign in**, using existing Supabase email OTP in the current app session. Existing account restrictions remain in force. An email can be read on another device; entering its code in the PWA creates the session there. Old link/invitation support remains optional.
+
+Local verification: the three new desktop scenarios first failed against the old screen. After implementation, **64 cloud browser checks** passed across desktop/mobile, including six new code request/verification checks, session persistence, expired-code recovery and no duplicate pending verification. **309 unit/integration tests** passed (six optional skips), lint/types/production build and **4 real service-worker checks** passed. After the final email-error wording change, lint/types and **20 focused desktop/mobile code and recovery checks** passed. Read-only Supabase inspection still reports **ACTIVE_HEALTHY**. No real email or model request was made.
+
+**Not yet published:** the live app remains Sites version 20. The prepared `supabase/templates/magic-link.html` must replace the project's Magic Link email body, with subject **Your Reseller Agent sign-in code**, before publishing the matching code-entry UI. The current Supabase MCP toolset cannot edit Auth templates. Computer-use inventory reports the Mac locked and local browser access disabled; the owner was asked to unlock/enable access. Do not bypass that restriction, extract credentials or claim the template is saved. [Setup and usage](phone-app.md). No merge or automatic sending is enabled.
+
 ## Phone sign-in outage recovered — 15 November 2026, 12:33 Manila
 
 The owner's installed-app screenshot showed a failed sign-in email request. Read-only Supabase inspection found the existing Reseller Agent project `ecusonvqyjnuwjhvcivb` **INACTIVE**, while Artie's Projects remained on the Free plan. The recent Auth-log window contained no events. This established a backend availability problem; the lifecycle status alone does not prove whether inactivity or a manual action caused the pause.

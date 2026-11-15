@@ -24,7 +24,7 @@ export function authFailureMessage(error: unknown): string {
   ) {
     return "Email delivery is not enabled for this address yet. Ask the workspace owner to finish the email-sender setup.";
   }
-  return "Could not send a sign-in link. Check your connection and try again. If this continues, contact the workspace owner.";
+  return "Could not send a sign-in email. Check your connection and try again. If this continues, contact the workspace owner.";
 }
 
 export function authRedirectMessage(hash: string, search: string): string {

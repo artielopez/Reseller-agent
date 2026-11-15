@@ -8,17 +8,26 @@
 
 An old Home Screen shortcut may retain its old icon or browser behavior. Keep any unsaved work, then remove only the shortcut and add it again. Do not clear website data to refresh an icon.
 
-## If your sign-in email opens Safari
+## Sign in with an email code (prepared, awaiting cloud configuration)
 
-Safari and a Home Screen app can have separate sign-in storage. Signing into Safari may therefore leave the installed app signed out.
+The code-entry update is implemented on PR #31 but is not published yet. The live version 20 still uses email links until the email-template change is saved and verified. Do not expect older emails to contain a code.
 
-1. From the installed app, request a fresh sign-in email.
-2. In the email, press and hold the **sign-in link** and choose **Copy Link**, without opening it.
-3. Return to the Reseller Agent icon. Expand **Sign in inside this app**, paste into **Unused sign-in link**, and tap **Sign in here**.
+Once released:
 
-An unused account invitation link also works. Expired invitations still require the owner to resend them; this does not enable public signup. Links are passwords: do not send them to anyone or paste them into chat. The form clears the pasted link on submission, verifies it directly with the configured Supabase project, and never visits its redirect URL. A previously opened/used link cannot be reused. A tracked or rewritten email link may need its original Reseller Agent confirmation URL.
+1. Open the Reseller Agent Home Screen icon and enter your email.
+2. Tap **Email me a sign-in code**.
+3. Read the newest email on any device and return to the PWA.
+4. Enter its code in **Email sign-in code**, then tap **Verify code and sign in**.
 
-The hosting access gate may also ask you to sign in when first opening the icon. Existing Artie/Janyl access restrictions remain in effect.
+This creates the session in the app where you enter the code. You do not need to open a URL in Safari. Codes are single-use; an expired/invalid code requires a fresh request. Codes are cleared after submission and are never stored or logged by the app. A timed-out verification is not repeated while its SDK request remains pending.
+
+The optional **Sign in inside this app** details section remains a fallback for old sign-in emails and unused invitations. New accounts must first accept their invitation. The hosting gate can also request its existing sign-in when first opening the icon.
+
+### Required operator setup before publication
+
+In the existing Supabase project, open Authentication → Email templates → Magic Link. Save `supabase/templates/magic-link.html` as its message body and use subject **Your Reseller Agent sign-in code**. The essential variable is `{{ .Token }}`. Preserve the current email provider, invitation settings, signup restrictions, token length/expiry and rate limits. This template sends a code without a browser link. Record a read-back before publishing the matching application. An ordinary request uses `signInWithOtp` with `shouldCreateUser: false`; verification uses `verifyOtp({ email, token, type: 'email' })`.
+
+Do not use a database update or extract credentials to bypass dashboard access. The Supabase MCP integration available here does not expose email-template updates. Configuration and delivery must be verified separately from synthetic browser tests.
 
 ## What works offline
 
