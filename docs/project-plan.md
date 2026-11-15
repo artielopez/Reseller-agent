@@ -2,6 +2,8 @@
 
 ## Phone app increment — 15 November 2026
 
+Operational acceptance update: the first phone sign-in retry exposed an inactive Supabase project, restored and verified healthy on 15 November. Future release readiness must include a live, read-only project/Auth health check alongside synthetic browser/build checks. Do not infer backend availability from a successful Sites deployment. No paid upgrade or keepalive automation is authorized by this recovery.
+
 The owner approved PWA implementation after the completed stack was merged. Home Screen metadata/icons, standalone safe-area layout, online/offline guidance, a generic offline fallback and an unused-email-link verification option are now published in **Sites version 20**. The existing design and private inventory model are preserved. No offline write queue, private-data cache, push notifications or automatic platform access/sending were added; no new recurring service or database change was required. [Installation/device acceptance guide](phone-app.md). [PR #31](https://github.com/artielopez/Reseller-agent/pull/31) remains open and unmerged; physical iPhone acceptance remains a separate gate from synthetic browser checks.
 
 Updated 15 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)

@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Phone sign-in outage recovered — 15 November 2026, 12:33 Manila
+
+The owner's installed-app screenshot showed a failed sign-in email request. Read-only Supabase inspection found the existing Reseller Agent project `ecusonvqyjnuwjhvcivb` **INACTIVE**, while Artie's Projects remained on the Free plan. The recent Auth-log window contained no events. This established a backend availability problem; the lifecycle status alone does not prove whether inactivity or a manual action caused the pause.
+
+Restoring the same project succeeded, progressing through `COMING_UP` to **ACTIVE_HEALTHY** at 04:33:09 UTC. Subsequent read-only Auth `/health` and `/settings` checks both returned **200**; email sign-in is enabled and public signup remains disabled. A database read returned **two confirmed app users and three inventory rows**, without retrieving private content. No credential, SMTP, schema, account-access or pricing changes were made. No email was sent by the agent and no app rebuild was required. The owner should retry the sign-in email from the installed app; actual email delivery and phone sign-in remain to be confirmed. [Paused-project recovery notes](cloud-workspace-setup.md#recovering-a-paused-free-project).
+
 ## Phone app published — 15 November 2026
 
 **Sites version 20 is live** at [Reseller Agent](https://reseller-agent-cloud.pandabur.chatgpt.site), source `eb46171ff6816007dfce240fd09197113bb10291`, deployment `appgdep_6af8b8f182bc819193ae7c2830778712` (**succeeded**). Artie/Janyl access and environment revision 1 are unchanged. [PR #31](https://github.com/artielopez/Reseller-agent/pull/31) remains open, unmerged and without auto-merge. [Release receipt](releases/2026-11-15-phone-pwa.md).
