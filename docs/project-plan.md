@@ -2,7 +2,7 @@
 
 ## Current assignment — 18 November sleep window
 
-Continue reversible implementation and verification through **11:34:22 Manila** without owner input, using `codex/phone-pwa` / PR #31. [Current execution ledger](overnight-work-2026-11-18.md). The continuation heartbeat is ACTIVE for this bounded window; the old 4 November heartbeat pause below is historical. Keep the code-entry release held for its matching email template, preserve the live audience, and make no merge, model call or live platform action. [Everyday selling guide](selling-today.md).
+The authorized independent implementation and verification is complete within available access at **05:54 Manila**, ahead of the **11:34:22** deadline. Work remains on `codex/phone-pwa` / PR #31. The continuation heartbeat was **deleted** after the final support-thread check found no response; no further idle polling is scheduled. [Completed work and remaining dependencies](overnight-work-2026-11-18.md#final-independent-work-handoff--0554-manila). Keep the code-entry release held for its matching email-template save/read-back; version 22 is saved, while version 20 remains live. No merge, model call, worker activation or live platform action occurred. The broader goal remains incomplete and no input is requested while the owner sleeps. [Everyday selling guide](selling-today.md).
 
 ## Correct the PWA sign-in experience — 16 November 2026
 

@@ -1,5 +1,15 @@
 # Reseller Agent status
 
+## Current handoff — 18 November 2026, 05:54 Manila
+
+Useful independent work is complete within the available access; the broader resale automation goal remains unfinished. The overnight heartbeat was **deleted**, confirmed by the scheduling tool, to stop idle runs. No owner action is requested during the sleep window. Changes remain on [PR #31](https://github.com/artielopez/Reseller-agent/pull/31), open and unmerged with auto-merge disabled. Latest checked head `b9f542f` passed [CI 44179320150](https://github.com/artielopez/Reseller-agent/actions/runs/44179320150).
+
+Prepared fixes cover stalled/failed listing copy, empty-copy prevention, late clipboard results across edits/platform/account changes, and uncertain sign-in with a deliberate reload action. Verification includes **309 unit/integration tests** (six optional skips), lint/types, app/worker builds and credential-free worker preflight; **74 ordinary, 74 cloud and four service-worker browser cases** passed (the final four cloud account-switch cases were run separately). The exact prepared Sites artifact separately passed types/build, **74 compiled cloud and four service-worker checks**. Production dependency audits are zero; full development tooling still has the documented 17 findings.
+
+**Live: Sites version 20. Prepared: version 22, NOT DEPLOYED**, source `082b84d616fca8ba8baf1bbe420681af78c7a8ee`. Email-code publication still requires saving/read-back of the matching Supabase email template. Artie/Janyl access is unchanged. The original Beeper inquiry thread was checked at 05:53 Manila: it contains only the sent inquiry, with no reply. No support email, real sign-in email, model call, worker activation or platform access occurred.
+
+Remaining work requires permitted dashboard/device/account access or provider evidence: align the email template and UI, verify real code delivery and installed-iPhone session persistence, complete ten-photo/two-user device acceptance, perform fresh supervised subscription checks before another AI trial, establish supported channel access, and configure separate multi-organization Supabase access. [Completed/remaining handoff](overnight-work-2026-11-18.md#final-independent-work-handoff--0554-manila) · [How to sell today](selling-today.md). Earlier checkpoints below are chronological evidence, not newer release instructions.
+
 ## Independent sleep-window work — 18 November 2026
 
 The owner authorized seven hours without input, through **11:34:22 Manila**. The bounded continuation reuses `codex/phone-pwa` and PR #31. [Execution ledger and remaining work](overnight-work-2026-11-18.md). No merges, paid model calls, live platform access, worker activation or owner prompts are permitted during this window.
