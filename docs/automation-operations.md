@@ -51,7 +51,7 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **20**, source `eb46171ff6816007dfce240fd09197113bb10291`, with Artie/Janyl access unchanged. Prepared **version 21 is saved but NOT DEPLOYED**; its code-entry flow requires the matching Supabase email template. The [current execution ledger](overnight-work-2026-11-18.md) records exact verification and later source changes. A newer saved version number is not evidence of a production deployment.
+The live cloud app is Sites version **20**, source `eb46171ff6816007dfce240fd09197113bb10291`, with Artie/Janyl access unchanged. Prepared **version 22 is saved but NOT DEPLOYED**, superseding undeployed version 21; its code-entry flow requires the matching Supabase email template. The [current execution ledger](overnight-work-2026-11-18.md) records exact verification and source changes. A newer saved version number is not evidence of a production deployment.
 
 The cumulative stack through PR #29 was merged by explicit owner instruction on 15 November. New PWA/email-code/recovery work remains in [PR #31](https://github.com/artielopez/Reseller-agent/pull/31), open and unmerged. Keep it reviewable; no merge or auto-merge without owner approval. GitHub and Sites have separate source histories. Test/documentation-only increments need no cloud publication. A future publication must use its exact pushed/built source, preserve the private audience and record the email-template prerequisite and runtime checks. The hosted migration mappings remain in [the setup record](cloud-workspace-setup.md).
 

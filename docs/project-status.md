@@ -12,6 +12,8 @@ Follow-up at 04:50 Manila: CI `44172502159` **passed**. A small additional recov
 
 05:05 continuation: CI `44174333704` **passed** for `8545f54`. Empty/whitespace listing fields can no longer overwrite the clipboard: four new desktop/mobile guard checks passed after reproducing enabled empty-field controls. Signed-out email-code/error screens pass two new automated accessibility checks. Full current app checks pass **309 tests**, lint/types/build and **148 browser checks**; four additional focused cloud account-switch tests also pass, confirming late listing clipboard success/failure cannot expose prior-owner feedback/text. Final consolidated artifact preparation is next; nothing new has been deployed.
 
+Consolidated release candidate: **Sites version 22, saved but NOT DEPLOYED**, source `082b84d616fca8ba8baf1bbe420681af78c7a8ee`, passed types/build and **74 compiled cloud + 4 service-worker checks**. It supersedes undeployed version 21 and contains all current UI fixes. GitHub implementation `ab5c7d1` is pushed; CI `44176925049` was running at preparation. Live version remains **20** pending the email-template prerequisite.
+
 ## In-app email codes prepared — 16 November 2026
 
 The owner reported that email links still open a browser instead of the installed PWA. The previous link-paste fallback did not resolve the desired simple sign-in experience. PR #31's next increment adds **Email me a sign-in code** and **Verify code and sign in**, using existing Supabase email OTP in the current app session. Existing account restrictions remain in force. An email can be read on another device; entering its code in the PWA creates the session there. Old link/invitation support remains optional.
