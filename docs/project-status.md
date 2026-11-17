@@ -1,5 +1,13 @@
 # Reseller Agent status
 
+## Independent sleep-window work — 18 November 2026
+
+The owner authorized seven hours without input, through **11:34:22 Manila**. The bounded continuation reuses `codex/phone-pwa` and PR #31. [Execution ledger and remaining work](overnight-work-2026-11-18.md). No merges, paid model calls, live platform access, worker activation or owner prompts are permitted during this window.
+
+New local fixes add a selectable full-post fallback when listing clipboard access fails/stalls, and suppress stale “Copied” feedback after edits/platform changes/account unmount. Six new desktop/mobile regressions reproduced the defects and passed after the fix. Independent review also reproduced a code-sign-in timeout/account-choice race; identity-changing controls now remain blocked until the original SDK verification settles, with explicit refresh guidance. Fourteen focused Auth checks pass. Next and matching lint configuration are patched to **16.4.5** in both preparation baselines; main and prepared Sites production audits report **zero findings**. Full tooling findings and patch limits are documented in [dependency maintenance](sites-dependency-maintenance.md).
+
+Final full regressions and compiled Sites packaging are underway. Email-code publication is still held until its Supabase email template is saved/read back; Sites version 20 remains the live release. The normal OpenClaw service was not restarted. Its credential-free worker preflight passed, making no cloud connection or model request.
+
 ## In-app email codes prepared — 16 November 2026
 
 The owner reported that email links still open a browser instead of the installed PWA. The previous link-paste fallback did not resolve the desired simple sign-in experience. PR #31's next increment adds **Email me a sign-in code** and **Verify code and sign in**, using existing Supabase email OTP in the current app session. Existing account restrictions remain in force. An email can be read on another device; entering its code in the PWA creates the session there. Old link/invitation support remains optional.

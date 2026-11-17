@@ -111,8 +111,9 @@ test("a lost verification response releases the screen without a duplicate reque
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "Could not confirm sign-in yet",
   );
-  await page.getByLabel("Unused sign-in link").fill(link);
-  await page.getByRole("button", { name: "Sign in here", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Sign in here", exact: true }),
+  ).toBeDisabled();
   expect(requests).toBe(1);
   await expect(page.getByLabel("Unused sign-in link")).toHaveValue("");
   release();

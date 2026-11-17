@@ -6,7 +6,7 @@ import { withRequestDeadline } from "@/lib/request-deadline";
 import { parseSignInLink } from "@/lib/pwa-auth";
 import { supabaseUrl } from "@/lib/config";
 const verificationTimeout =
-  "Could not confirm sign-in yet. Check whether your inventory opens before requesting another link.";
+  "Could not confirm sign-in yet. The original request may still finish. Refresh to check your session before choosing another email or trying again.";
 const emailTimeout =
   "Could not confirm the sign-in email request. Check your inbox before requesting another code; the email may already have been sent.";
 import { authFailureMessage, authRedirectMessage } from "@/lib/auth-feedback";
@@ -29,6 +29,7 @@ export function AuthPanel() {
   const [code, setCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   const verificationPending = useRef(false);
+  const [verificationUnresolved, setVerificationUnresolved] = useState(false);
   const linkError = useSyncExternalStore(
     subscribeToUrlChanges,
     redirectMessage,
@@ -37,6 +38,10 @@ export function AuthPanel() {
   const displayedError = error || (!message && !busy ? linkError : "");
   async function signIn(event: FormEvent) {
     event.preventDefault();
+    if (verificationPending.current) {
+      setError(verificationTimeout);
+      return;
+    }
     setBusy(true);
     setError("");
     setMessage("");
@@ -82,6 +87,7 @@ export function AuthPanel() {
       return;
     }
     verificationPending.current = true;
+    setVerificationUnresolved(true);
     setVerifying(true);
     try {
       const { data, error } = await withRequestDeadline(
@@ -90,6 +96,7 @@ export function AuthPanel() {
             .auth.verifyOtp({ email: address, token, type: "email" })
             .finally(() => {
               verificationPending.current = false;
+              setVerificationUnresolved(false);
             }),
         verificationTimeout,
       );
@@ -128,6 +135,7 @@ export function AuthPanel() {
       return;
     }
     verificationPending.current = true;
+    setVerificationUnresolved(true);
     setVerifying(true);
     try {
       const { data, error } = await withRequestDeadline(
@@ -136,6 +144,7 @@ export function AuthPanel() {
             .auth.verifyOtp(params)
             .finally(() => {
               verificationPending.current = false;
+              setVerificationUnresolved(false);
             }),
         verificationTimeout,
       );
@@ -175,7 +184,7 @@ export function AuthPanel() {
               type="email"
               autoComplete="email"
               required
-              disabled={busy || verifying}
+              disabled={busy || verifying || verificationUnresolved}
               value={email}
               onChange={(event) => {
                 setEmail(event.target.value);
@@ -187,7 +196,10 @@ export function AuthPanel() {
             />
           </div>
         </label>
-        <button className="button primary w-full" disabled={busy || verifying}>
+        <button
+          className="button primary w-full"
+          disabled={busy || verifying || verificationUnresolved}
+        >
           {busy ? "Sending code…" : "Email me a sign-in code"}
           <ArrowRight size={17} />
         </button>
@@ -205,7 +217,7 @@ export function AuthPanel() {
             required
             aria-describedby="code-help"
             value={code}
-            disabled={busy || verifying}
+            disabled={busy || verifying || verificationUnresolved}
             onChange={(event) => setCode(event.target.value)}
           />
         </label>
@@ -215,7 +227,9 @@ export function AuthPanel() {
         </p>
         <button
           className="button primary w-full"
-          disabled={busy || verifying || !email.trim()}
+          disabled={
+            busy || verifying || verificationUnresolved || !email.trim()
+          }
         >
           {verifying ? "Verifying…" : "Verify code and sign in"}
         </button>
@@ -239,7 +253,10 @@ export function AuthPanel() {
               onChange={(event) => setPastedLink(event.target.value)}
             />
           </label>
-          <button className="button primary" disabled={busy || verifying}>
+          <button
+            className="button primary"
+            disabled={busy || verifying || verificationUnresolved}
+          >
             {verifying ? "Verifying link…" : "Sign in here"}
           </button>
         </form>

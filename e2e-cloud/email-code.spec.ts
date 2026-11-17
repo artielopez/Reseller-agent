@@ -122,10 +122,55 @@ test("a pending code verification is bounded and never repeated automatically", 
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "Could not confirm sign-in yet",
   );
+  await expect(
+    page.getByLabel("Email sign-in code", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Verify code and sign in", exact: true }),
+  ).toBeDisabled();
+  expect(count).toBe(1);
+  release();
+});
+
+test("an unresolved code verification keeps its account fixed until the SDK settles", async ({
+  page,
+}) => {
+  let release!: () => void,
+    requested = false;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(`${backendOrigin}/**`, async (route) => {
+    const path = new URL(route.request().url()).pathname;
+    if (path === "/auth/v1/verify") {
+      requested = true;
+      await held;
+      return route.fulfill({ json: session });
+    }
+    if (path === "/auth/v1/user") return route.fulfill({ json: session.user });
+    if (path === "/rest/v1/items") return route.fulfill({ json: [] });
+    return route.fulfill({ status: 400, json: {} });
+  });
+  await page.goto("/");
+  await page.getByLabel("Email address", { exact: true }).fill(email);
+  await page.clock.install();
   await page.getByLabel("Email sign-in code", { exact: true }).fill("123456");
   await page
     .getByRole("button", { name: "Verify code and sign in", exact: true })
     .click();
-  expect(count).toBe(1);
+  await expect.poll(() => requested).toBe(true);
+  await page.clock.fastForward(16000);
+  await expect(
+    page.getByLabel("Email address", { exact: true }),
+  ).toBeDisabled();
+  await expect(
+    page.getByRole("button", { name: "Email me a sign-in code", exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Refresh",
+  );
   release();
+  await expect(
+    page.getByRole("button", { name: "Add item", exact: true }),
+  ).toBeVisible();
 });

@@ -58,6 +58,8 @@ export function ItemEditor({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [copied, setCopied] = useState("");
+  const [manualCopy, setManualCopy] = useState("");
+  const copyRequest = useRef(0);
   const [dirty, setDirty] = useState(false);
   const listing = item.listings.find((entry) => entry.channel === channel)!;
   const priceReview = listingPriceReview(listing, price);
@@ -68,11 +70,19 @@ export function ItemEditor({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
+  function invalidateCopy() {
+    copyRequest.current++;
+    setCopied("");
+    setManualCopy("");
+    setNotice("");
+  }
   function update(patch: Partial<Item>) {
+    invalidateCopy();
     setDirty(true);
     setItem((current) => ({ ...current, ...patch }));
   }
   function updateListing(patch: Partial<Listing>) {
+    invalidateCopy();
     setDirty(true);
     setCopied("");
     setItem((current) => ({
@@ -163,19 +173,29 @@ export function ItemEditor({
     }
   }
   async function copy(kind: "title" | "description" | "post") {
+    const request = ++copyRequest.current;
+    const signal = requestSignal();
+    const text =
+      kind === "post"
+        ? `${listing.title}\n\n${listing.description}`
+        : listing[kind];
+    setError("");
+    setNotice("");
+    setCopied("");
+    setManualCopy("");
+    const isCurrent = () => !signal.aborted && request === copyRequest.current;
     try {
-      const text =
-        kind === "post"
-          ? `${listing.title}\n\n${listing.description}`
-          : listing[kind];
       await writeClipboard(text);
+      if (!isCurrent()) return;
       setCopied(kind);
       setNotice(
         "Copied. Paste into your listing, then save its URL here after posting.",
       );
     } catch {
+      if (!isCurrent()) return;
+      setManualCopy(text);
       setError(
-        "Clipboard access is unavailable. Select the title or description and copy it manually.",
+        "Automatic copying could not be confirmed. Select the text below and copy it manually before posting.",
       );
     }
   }
@@ -266,6 +286,7 @@ export function ItemEditor({
                     accept="image/jpeg,image/png,image/webp"
                     multiple
                     onChange={(event) => {
+                      invalidateCopy();
                       void upload(event.target.files);
                       event.target.value = "";
                     }}
@@ -301,6 +322,7 @@ export function ItemEditor({
                     required
                     value={price}
                     onChange={(event) => {
+                      invalidateCopy();
                       setPrice(event.target.value);
                       setDirty(true);
                     }}
@@ -428,7 +450,7 @@ export function ItemEditor({
                   if (next < 0) return;
                   event.preventDefault();
                   setChannel(channels[next]);
-                  setCopied("");
+                  invalidateCopy();
                   document.getElementById(`tab-${channels[next]}`)?.focus();
                 }}
                 aria-selected={channel === value}
@@ -437,7 +459,7 @@ export function ItemEditor({
                 key={value}
                 onClick={() => {
                   setChannel(value);
-                  setCopied("");
+                  invalidateCopy();
                 }}
               >
                 {value === "carousell"
@@ -512,6 +534,17 @@ export function ItemEditor({
                 </button>
               ))}
             </div>
+            {manualCopy && (
+              <label className="field">
+                <span>Copy listing manually</span>
+                <textarea
+                  readOnly
+                  rows={6}
+                  value={manualCopy}
+                  onFocus={(event) => event.currentTarget.select()}
+                />
+              </label>
+            )}
             <div className="posting-note">
               <strong>Copy. Post. Keep track.</strong>
               <p>
