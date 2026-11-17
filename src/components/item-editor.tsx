@@ -182,6 +182,7 @@ export function ItemEditor({
       kind === "post"
         ? `${listing.title}\n\n${listing.description}`
         : listing[kind];
+    if (!text.trim()) return;
     setError("");
     setNotice("");
     setCopied("");
@@ -527,7 +528,11 @@ export function ItemEditor({
                   type="button"
                   className="button secondary small"
                   key={kind}
-                  disabled={!listing.title && !listing.description}
+                  disabled={
+                    kind === "post"
+                      ? !listing.title.trim() && !listing.description.trim()
+                      : !listing[kind].trim()
+                  }
                   onClick={() => copy(kind)}
                 >
                   {copied === kind ? <Check size={14} /> : <Copy size={14} />}

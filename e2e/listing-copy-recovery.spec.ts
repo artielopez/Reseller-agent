@@ -83,13 +83,11 @@ for (const change of ["edit", "channel"] as const) {
 
 test("changing listing tabs preserves a real photo error", async ({ page }) => {
   await openItem(page);
-  await page
-    .getByLabel("Upload photos")
-    .setInputFiles({
-      name: "unsupported.svg",
-      mimeType: "image/svg+xml",
-      buffer: Buffer.from("<svg/>"),
-    });
+  await page.getByLabel("Upload photos").setInputFiles({
+    name: "unsupported.svg",
+    mimeType: "image/svg+xml",
+    buffer: Buffer.from("<svg/>"),
+  });
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
     "Choose JPEG",
   );
@@ -98,3 +96,29 @@ test("changing listing tabs preserves a real photo error", async ({ page }) => {
     "Choose JPEG",
   );
 });
+
+for (const empty of ["title", "description"] as const) {
+  test(`cannot clear the clipboard by copying an empty listing ${empty}`, async ({
+    page,
+  }) => {
+    await openItem(page);
+    const field = page.getByRole("textbox", {
+      name: `Carousell ${empty}`,
+      exact: true,
+    });
+    await field.fill("   ");
+    await expect(
+      page.getByRole("button", { name: `Copy ${empty}`, exact: true }),
+    ).toBeDisabled();
+    await expect(
+      page.getByRole("button", { name: "Copy post", exact: true }),
+    ).toBeEnabled();
+    const other = empty === "title" ? "description" : "title";
+    await page
+      .getByRole("textbox", { name: `Carousell ${other}`, exact: true })
+      .fill("");
+    await expect(
+      page.getByRole("button", { name: "Copy post", exact: true }),
+    ).toBeDisabled();
+  });
+}

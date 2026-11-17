@@ -50,3 +50,12 @@ The 15-minute thread heartbeat is bounded by the deadline. Pause it when all use
 - Review empty-field copy behavior (a blank channel title currently shares enablement with a nonblank description) and protect against clearing the clipboard with empty content if reproduced. Check a minimal signed-out accessibility flow, including the new deliberate reload, using synthetic data.
 - After useful fixes are finished, prepare one final exact compiled Sites artifact/checks and update save-only provenance. Do not deploy version 21 or a successor before email-template read-back. The latest two UI fixes currently exist only in the main review source, not saved version 21.
 - Consolidate the final acceptance handoff and pause the heartbeat when independent useful work is exhausted or at the deadline. Do not turn unresolved account/platform work into artificial passing acceptance.
+
+## 05:05 Manila continuation
+
+- CI **44174333704 passed** for `8545f54`; PR #31 remains open with auto-merge disabled.
+- Reproduced another posting reliability defect: **Copy title/description** stayed enabled for an empty/whitespace field when the other field was populated, allowing an empty clipboard overwrite. Per-field button guards and a final nonblank dispatch check now prevent it. Both desktop reproductions failed before the fix; all **12 listing recovery browser checks pass** afterward.
+- New signed-out email-code/error/fallback accessibility checks report **zero automated WCAG A/AA violations** on desktop/mobile. They also verify one-time-code autocomplete. These automated checks do not establish VoiceOver/iPhone acceptance.
+- Final artifact preparation/checks will follow the main verification. No live email, platform traffic, model request, credential read or worker change occurred.
+- Main verification after the empty-copy guard passed **309 tests** (six optional skips), lint/types/build and **74 ordinary + 70 cloud + 4 PWA browser checks**. Added a final synthetic cloud account-switch check for late clipboard success/failure before consolidating the exact artifact; this adds coverage without changing the reviewed owner-lifetime guard.
+- All **four** late clipboard success/failure account-switch checks passed in desktop/mobile cloud mode. They verify the previous owner's text, manual fallback and status cannot enter the next workspace. This is synthetic HTTP/browser evidence, not the outstanding actual Artie/Janyl physical-device acceptance.

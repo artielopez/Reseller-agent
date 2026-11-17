@@ -254,3 +254,50 @@ test("uncertain sign-out retains edits and reports recovery without queueing ano
   ).toBeVisible();
   await expect(page.getByLabel("Item title")).toHaveCount(0);
 });
+
+for (const outcome of ["success", "failure"] as const) {
+  test(`a late listing clipboard ${outcome} cannot enter a different owner's workspace`, async ({
+    page,
+  }) => {
+    await inventory(page);
+    await page
+      .getByLabel("Carousell title", { exact: true })
+      .fill("Private original owner copy");
+    await page.evaluate(() =>
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: () =>
+            new Promise<void>((resolve, reject) => {
+              (
+                window as unknown as { finishCopy: (fail: boolean) => void }
+              ).finishCopy = (fail) =>
+                fail ? reject(new Error("denied")) : resolve();
+            }),
+        },
+      }),
+    );
+    await page.getByRole("button", { name: "Copy title", exact: true }).click();
+    await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
+    await expect(page.getByLabel("Item title", { exact: true })).toHaveCount(0);
+    await page.evaluate(
+      (fail) =>
+        (
+          window as unknown as { finishCopy: (fail: boolean) => void }
+        ).finishCopy(fail),
+      outcome === "failure",
+    );
+    await expect(
+      page.getByRole("button", { name: "Add item", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Copied\. Paste into your listing/),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("textbox", { name: "Copy listing manually", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("Private original owner copy", { exact: true }),
+    ).toHaveCount(0);
+  });
+}
