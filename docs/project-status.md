@@ -14,6 +14,8 @@ Follow-up at 04:50 Manila: CI `44172502159` **passed**. A small additional recov
 
 Consolidated release candidate: **Sites version 22, saved but NOT DEPLOYED**, source `082b84d616fca8ba8baf1bbe420681af78c7a8ee`, passed types/build and **74 compiled cloud + 4 service-worker checks**. It supersedes undeployed version 21 and contains all current UI fixes. GitHub implementation `ab5c7d1` is pushed; CI `44176925049` was running at preparation. Live version remains **20** pending the email-template prerequisite.
 
+05:20 checkpoint: implementation CI `44176925049` **passed**. [Fresh primary-source channel review](research/channel-access-check-2026-11-18.md) found no material new basis for automatic personal-profile/Group/Carousell access. Supabase discovery still exposes only Artie's Projects and its healthy Reseller Agent project; cross-organization access remains unconfigured. No platform account, credentials, permissions or deployment was changed.
+
 ## In-app email codes prepared — 16 November 2026
 
 The owner reported that email links still open a browser instead of the installed PWA. The previous link-paste fallback did not resolve the desired simple sign-in experience. PR #31's next increment adds **Email me a sign-in code** and **Verify code and sign in**, using existing Supabase email OTP in the current app session. Existing account restrictions remain in force. An email can be read on another device; entering its code in the PWA creates the session there. Old link/invitation support remains optional.
