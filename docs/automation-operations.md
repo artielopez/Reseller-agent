@@ -1,8 +1,10 @@
 # Operating Reseller Agent
 
-Current mode, 4 November 2026: private cloud inventory and assisted replies. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
+Current mode, 18 November 2026: private cloud inventory and assisted replies. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
 
 ## Everyday use
+
+[Step-by-step posting guide](selling-today.md). The live app still uses email links; code-entry sign-in is prepared but awaits its matching Supabase template and publication.
 
 1. Open [the private cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) with your invited ChatGPT account, then sign into the app with your own email link. Artie and Janyl have separate inventories; neither needs Supabase administrator access.
 2. Save the item first. Add its facts, asking price and up to ten supported photos. Review each platform's listing copy, especially after a price or condition change. Copy it and post through the platform yourself; record the resulting URL/publication status in the app.
@@ -49,9 +51,9 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **13**, published from source `b592ec18bddd9073ce8100e894086a68e13c9d69`, with its audience limited to Artie and Janyl. The [overnight release ledger](overnight-work-2026-11-04.md) records the current successful deployment and the pending signed-in UI check. GitHub and the separate Sites source repository have different release histories. The eight hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
+The live cloud app is Sites version **20**, source `eb46171ff6816007dfce240fd09197113bb10291`, with Artie/Janyl access unchanged. Prepared **version 22 is saved but NOT DEPLOYED**, superseding undeployed version 21; its code-entry flow requires the matching Supabase email template. The [current execution ledger](overnight-work-2026-11-18.md) records exact verification and source changes. A newer saved version number is not evidence of a production deployment.
 
-[Draft PR #29](https://github.com/artielopez/Reseller-agent/pull/29) contains the latest cumulative unmerged work, including request recovery and saved-question editing. See the [review map](release-review-map.md). Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
+The cumulative stack through PR #29 was merged by explicit owner instruction on 15 November. New PWA/email-code/recovery work remains in [PR #31](https://github.com/artielopez/Reseller-agent/pull/31), open and unmerged. Keep it reviewable; no merge or auto-merge without owner approval. GitHub and Sites have separate source histories. Test/documentation-only increments need no cloud publication. A future publication must use its exact pushed/built source, preserve the private audience and record the email-template prerequisite and runtime checks. The hosted migration mappings remain in [the setup record](cloud-workspace-setup.md).
 
 For a regression, first pause/revoke the affected worker capability and preserve the manual workflow. Prepare and verify a compatible prior app source before an authorized rollback. Do not revert to a client lacking save-revision support while the guard is active. Older open cloud editors must reload. Do not blindly revert to an older six-photo client after ten-photo data exists, reapply initial migrations, weaken RLS, or delete data to make an older build work. Disabling drafting is safer than guessing a migration downgrade.
 

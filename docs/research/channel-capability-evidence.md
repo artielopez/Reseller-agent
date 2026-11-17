@@ -1,5 +1,9 @@
 # Account capability evidence — 29 October 2026
 
+## Documentation/connection checkpoint — 18 November 2026
+
+[Dated primary-source recheck](channel-access-check-2026-11-18.md): no material new permission/API basis was found for the requested personal Marketplace, Group-comment or Carousell automation. Native availability/CarouBiz tools remain account-entitlement checks. Beeper documents useful draft/update/reconciliation primitives but still does not establish this account's Marketplace coverage or Meta permission. The Carousell inquiry remains unsent. No personal platform UI or messages were accessed. Supabase still exposes only Artie's Projects; cross-organization access is unverified.
+
 ## Follow-up — 3 November 2026
 
 Official [Beeper API documentation](https://developers.beeper.com/desktop-api/), [Meta's native reply announcement](https://about.fb.com/news/2026/03/facebook-marketplace-new-meta-ai-tools-make-selling-faster-and-easier/) and [Carousell PH reply documentation](https://support.carousell.com/hc/en-us/articles/900006211046--Philippines-CarouBiz-tools-Quick-and-Auto-Reply) were rechecked. They do not establish this account's native eligibility or permission for our custom connector. The owner-approved [Beeper inquiry](../channel-access-support-draft.md) was sent to its official developer contact; response pending. No new platform account inspection or message access occurred.

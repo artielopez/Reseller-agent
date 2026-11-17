@@ -1,5 +1,11 @@
 # Sites dependency maintenance — 4 November 2026
 
+## 18 November patch continuation
+
+The main application and Sites preparation baseline now pin Next.js and `eslint-config-next` **16.4.5**, addressing GHSA-mfr8-8qww-v76h and GHSA-vc7v-qv4w-wrv8. Source inspection found no affected Cache Components/root-param caching APIs in this app. Both the main and prepared Sites **production audits report zero findings**. Publication remains held for the matching email-code template; this patch is not yet a claim about live version 20.
+
+Main full audit currently reports **17 tooling findings: 11 high and six moderate**, through picomatch/minimatch and inherited test/lint packages. Picomatch's advisory has no published patched compatible version in the checked registry; querying 4.0.8 returned 404. Do not use a forced Vitest/Next downgrade or an unverified major override. Keep test/dev servers local and recheck official package releases when evidence changes. The earlier counts below are historical snapshots, not the current full audit. [Current verification ledger](overnight-work-2026-11-18.md).
+
 The Next.js repository and the retained Sites/Vinext source have separate lockfiles.
 Auditing only the main repository does not cover the deployed adapter. In particular,
 some packages declared as development dependencies (React Server Components and

@@ -1,5 +1,11 @@
 # End-to-end acceptance and release gates
 
+## Current release checkpoint — 18 November 2026
+
+The live app is **Sites version 20**. The email-code sign-in flow, Next.js patch and recovery follow-ups are on open PR #31. The consolidated candidate **version 22 is saved but NOT DEPLOYED**; it supersedes undeployed version 21. Read [current status](project-status.md) and [the current execution ledger](overnight-work-2026-11-18.md) before releasing or performing device acceptance. The template must contain `{{ .Token }}` and be saved/read back before the matching code UI is published. Existing invitation/account restrictions remain in place.
+
+The earlier acceptance evidence below is retained. User activation and one supervised real OpenClaw draft are established; continuous model operation, automatic channel access and actual iPhone code/photo acceptance remain unresolved. [Everyday assisted selling guide](selling-today.md).
+
 Updated 4 November 2026. This is the Task 6 acceptance register from the [sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md). It preserves the full automatic intake/reply objective. Passing manual assistance or synthetic tests does not complete that objective.
 
 Current usable mode: [private cloud inventory and manual inbox](https://reseller-agent-cloud.pandabur.chatgpt.site), with supervised, one-question OpenClaw drafting. Automatic capture and sending are disabled. [Operating instructions](automation-operations.md) · [chronological evidence](project-status.md).

@@ -1,8 +1,22 @@
 # Reseller Agent project plan
 
+## Current assignment — 18 November sleep window
+
+The authorized independent implementation and verification is complete within available access at **05:54 Manila**, ahead of the **11:34:22** deadline. Work remains on `codex/phone-pwa` / PR #31. The continuation heartbeat was **deleted** after the final support-thread check found no response; no further idle polling is scheduled. [Completed work and remaining dependencies](overnight-work-2026-11-18.md#final-independent-work-handoff--0554-manila). Keep the code-entry release held for its matching email-template save/read-back; version 22 is saved, while version 20 remains live. No merge, model call, worker activation or live platform action occurred. The broader goal remains incomplete and no input is requested while the owner sleeps. [Everyday selling guide](selling-today.md).
+
+## Correct the PWA sign-in experience — 16 November 2026
+
+Use emailed one-time codes as the primary sign-in flow, verified inside the app where the user started. The link-copy workaround remains only for old emails/invitations. Implementation and synthetic tests are ready in PR #31. Next: save/read back the prepared Magic Link email template in Supabase, verify code delivery, build/test the matching Sites artifact, publish with the same audience, then ask for one actual iPhone code sign-in/reopen test. Dashboard access currently needs the Mac unlocked and local browser use enabled. Keep Sites version 20 live until the email and UI can be released together. Preserve existing signup restrictions, OTP security settings, SMTP and account access.
+
+## Phone app increment — 15 November 2026
+
+Operational acceptance update: the first phone sign-in retry exposed an inactive Supabase project, restored and verified healthy on 15 November. Future release readiness must include a live, read-only project/Auth health check alongside synthetic browser/build checks. Do not infer backend availability from a successful Sites deployment. No paid upgrade or keepalive automation is authorized by this recovery.
+
+The owner approved PWA implementation after the completed stack was merged. Home Screen metadata/icons, standalone safe-area layout, online/offline guidance, a generic offline fallback and an unused-email-link verification option are now published in **Sites version 20**. The existing design and private inventory model are preserved. No offline write queue, private-data cache, push notifications or automatic platform access/sending were added; no new recurring service or database change was required. [Installation/device acceptance guide](phone-app.md). [PR #31](https://github.com/artielopez/Reseller-agent/pull/31) remains open and unmerged; physical iPhone acceptance remains a separate gate from synthetic browser checks.
+
 Updated 15 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
-## Current assignment
+## Prior merge assignment — 15 November
 
 The owner approved merging and deploying all completed work on 15 November.
 PR #29 and its 21 included development snapshots are merged into `main`; Sites
