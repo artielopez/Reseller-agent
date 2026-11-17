@@ -36,6 +36,8 @@ import { demoMode } from "@/lib/config";
 import { requestListingCopy } from "@/lib/listing-generation";
 import { useRequestLifetime } from "@/lib/use-request-lifetime";
 import { preparePhoto } from "@/lib/photos";
+const clipboardFailure =
+  "Automatic copying could not be confirmed. Select the text below and copy it manually before posting.";
 
 export function ItemEditor({
   initial,
@@ -75,6 +77,7 @@ export function ItemEditor({
     setCopied("");
     setManualCopy("");
     setNotice("");
+    setError((current) => (current === clipboardFailure ? "" : current));
   }
   function update(patch: Partial<Item>) {
     invalidateCopy();
@@ -194,9 +197,7 @@ export function ItemEditor({
     } catch {
       if (!isCurrent()) return;
       setManualCopy(text);
-      setError(
-        "Automatic copying could not be confirmed. Select the text below and copy it manually before posting.",
-      );
+      setError(clipboardFailure);
     }
   }
   const name = channelNames[channel];

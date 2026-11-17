@@ -88,6 +88,8 @@ The model is configurable. The default is [`gpt-6-luna`](https://developers.open
 
 ## Everyday workflow
 
+For a step-by-step operator guide, see [Prepare and post an item today](docs/selling-today.md), including current sign-in, template/AI limitations, photo handling, publication tracking and manual buyer replies.
+
 1. Select **Add item**. Add up to ten JPEG, PNG or WebP photos and enter the title, PHP asking price, condition, category and flaws. Photos are optional for a draft.
 2. Select **Generate listing copy**. Review and edit the Carousell, Marketplace and Groups tabs. Regeneration asks before replacing existing copy.
 3. **Save item**, then copy its title, description or full post into the platform. Add the photos through the platform's normal posting flow.

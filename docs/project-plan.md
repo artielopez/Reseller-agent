@@ -1,5 +1,9 @@
 # Reseller Agent project plan
 
+## Current assignment — 18 November sleep window
+
+Continue reversible implementation and verification through **11:34:22 Manila** without owner input, using `codex/phone-pwa` / PR #31. [Current execution ledger](overnight-work-2026-11-18.md). The continuation heartbeat is ACTIVE for this bounded window; the old 4 November heartbeat pause below is historical. Keep the code-entry release held for its matching email template, preserve the live audience, and make no merge, model call or live platform action. [Everyday selling guide](selling-today.md).
+
 ## Correct the PWA sign-in experience — 16 November 2026
 
 Use emailed one-time codes as the primary sign-in flow, verified inside the app where the user started. The link-copy workaround remains only for old emails/invitations. Implementation and synthetic tests are ready in PR #31. Next: save/read back the prepared Magic Link email template in Supabase, verify code delivery, build/test the matching Sites artifact, publish with the same audience, then ask for one actual iPhone code sign-in/reopen test. Dashboard access currently needs the Mac unlocked and local browser use enabled. Keep Sites version 20 live until the email and UI can be released together. Preserve existing signup restrictions, OTP security settings, SMTP and account access.
@@ -12,7 +16,7 @@ The owner approved PWA implementation after the completed stack was merged. Home
 
 Updated 15 November 2026. [Status and evidence](project-status.md) · [Imported handoff](project-handoff.md) · [Sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md) · [Manual buyer foundation](superpowers/plans/2026-10-28-buyer-replies.md)
 
-## Current assignment
+## Prior merge assignment — 15 November
 
 The owner approved merging and deploying all completed work on 15 November.
 PR #29 and its 21 included development snapshots are merged into `main`; Sites

@@ -174,3 +174,36 @@ test("an unresolved code verification keeps its account fixed until the SDK sett
     page.getByRole("button", { name: "Add item", exact: true }),
   ).toBeVisible();
 });
+
+test("uncertain verification offers a deliberate reload without sending another email or retaining the code", async ({
+  page,
+}) => {
+  let count = 0,
+    release!: () => void;
+  const held = new Promise<void>((resolve) => {
+    release = resolve;
+  });
+  await page.route(`${backendOrigin}/auth/v1/verify`, async (route) => {
+    count++;
+    await held;
+    await route.fulfill({ status: 400, json: {} }).catch(() => {});
+  });
+  await page.goto("/");
+  await page.getByLabel("Email address", { exact: true }).fill(email);
+  await page.clock.install();
+  await page.getByLabel("Email sign-in code", { exact: true }).fill("123456");
+  await page
+    .getByRole("button", { name: "Verify code and sign in", exact: true })
+    .click();
+  await expect.poll(() => count).toBe(1);
+  await page.clock.fastForward(16000);
+  await page
+    .getByRole("button", { name: "Reload to check sign-in", exact: true })
+    .click();
+  await expect(page.getByLabel("Email address", { exact: true })).toBeEnabled();
+  await expect(
+    page.getByLabel("Email sign-in code", { exact: true }),
+  ).toHaveValue("");
+  expect(count).toBe(1);
+  release();
+});

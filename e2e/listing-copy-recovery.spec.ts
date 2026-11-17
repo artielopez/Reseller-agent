@@ -22,7 +22,10 @@ test("a stalled listing clipboard offers one selectable full post and withdraws 
   await page.clock.install();
   await page.getByRole("button", { name: "Copy post", exact: true }).click();
   await page.clock.fastForward(3001);
-  const manual = page.getByRole("textbox", { name: "Copy listing manually", exact: true });
+  const manual = page.getByRole("textbox", {
+    name: "Copy listing manually",
+    exact: true,
+  });
   await expect(manual).toHaveValue(
     "Reviewed tote title\n\nReviewed description. PHP 450.",
   );
@@ -38,6 +41,9 @@ test("a stalled listing clipboard offers one selectable full post and withdraws 
     .getByRole("textbox", { name: "Carousell description", exact: true })
     .fill("Changed description");
   await expect(manual).toHaveCount(0);
+  await expect(
+    page.getByRole("main").getByText(/Select the text below/),
+  ).toHaveCount(0);
 });
 for (const change of ["edit", "channel"] as const) {
   test(`a late listing clipboard completion cannot claim success after ${change}`, async ({
@@ -74,3 +80,21 @@ for (const change of ["edit", "channel"] as const) {
     ).toHaveCount(0);
   });
 }
+
+test("changing listing tabs preserves a real photo error", async ({ page }) => {
+  await openItem(page);
+  await page
+    .getByLabel("Upload photos")
+    .setInputFiles({
+      name: "unsupported.svg",
+      mimeType: "image/svg+xml",
+      buffer: Buffer.from("<svg/>"),
+    });
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Choose JPEG",
+  );
+  await page.getByRole("tab", { name: "Marketplace", exact: true }).click();
+  await expect(page.getByRole("main").getByRole("alert")).toContainText(
+    "Choose JPEG",
+  );
+});

@@ -35,3 +35,18 @@ The 15-minute thread heartbeat is bounded by the deadline. Pause it when all use
 2. Improve remaining independently reproducible sign-in/clipboard recovery UX, including the deferred stale clipboard message and a usable reconciliation action for an uncertain verification inside standalone mode. Use focused failing regressions, then appropriate full checks; keep one PR.
 3. Review the everyday posting and buyer-use instructions against the implemented UI and update the acceptance handoff. Physical iPhone, live email-code template/delivery, fresh supervised model allowance and permitted external channel access remain participant/provider dependencies; do not manufacture completion with more synthetic tests.
 4. Do not repeat unchanged model/runtime/browser checks. The Mac/browser access restriction is already known. After useful work is exhausted or by the deadline, record the final handoff and pause the heartbeat. The broader goal remains unfinished.
+
+## 04:50 Manila continuation
+
+- Implementation CI **44172502159 passed** for `eca2a80`. No merge or deployment follows from CI success.
+- The deferred clipboard message was reproduced as stale “Select the text below” after its fallback disappeared. The scoped fix clears only that exact clipboard error on invalidation; a separate photo-error regression confirms unrelated errors survive tab changes.
+- Added **Reload to check sign-in** after a verification becomes uncertain, so the standalone app has a visible deliberate reconciliation action. The regression first failed because the action was absent, then passed; reload neither sends another email nor retains the typed code. Identity controls remain fixed while the SDK request is unresolved.
+- Focused follow-up verification: **8 listing recovery + 16 Auth browser checks passed** across desktop/mobile. Initial reproduction attempts had one route-announcer locator ambiguity and overlapping local Next servers/trace directories; corrected/scoped tests and sequential servers established the actual failures. These were harness issues, not extra product defects. Final full verification passed: **309 tests** (six optional skips), lint/types/build, **70 ordinary + 68 cloud + 4 PWA browser checks**. No worker implementation changed, so its preceding successful build/preflight was not repeated.
+- Added [selling-today.md](selling-today.md), distinguishing the live browser/link/template flow from prepared code sign-in and explaining original-photo selection, channel copy/post/URL tracking and reviewed manual buyer replies. Updated the supervised checklist to use current status rather than a historical overnight release number.
+
+### Next after 04:50 increment
+
+- Verify this new commit's CI when available; prior eca2a80 CI is already successful.
+- Review empty-field copy behavior (a blank channel title currently shares enablement with a nonblank description) and protect against clearing the clipboard with empty content if reproduced. Check a minimal signed-out accessibility flow, including the new deliberate reload, using synthetic data.
+- After useful fixes are finished, prepare one final exact compiled Sites artifact/checks and update save-only provenance. Do not deploy version 21 or a successor before email-template read-back. The latest two UI fixes currently exist only in the main review source, not saved version 21.
+- Consolidate the final acceptance handoff and pause the heartbeat when independent useful work is exhausted or at the deadline. Do not turn unresolved account/platform work into artificial passing acceptance.

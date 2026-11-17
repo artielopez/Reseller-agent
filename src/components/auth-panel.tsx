@@ -275,6 +275,15 @@ export function AuthPanel() {
           {displayedError}
         </p>
       )}
+      {verificationUnresolved && !verifying && (
+        <button
+          className="button secondary"
+          type="button"
+          onClick={() => window.location.reload()}
+        >
+          Reload to check sign-in
+        </button>
+      )}
       <p className="text-sm muted">
         Private workspace. Your account must already be invited. Use an unused
         invitation to activate a new account; for later sign-ins, enter your
