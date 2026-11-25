@@ -1,10 +1,10 @@
 # Reseller Agent status
 
-## Phone sign-in release resumed — 25 November 2026
+## Phone code sign-in deployed — 25 November 2026
 
-The owner authorized finishing and deploying phone sign-in, with **no merge**. Version **22** remains the exact prepared candidate; version **20** remains live. Fresh checks passed **309 tests** (six optional skips), lint/types/build, **74 compiled cloud + four service-worker browser checks**, and zero findings in both production dependency audits. Supabase reports healthy with no health-advisor notices. Current Sites access remains Artie owner/Janyl viewer. [Release evidence and resume steps](releases/2026-11-25-phone-sign-in.md).
+The owner authorized finishing and deploying phone sign-in, with **no merge**, and confirmed the matching Supabase Magic Link subject/body was saved and checked after reloading. **Sites version 22 is live**, source `082b84d616fca8ba8baf1bbe420681af78c7a8ee`, deployment `appgdep_6b0684ba42948191b47be503f3d76cce` (**succeeded**, environment revision 1). Sign-in now requests a code that is entered inside the same app. Fresh checks passed **309 tests** (six optional skips), lint/types/build, **74 compiled cloud + four service-worker browser checks**, and zero findings in both production dependency audits. Supabase reports healthy with no health-advisor notices. Post-publication access read-back confirms Artie owner/Janyl viewer unchanged. [Release evidence](releases/2026-11-25-phone-sign-in.md).
 
-The critical dependency is still saving/read-back of the matching Supabase Magic Link email template. The connector cannot edit Auth templates; the available browser tool cannot start because its configured Chrome executable is missing. The owner was asked for that one dashboard setting while independent checks completed. No credentials were extracted, browser installed, real email requested, deployment started or PR merged. Code sign-in is not live yet.
+Template read-back is **owner-confirmed**, because the connector cannot edit Auth templates and the available browser cannot start without its configured Chrome executable. Real delivery and installed-iPhone sign-in/reopen acceptance remain pending the requested device check. No credentials were extracted, browser installed, real email requested by the agent, worker activated or PR merged; auto-merge is disabled. Earlier version-20/undeployed-22 entries below are historical.
 
 ## Current handoff — 18 November 2026, 05:54 Manila
 

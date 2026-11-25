@@ -8,11 +8,11 @@
 
 An old Home Screen shortcut may retain its old icon or browser behavior. Keep any unsaved work, then remove only the shortcut and add it again. Do not clear website data to refresh an icon.
 
-## Sign in with an email code (prepared, awaiting cloud configuration)
+## Sign in with an email code
 
-The code-entry update is implemented on PR #31 but is not published yet. The live version 20 still uses email links until the email-template change is saved and verified. Do not expect older emails to contain a code.
+Email-code sign-in is published in **Sites version 22** on 25 November 2026. The owner confirmed the matching email template was saved/read back before publication. PR #31 remains unmerged. [Release receipt](releases/2026-11-25-phone-sign-in.md). Older emails may contain only a link; request a fresh code when signing in.
 
-Once released:
+To sign in:
 
 1. Open the Reseller Agent Home Screen icon and enter your email.
 2. Tap **Email me a sign-in code**.
@@ -23,9 +23,9 @@ This creates the session in the app where you enter the code. You do not need to
 
 The optional **Sign in inside this app** details section remains a fallback for old sign-in emails and unused invitations. New accounts must first accept their invitation. The hosting gate can also request its existing sign-in when first opening the icon.
 
-### Required operator setup before publication
+### Operator setup and recovery
 
-In the existing Supabase project, open Authentication → Email templates → Magic Link. Save `supabase/templates/magic-link.html` as its message body and use subject **Your Reseller Agent sign-in code**. The essential variable is `{{ .Token }}`. Preserve the current email provider, invitation settings, signup restrictions, token length/expiry and rate limits. This template sends a code without a browser link. Record a read-back before publishing the matching application. An ordinary request uses `signInWithOtp` with `shouldCreateUser: false`; verification uses `verifyOtp({ email, token, type: 'email' })`.
+The owner confirmed the live Magic Link subject **Your Reseller Agent sign-in code** and a code message containing `{{ .Token }}` were saved/read back. The complete equivalent template is `supabase/templates/magic-link.html`. If restoring/recreating configuration, open Authentication → Email templates → Magic Link and use that template/subject. Preserve the current email provider, invitation settings, signup restrictions, token length/expiry and rate limits. This template sends a code without a browser link. Coordinate email/app rollback: a link-only UI cannot use a code-only email. An ordinary request uses `signInWithOtp` with `shouldCreateUser: false`; verification uses `verifyOtp({ email, token, type: 'email' })`.
 
 Do not use a database update or extract credentials to bypass dashboard access. The Supabase MCP integration available here does not expose email-template updates. Configuration and delivery must be verified separately from synthetic browser tests.
 

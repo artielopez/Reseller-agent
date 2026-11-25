@@ -2,7 +2,7 @@
 
 ## Current assignment — 25 November phone sign-in release
 
-Finish and deploy the prepared email-code phone flow; keep PR #31 unmerged without owner approval. Fresh app and exact compiled-candidate checks pass. The remaining critical step is the Supabase Magic Link email subject/body save/read-back; the owner has been asked to complete it because the connector cannot edit templates and the available dashboard browser cannot initialize. Once confirmed, deploy existing saved version **22** with the unchanged Artie/Janyl audience, verify the deployment, then complete one deliberate real-code/installed-iPhone session check. [Exact release checkpoint](releases/2026-11-25-phone-sign-in.md). Do not bypass the template dependency or claim physical-device acceptance from synthetic tests.
+The owner confirmed the Supabase Magic Link subject/body save/read-back, and **Sites version 22 is now deployed successfully**, preserving Artie/Janyl access and environment revision 1. Fresh app and exact compiled-candidate checks pass. Keep PR #31 unmerged without owner approval. The remaining step is one deliberate real-code/installed-iPhone session check; the owner was asked to enter the code privately and confirm reopening retains the correct inventory. [Exact release receipt and acceptance limits](releases/2026-11-25-phone-sign-in.md). Do not claim real email delivery or physical-device acceptance from synthetic tests. Prior prepared/unpublished instructions below describe the historical release dependency.
 
 ## Current assignment — 18 November sleep window
 

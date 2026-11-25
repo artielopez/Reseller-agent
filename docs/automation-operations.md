@@ -1,12 +1,12 @@
 # Operating Reseller Agent
 
-Current mode, 18 November 2026: private cloud inventory and assisted replies. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
+Current mode, 25 November 2026: private cloud inventory and assisted replies. Sites version 22 includes in-app email-code sign-in. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
 
 ## Everyday use
 
-[Step-by-step posting guide](selling-today.md). The live app still uses email links; code-entry sign-in is prepared but awaits its matching Supabase template and publication.
+[Step-by-step posting guide](selling-today.md). The live app requests an emailed code that is entered inside the same app/browser; opening an email link is no longer required for routine sign-in.
 
-1. Open [the private cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) with your invited ChatGPT account, then sign into the app with your own email link. Artie and Janyl have separate inventories; neither needs Supabase administrator access.
+1. Open [the private cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) with your invited ChatGPT account, then request a code for your own email and enter it in that app. Artie and Janyl have separate inventories; neither needs Supabase administrator access.
 2. Save the item first. Add its facts, asking price and up to ten supported photos. Review each platform's listing copy, especially after a price or condition change. Copy it and post through the platform yourself; record the resulting URL/publication status in the app.
 3. Choose **Open buyer inbox**, select the saved item, channel and question location, paste the buyer question, then **Save question**. Buyer name is optional. Automatic import is not available.
 4. For a supervised AI run, use the saved question’s **Request AI draft** panel, **Refresh draft status**, then **Load saved replies**. The button queues work but does not start the Mac worker. Use/edit a template or an existing AI draft. Review the saved facts and exact wording, save and explicitly approve the reply, then copy it. Send through the source platform yourself and separately mark the inquiry **Answered**.
@@ -29,7 +29,7 @@ After verifying the saved unapproved draft, pause the queue, revoke that tempora
 
 | Symptom                                                   | Response                                                                                                                                                                                             |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sign-in link expired or already used                      | Open the cloud app first, request a fresh link for the existing app account, and use the newest email on the same device. Do not share its URL or grant Supabase admin access as an email workaround |
+| Sign-in code invalid, expired or already used             | Check the email/account, request one fresh code, and enter the newest code in the app where you want to sign in. Do not share it or grant Supabase admin access as an email workaround |
 | Save or photo upload fails                                | Preserve unsaved edits. After an uncertain save, reload/check inventory before any deliberate retry; do not assume the save failed or create a replacement item automatically                            |
 | Worker outcome is `unknown` or an acknowledgment was lost | Stop and inspect the saved queue/draft before another attempt. A successful save may already exist. Follow [network recovery](worker-recovery-acceptance.md); never blindly repeat inference         |
 | Worker cannot acquire its lock after a crash              | Keep the queue paused. Identify the exact worker/run and confirm its processes stopped before removing only that stale lock/run directory. No age/PID-only deletion or broad process killing         |
@@ -51,7 +51,7 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **20**, source `eb46171ff6816007dfce240fd09197113bb10291`, with Artie/Janyl access unchanged. Prepared **version 22 is saved but NOT DEPLOYED**, superseding undeployed version 21; its code-entry flow requires the matching Supabase email template. The [current execution ledger](overnight-work-2026-11-18.md) records exact verification and source changes. A newer saved version number is not evidence of a production deployment.
+The live cloud app is Sites version **22**, source `082b84d616fca8ba8baf1bbe420681af78c7a8ee`, with Artie/Janyl access unchanged. The owner confirmed the matching email-template save/read-back before the successful 25 November deployment. [Release receipt and outstanding device acceptance](releases/2026-11-25-phone-sign-in.md). The [overnight execution ledger](overnight-work-2026-11-18.md) records earlier verification/source changes; its save-only checkpoint is historical. A newer saved version number alone is not evidence of a production deployment.
 
 The cumulative stack through PR #29 was merged by explicit owner instruction on 15 November. New PWA/email-code/recovery work remains in [PR #31](https://github.com/artielopez/Reseller-agent/pull/31), open and unmerged. Keep it reviewable; no merge or auto-merge without owner approval. GitHub and Sites have separate source histories. Test/documentation-only increments need no cloud publication. A future publication must use its exact pushed/built source, preserve the private audience and record the email-template prerequisite and runtime checks. The hosted migration mappings remain in [the setup record](cloud-workspace-setup.md).
 

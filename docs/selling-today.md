@@ -4,7 +4,7 @@ Use the [private cloud workspace](https://reseller-agent-cloud.pandabur.chatgpt.
 
 ## Sign in
 
-Until the email-code release is published, use the normal Safari/Chrome browser and finish the newest sign-in email link in that browser. Opening a link in Safari does not automatically sign in a separate Home Screen app. The code-entry update is prepared; its email-template configuration is still pending. Check [current status](project-status.md) before following newer code instructions.
+Open the installed Home Screen app or your normal Safari/Chrome browser. Enter your email, tap **Email me a sign-in code**, then read the newest email and enter its code back in that same app/browser. You can read the email on another device; no link needs to open in Safari. The code-entry flow is live in version 22. Save open work before closing/reopening an older app screen to load the update. If already signed in, continue using that session. See [the phone guide](phone-app.md).
 
 Use your own email/account. Artie and Janyl each have private inventory; one person's saved items are not automatically shared with the other. Already-activated users do not need another invitation. If the backend has paused, an owner must restore the existing Supabase project; reinstalling the icon or repeatedly requesting emails will not restore it.
 
@@ -23,7 +23,7 @@ Use your own email/account. Artie and Janyl each have private inventory; one per
 4. Return to Reseller Agent. Paste the actual published URL into that channel's **listing URL**, choose **Published**, and save. Set the overall item to **Listed** when appropriate.
 5. Repeat for the other channels you want. Copying does not publish, and marking Published does not verify the external listing.
 
-If automatic copying fails, the prepared next release provides a **Copy listing manually** text box with the exact requested text. The live version may instead direct you to copy from its editable fields. On phone, press and hold to select/copy text. Editing or switching channels withdraws a stale fallback. A delayed browser clipboard operation may still finish; check the text you paste before publishing.
+If automatic copying fails, the app provides a **Copy listing manually** text box with the exact requested text. On phone, press and hold to select/copy text. Editing or switching channels withdraws a stale fallback. A delayed browser clipboard operation may still finish; check the text you paste before publishing.
 
 ## Keep the inventory accurate
 
@@ -44,4 +44,4 @@ A changed item price/status, question or relevant seller term requires another r
 
 ## What to check on your actual phone
 
-First verify an item with a few photos saves and reopens from the same private account; then check all ten photos, platform text paste, listing-URL save and a manual buyer reply. Code sign-in inside the installed PWA is a separate acceptance step after the matching release is configured. Internet is required; unsaved edits are not queued if you close/reload offline.
+First verify code sign-in inside the installed PWA and that closing/reopening retains the correct inventory. Then verify an item with a few photos saves/reopens from the same private account, followed by all ten photos, platform text paste, listing-URL save and a manual buyer reply. Actual-device acceptance remains separate from the successful release and automated checks. Internet is required; unsaved edits are not queued if you close/reload offline.

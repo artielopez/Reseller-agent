@@ -2,7 +2,7 @@
 
 ## Current release checkpoint — 18 November 2026
 
-The live app is **Sites version 20**. The email-code sign-in flow, Next.js patch and recovery follow-ups are on open PR #31. The consolidated candidate **version 22 is saved but NOT DEPLOYED**; it supersedes undeployed version 21. Read [current status](project-status.md) and [the current execution ledger](overnight-work-2026-11-18.md) before releasing or performing device acceptance. The template must contain `{{ .Token }}` and be saved/read back before the matching code UI is published. Existing invitation/account restrictions remain in place.
+The live app is **Sites version 22**, published successfully on 25 November after the owner confirmed the matching email-template save/read-back. It includes email-code sign-in, the Next.js patch and recovery follow-ups; PR #31 remains open and unmerged. [Release receipt](releases/2026-11-25-phone-sign-in.md) and [current status](project-status.md). Real code delivery/installed-iPhone sign-in/reopen acceptance remains pending a device result. Existing invitation/account restrictions remain in place. The earlier overnight save-only checkpoint below is historical.
 
 The earlier acceptance evidence below is retained. User activation and one supervised real OpenClaw draft are established; continuous model operation, automatic channel access and actual iPhone code/photo acceptance remain unresolved. [Everyday assisted selling guide](selling-today.md).
 
