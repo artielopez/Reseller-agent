@@ -44,4 +44,4 @@ A changed item price/status, question or relevant seller term requires another r
 
 ## What to check on your actual phone
 
-First verify code sign-in inside the installed PWA and that closing/reopening retains the correct inventory. Then verify an item with a few photos saves/reopens from the same private account, followed by all ten photos, platform text paste, listing-URL save and a manual buyer reply. Actual-device acceptance remains separate from the successful release and automated checks. Internet is required; unsaved edits are not queued if you close/reload offline.
+The owner reported code sign-in inside the installed PWA and closing/reopening **works** on 25 November. Next verify an item with a few photos saves/reopens from the same private account, followed by all ten photos, platform text paste, listing-URL save and a manual buyer reply. Those checks remain separate from accepted phone sign-in. Internet is required; unsaved edits are not queued if you close/reload offline.

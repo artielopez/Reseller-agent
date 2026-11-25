@@ -10,7 +10,7 @@ See the [current status](docs/project-status.md), [project plan](docs/project-pl
 
 ## Install on your phone
 
-Open the [cloud workspace](https://reseller-agent-cloud.pandabur.chatgpt.site) in iPhone Safari, then choose **Share → Add to Home Screen** and enable **Open as Web App** if offered. Open its icon, choose **Email me a sign-in code**, then enter the newest emailed code inside the app. This flow is live in Sites version 22; older unused sign-in links remain an optional fallback. See the [phone guide](docs/phone-app.md) for instructions and pending actual-device checks. Inventory and photos still require internet; offline writes are not queued.
+Open the [cloud workspace](https://reseller-agent-cloud.pandabur.chatgpt.site) in iPhone Safari, then choose **Share → Add to Home Screen** and enable **Open as Web App** if offered. Open its icon, choose **Email me a sign-in code**, then enter the newest emailed code inside the app. This flow is live in Sites version 22; the owner reported successful iPhone sign-in/reopen. Older unused sign-in links remain an optional fallback. See the [phone guide](docs/phone-app.md) for instructions and the remaining device checks. Inventory and photos still require internet; offline writes are not queued.
 
 ## Try it in demo mode
 

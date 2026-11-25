@@ -8,7 +8,7 @@ to read platform inboxes or send automatically. Record outcomes in
 ## Before starting
 
 - Confirm the exact live Sites version and private Artie/Janyl audience from the
-  latest [status tracker](project-status.md). The [18 November ledger](overnight-work-2026-11-18.md) records saved-but-undeployed code-entry builds; do not confuse a saved version with the live release. Reload old app tabs.
+  latest [status tracker](project-status.md). [Version 22's release receipt](releases/2026-11-25-phone-sign-in.md) records successful code-entry publication and owner-reported phone sign-in/reopen acceptance. The 18 November save-only checkpoint is historical. Save open work before reloading old app tabs.
 - Keep the Mac queue paused and existing trial enrollment revoked. Run the
   credential-free `npm run worker:check` from the repository; it must succeed
   before considering a supervised worker pass. This does not check live OAuth
@@ -28,8 +28,9 @@ to read platform inboxes or send automatically. Record outcomes in
 3. Open the same owned item on two devices, save a change on one, then try the
    older editor. The second save must preserve edits and report a conflict.
    Reload deliberately; do not overwrite the first save by recreating the item.
-4. Verify sign-in recovery using the newest email on the same device. A request
-   timeout is uncertain: check the inbox before requesting another link.
+4. Verify sign-in recovery using the newest emailed code, entered inside the app
+   where the session is wanted. A request timeout is uncertain: check the inbox
+   before requesting another code. Do not log or exchange codes.
 5. With a keyboard or screen reader, open an item or saved-question editor.
    Confirm the new heading is announced/focused and Tab reaches its controls.
    Save or cancel and confirm focus returns to the dashboard/review heading.

@@ -35,8 +35,10 @@ The owner was asked to open [Magic Link email templates](https://supabase.com/da
 
 Current official docs confirm the shared OTP/Magic Link implementation and `verifyOtp({ email, token, type: 'email' })`: [passwordless email sign-in](https://supabase.com/docs/guides/auth/auth-email-passwordless). The 25 November changelog review found no applicable change requiring an Auth flow redesign.
 
-## Remaining actual-device acceptance
+## Actual-device acceptance — owner reported
 
-The owner was asked to reopen the Home Screen app, request one code if signed out, enter it privately, then close/reopen and confirm the correct inventory. If already signed in, preserve that session instead of asking for a logout solely to test. **Real code delivery and installed-iPhone acceptance remain pending a result**; the successful deployment and synthetic checks do not establish them. No real email request was made by the agent, and no code was read or logged.
+The owner was asked to reopen the Home Screen app, request one code if signed out, enter it privately, then close/reopen and confirm the correct inventory; the question explicitly offered reporting an already-signed-in session instead. The owner replied **“works.”** Record this as **owner-reported successful iPhone code sign-in/reopen acceptance**, including the requested email step, not as an independently observed browser session. No real email request was made by the agent, and no code was read or logged. No additional logout/email request is needed to repeat the accepted check.
+
+The phone sign-in fix is deployed and accepted by the owner. Ten-photo/cross-device/second-user acceptance and the broader permitted-channel/AI-worker work remain separate; this report does not close those gates.
 
 Keep PR #31 unmerged. Preserve version 20 provenance for recovery, but do not roll back to a link-only UI against a code-only email without coordinating the template too. No automatic buyer reading/sending, normal OpenClaw restart or model call belongs to this release.

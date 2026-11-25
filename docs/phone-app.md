@@ -12,6 +12,8 @@ An old Home Screen shortcut may retain its old icon or browser behavior. Keep an
 
 Email-code sign-in is published in **Sites version 22** on 25 November 2026. The owner confirmed the matching email template was saved/read back before publication. PR #31 remains unmerged. [Release receipt](releases/2026-11-25-phone-sign-in.md). Older emails may contain only a link; request a fresh code when signing in.
 
+The owner subsequently reported the requested installed-iPhone code sign-in and close/reopen check **works**. This is participant-reported acceptance; the agent did not view the private code/session. Keep working sessions rather than signing out merely to repeat this check.
+
 To sign in:
 
 1. Open the Reseller Agent Home Screen icon and enter your email.
@@ -43,10 +45,10 @@ Updates load when online. Worker updates do not force a reload over unsaved edit
 
 The regression suite checks manifest/icon delivery, real browser service-worker installation, offline navigation and recovery, cache contents, and synthetic email-link sign-in persistence/error recovery. Mobile browser emulation is **not** a physical iPhone installation test.
 
-Remaining acceptance on an actual iPhone:
+Actual-device acceptance checklist (code sign-in/reopen is owner-reported passing on 25 November; the other checks remain separate):
 
 - Add the current cloud site to Home Screen and check its icon and standalone launch.
-- Sign in in the installed app, close/reopen, and confirm the correct private inventory.
+- Sign in in the installed app, close/reopen, and confirm the correct private inventory — owner reported **works** on 25 November.
 - Save an item with up to ten photos; reopen and verify them.
 - Turn off connectivity, confirm the warning/reconnect screen, restore connectivity and reopen the inventory.
 - Open the buyer inbox and confirm review/copy works. This does not enable automatic platform reading/sending.

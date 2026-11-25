@@ -2,7 +2,7 @@
 
 ## Current assignment — 25 November phone sign-in release
 
-The owner confirmed the Supabase Magic Link subject/body save/read-back, and **Sites version 22 is now deployed successfully**, preserving Artie/Janyl access and environment revision 1. Fresh app and exact compiled-candidate checks pass. Keep PR #31 unmerged without owner approval. The remaining step is one deliberate real-code/installed-iPhone session check; the owner was asked to enter the code privately and confirm reopening retains the correct inventory. [Exact release receipt and acceptance limits](releases/2026-11-25-phone-sign-in.md). Do not claim real email delivery or physical-device acceptance from synthetic tests. Prior prepared/unpublished instructions below describe the historical release dependency.
+**Phone sign-in is deployed and owner-accepted.** The owner confirmed the Supabase Magic Link subject/body save/read-back; **Sites version 22** deployed successfully, preserving Artie/Janyl access and environment revision 1. Fresh app and exact compiled-candidate checks pass. The owner then reported **“works”** for the requested real email-code/installed-iPhone sign-in and session-reopen check. This is owner-reported device evidence, not synthetic coverage or an agent-observed private session. Keep PR #31 unmerged without owner approval. Ten-photo/two-user acceptance and supported buyer-channel/worker work remain separate. [Exact release receipt and acceptance limits](releases/2026-11-25-phone-sign-in.md). Prior prepared/unpublished instructions below describe the historical release dependency.
 
 ## Current assignment — 18 November sleep window
 
