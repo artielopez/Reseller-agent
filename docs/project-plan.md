@@ -1,5 +1,9 @@
 # Reseller Agent project plan
 
+## Current assignment — 25 November phone sign-in release
+
+Finish and deploy the prepared email-code phone flow; keep PR #31 unmerged without owner approval. Fresh app and exact compiled-candidate checks pass. The remaining critical step is the Supabase Magic Link email subject/body save/read-back; the owner has been asked to complete it because the connector cannot edit templates and the available dashboard browser cannot initialize. Once confirmed, deploy existing saved version **22** with the unchanged Artie/Janyl audience, verify the deployment, then complete one deliberate real-code/installed-iPhone session check. [Exact release checkpoint](releases/2026-11-25-phone-sign-in.md). Do not bypass the template dependency or claim physical-device acceptance from synthetic tests.
+
 ## Current assignment — 18 November sleep window
 
 The authorized independent implementation and verification is complete within available access at **05:54 Manila**, ahead of the **11:34:22** deadline. Work remains on `codex/phone-pwa` / PR #31. The continuation heartbeat was **deleted** after the final support-thread check found no response; no further idle polling is scheduled. [Completed work and remaining dependencies](overnight-work-2026-11-18.md#final-independent-work-handoff--0554-manila). Keep the code-entry release held for its matching email-template save/read-back; version 22 is saved, while version 20 remains live. No merge, model call, worker activation or live platform action occurred. The broader goal remains incomplete and no input is requested while the owner sleeps. [Everyday selling guide](selling-today.md).

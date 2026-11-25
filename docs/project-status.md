@@ -1,5 +1,11 @@
 # Reseller Agent status
 
+## Phone sign-in release resumed — 25 November 2026
+
+The owner authorized finishing and deploying phone sign-in, with **no merge**. Version **22** remains the exact prepared candidate; version **20** remains live. Fresh checks passed **309 tests** (six optional skips), lint/types/build, **74 compiled cloud + four service-worker browser checks**, and zero findings in both production dependency audits. Supabase reports healthy with no health-advisor notices. Current Sites access remains Artie owner/Janyl viewer. [Release evidence and resume steps](releases/2026-11-25-phone-sign-in.md).
+
+The critical dependency is still saving/read-back of the matching Supabase Magic Link email template. The connector cannot edit Auth templates; the available browser tool cannot start because its configured Chrome executable is missing. The owner was asked for that one dashboard setting while independent checks completed. No credentials were extracted, browser installed, real email requested, deployment started or PR merged. Code sign-in is not live yet.
+
 ## Current handoff — 18 November 2026, 05:54 Manila
 
 Useful independent work is complete within the available access; the broader resale automation goal remains unfinished. The overnight heartbeat was **deleted**, confirmed by the scheduling tool, to stop idle runs. No owner action is requested during the sleep window. Changes remain on [PR #31](https://github.com/artielopez/Reseller-agent/pull/31), open and unmerged with auto-merge disabled. Latest checked head `b9f542f` passed [CI 44179320150](https://github.com/artielopez/Reseller-agent/actions/runs/44179320150).
