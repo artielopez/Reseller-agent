@@ -2,6 +2,8 @@
 
 Checked 1 November 2026, after the owner requested future access to Artie's Projects and SoleVault.
 
+Read-only recheck **18 November 2026, approximately 05:20 Manila**: the connected toolset still lists only **Artie's Projects** and its one Reseller Agent project, status **ACTIVE_HEALTHY**. No separate account/token/configuration was read, no scope was changed and no access to SoleVault is established. Supabase's current [MCP guide](https://supabase.com/docs/guides/ai-tools/mcp) still describes choosing an organization during OAuth; its [scoped-token guide](https://supabase.com/blog/scope-your-personal-access-tokens) documents selecting resources across multiple organizations. The separate least-privilege setup below remains prepared, not active.
+
 ## Observed connection
 
 - The connected ChatGPT Supabase app works and lists **Artie's Projects** only. Its existing scope was not changed.

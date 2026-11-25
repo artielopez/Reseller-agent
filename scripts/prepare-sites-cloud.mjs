@@ -65,10 +65,10 @@ for (const name of ["@supabase/supabase-js", "openai", "zod", "lucide-react"]) {
 // Reviewed Sites compatibility baseline. Keep React/DOM/RSC on the same patch
 // and retain Vinext's integration; older starter pins have published advisories.
 // Refresh the Sites lockfile and run its supported installer after changing these.
-manifest.dependencies.next = "16.4.3";
+manifest.dependencies.next = "16.4.5";
 manifest.dependencies.react = "19.3.1";
 manifest.dependencies["react-dom"] = "19.3.1";
-manifest.devDependencies["eslint-config-next"] = "16.4.3";
+manifest.devDependencies["eslint-config-next"] = "16.4.5";
 manifest.devDependencies["react-server-dom-webpack"] = "19.3.1";
 manifest.devDependencies["@vitejs/plugin-rsc"] = "0.5.37";
 manifest.devDependencies.vinext = "1.4.2";

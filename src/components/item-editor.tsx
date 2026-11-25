@@ -36,6 +36,8 @@ import { demoMode } from "@/lib/config";
 import { requestListingCopy } from "@/lib/listing-generation";
 import { useRequestLifetime } from "@/lib/use-request-lifetime";
 import { preparePhoto } from "@/lib/photos";
+const clipboardFailure =
+  "Automatic copying could not be confirmed. Select the text below and copy it manually before posting.";
 
 export function ItemEditor({
   initial,
@@ -58,6 +60,8 @@ export function ItemEditor({
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [copied, setCopied] = useState("");
+  const [manualCopy, setManualCopy] = useState("");
+  const copyRequest = useRef(0);
   const [dirty, setDirty] = useState(false);
   const listing = item.listings.find((entry) => entry.channel === channel)!;
   const priceReview = listingPriceReview(listing, price);
@@ -68,11 +72,20 @@ export function ItemEditor({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
+  function invalidateCopy() {
+    copyRequest.current++;
+    setCopied("");
+    setManualCopy("");
+    setNotice("");
+    setError((current) => (current === clipboardFailure ? "" : current));
+  }
   function update(patch: Partial<Item>) {
+    invalidateCopy();
     setDirty(true);
     setItem((current) => ({ ...current, ...patch }));
   }
   function updateListing(patch: Partial<Listing>) {
+    invalidateCopy();
     setDirty(true);
     setCopied("");
     setItem((current) => ({
@@ -163,20 +176,29 @@ export function ItemEditor({
     }
   }
   async function copy(kind: "title" | "description" | "post") {
+    const request = ++copyRequest.current;
+    const signal = requestSignal();
+    const text =
+      kind === "post"
+        ? `${listing.title}\n\n${listing.description}`
+        : listing[kind];
+    if (!text.trim()) return;
+    setError("");
+    setNotice("");
+    setCopied("");
+    setManualCopy("");
+    const isCurrent = () => !signal.aborted && request === copyRequest.current;
     try {
-      const text =
-        kind === "post"
-          ? `${listing.title}\n\n${listing.description}`
-          : listing[kind];
       await writeClipboard(text);
+      if (!isCurrent()) return;
       setCopied(kind);
       setNotice(
         "Copied. Paste into your listing, then save its URL here after posting.",
       );
     } catch {
-      setError(
-        "Clipboard access is unavailable. Select the title or description and copy it manually.",
-      );
+      if (!isCurrent()) return;
+      setManualCopy(text);
+      setError(clipboardFailure);
     }
   }
   const name = channelNames[channel];
@@ -266,6 +288,7 @@ export function ItemEditor({
                     accept="image/jpeg,image/png,image/webp"
                     multiple
                     onChange={(event) => {
+                      invalidateCopy();
                       void upload(event.target.files);
                       event.target.value = "";
                     }}
@@ -301,6 +324,7 @@ export function ItemEditor({
                     required
                     value={price}
                     onChange={(event) => {
+                      invalidateCopy();
                       setPrice(event.target.value);
                       setDirty(true);
                     }}
@@ -428,7 +452,7 @@ export function ItemEditor({
                   if (next < 0) return;
                   event.preventDefault();
                   setChannel(channels[next]);
-                  setCopied("");
+                  invalidateCopy();
                   document.getElementById(`tab-${channels[next]}`)?.focus();
                 }}
                 aria-selected={channel === value}
@@ -437,7 +461,7 @@ export function ItemEditor({
                 key={value}
                 onClick={() => {
                   setChannel(value);
-                  setCopied("");
+                  invalidateCopy();
                 }}
               >
                 {value === "carousell"
@@ -504,7 +528,11 @@ export function ItemEditor({
                   type="button"
                   className="button secondary small"
                   key={kind}
-                  disabled={!listing.title && !listing.description}
+                  disabled={
+                    kind === "post"
+                      ? !listing.title.trim() && !listing.description.trim()
+                      : !listing[kind].trim()
+                  }
                   onClick={() => copy(kind)}
                 >
                   {copied === kind ? <Check size={14} /> : <Copy size={14} />}
@@ -512,6 +540,17 @@ export function ItemEditor({
                 </button>
               ))}
             </div>
+            {manualCopy && (
+              <label className="field">
+                <span>Copy listing manually</span>
+                <textarea
+                  readOnly
+                  rows={6}
+                  value={manualCopy}
+                  onFocus={(event) => event.currentTarget.select()}
+                />
+              </label>
+            )}
             <div className="posting-note">
               <strong>Copy. Post. Keep track.</strong>
               <p>

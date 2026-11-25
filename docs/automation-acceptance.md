@@ -1,5 +1,11 @@
 # End-to-end acceptance and release gates
 
+## Current release checkpoint — 18 November 2026
+
+The live app is **Sites version 22**, published successfully on 25 November after the owner confirmed the matching email-template save/read-back. It includes email-code sign-in, the Next.js patch and recovery follow-ups; PR #31 remains open and unmerged. [Release receipt](releases/2026-11-25-phone-sign-in.md) and [current status](project-status.md). The owner reported the requested real code/installed-iPhone sign-in and reopen check **works**; record participant-reported acceptance, not agent-observed private-session evidence. Ten-photo/two-user checks remain separate. Existing invitation/account restrictions remain in place. The earlier overnight save-only checkpoint below is historical.
+
+The earlier acceptance evidence below is retained. User activation and one supervised real OpenClaw draft are established; continuous model operation, automatic channel access and actual iPhone code/photo acceptance remain unresolved. [Everyday assisted selling guide](selling-today.md).
+
 Updated 4 November 2026. This is the Task 6 acceptance register from the [sales-assistant plan](superpowers/plans/2026-10-29-sales-assistant.md). It preserves the full automatic intake/reply objective. Passing manual assistance or synthetic tests does not complete that objective.
 
 Current usable mode: [private cloud inventory and manual inbox](https://reseller-agent-cloud.pandabur.chatgpt.site), with supervised, one-question OpenClaw drafting. Automatic capture and sending are disabled. [Operating instructions](automation-operations.md) · [chronological evidence](project-status.md).
@@ -51,9 +57,9 @@ Earlier feature-version entries identify their original acceptance releases.
 
 Use clearly labelled synthetic items and questions. Do not send test replies to real buyers. Record which device/browser/account was actually used; emulated Chromium is not physical Safari evidence.
 
-1. **Janyl's own session:** use her existing activated account and saved item. Reopen/reload it and confirm its photo decodes on her device. Request a new sign-in link only if her session has expired, and open it on that same device. The outer Sites access gate and Supabase application sign-in are separate.
+1. **Janyl's own session:** use her existing activated account and saved item. Reopen/reload it and confirm its photo decodes on her device. Request a new sign-in code only if her session has expired, and enter it in the app where she wants to sign in. The outer Sites access gate and Supabase application sign-in are separate.
 2. **Two inventories:** each person should see only their own inventory and questions. Reload and switch accounts deliberately. An engineer must additionally verify denial of cross-owner HTTP/Storage access without exchanging login links or sessions. Merely seeing different dashboard titles is insufficient.
-3. **iPhone and Windows:** sign in, reopen a saved test item and its inquiry, edit/save, reload, and confirm the same data on the other device. Copy approved synthetic text into a private note and compare it; do not send it to a buyer. Verify expired-link recovery and sign-out as part of the same session.
+3. **iPhone and Windows:** sign in, reopen a saved test item and its inquiry, edit/save, reload, and confirm the same data on the other device. Copy approved synthetic text into a private note and compare it; do not send it to a buyer. Verify expired-code recovery and sign-out as part of the same session.
 4. **Ten photos:** on a labelled test item, use ten non-sensitive JPEG/PNG/WebP photos, save and reload. Confirm all ten load, remove one and save/reload, then verify its Storage object was removed. Engineer separately checks cross-owner access. App re-encoding/size limits still apply.
 5. **Stale approval:** approve a synthetic reply on one device, change its item's price/status on the other, then verify copying requires fresh review. Marking an inquiry Answered is a separate manual action; copying alone must leave it Open.
 

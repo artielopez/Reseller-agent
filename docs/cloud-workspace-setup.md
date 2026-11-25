@@ -2,6 +2,16 @@
 
 This is the initial 1 November setup snapshot, except for the migration mapping maintained below. Later sign-in, email, account and release evidence is in [current status](project-status.md). Do not interpret the initial unprovisioned-user or localhost statements as current configuration.
 
+## Recovering a paused Free project
+
+If the hosted page opens but sign-in and inventory requests fail, first inspect this exact project's lifecycle status. On 15 November, a real iPhone sign-in failure coincided with project status `INACTIVE`; Artie's Projects was still on the Free plan. Restoring the existing project was accepted and moved it to `COMING_UP`. This recovery does not require changing SMTP credentials, inviting existing users again, rebuilding the site or upgrading the plan.
+
+Wait for `ACTIVE_HEALTHY` and a successful Auth health/settings check before declaring recovery. Do not repeat the restore command while it is starting. Preserve the existing project, stored data and access settings. Only an actual email request/delivery and device login can establish end-to-end sign-in success.
+
+Recovery on 15 November was verified at 04:33:09 UTC: `ACTIVE_HEALTHY`, followed by Auth health/settings **HTTP 200**, email enabled and public signup disabled. A read-only database check found two confirmed app users and three inventory rows. No recovery email was sent automatically; the next actual-device check is the owner's fresh sign-in request.
+
+Supabase documents automatic pausing after low database activity over seven days on the Free plan. This explains a possible recurrence, but the lifecycle status alone does not identify who or what initiated a specific pause. No paid upgrade or artificial keepalive schedule is enabled. [Supabase project-pausing documentation](https://supabase.com/docs/guides/platform/free-project-pausing).
+
 ## Actual resources
 
 - Organization: **Artie's Projects**, `oitbiothcymcqgcocyqo`, Personal / Free. The owner's explicit organization choice supersedes earlier SoleVault proposals.

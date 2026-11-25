@@ -143,11 +143,11 @@ for (const path of ["/", "/inbox"]) {
     await page.goto(path);
     await expect.poll(() => requested).toBe(true);
     await expect(
-      page.getByRole("button", { name: "Email me a sign-in link" }),
+      page.getByRole("button", { name: "Email me a sign-in code" }),
     ).toHaveCount(0);
     await page.clock.fastForward(15_001);
     await expect(
-      page.getByRole("button", { name: "Email me a sign-in link" }),
+      page.getByRole("button", { name: "Email me a sign-in code" }),
     ).toBeVisible();
     release();
   });
@@ -169,14 +169,14 @@ test("a lost sign-in-email response releases the form without automatically rese
   await page.goto("/");
   await page.getByLabel("Email address").fill("seller@example.test");
   await page.clock.install();
-  await page.getByRole("button", { name: "Email me a sign-in link" }).click();
+  await page.getByRole("button", { name: "Email me a sign-in code" }).click();
   await expect.poll(() => requests).toBe(1);
   await page.clock.fastForward(15_001);
   await expect(
-    page.getByRole("button", { name: "Email me a sign-in link" }),
+    page.getByRole("button", { name: "Email me a sign-in code" }),
   ).toBeEnabled();
   await expect(page.getByRole("main").getByRole("alert")).toContainText(
-    "Check your inbox before requesting another link",
+    "Check your inbox before requesting another code",
   );
   expect(requests).toBe(1);
   release();
@@ -250,7 +250,54 @@ test("uncertain sign-out retains edits and reports recovery without queueing ano
   expect(requests).toBe(1);
   release();
   await expect(
-    page.getByRole("button", { name: "Email me a sign-in link" }),
+    page.getByRole("button", { name: "Email me a sign-in code" }),
   ).toBeVisible();
   await expect(page.getByLabel("Item title")).toHaveCount(0);
 });
+
+for (const outcome of ["success", "failure"] as const) {
+  test(`a late listing clipboard ${outcome} cannot enter a different owner's workspace`, async ({
+    page,
+  }) => {
+    await inventory(page);
+    await page
+      .getByLabel("Carousell title", { exact: true })
+      .fill("Private original owner copy");
+    await page.evaluate(() =>
+      Object.defineProperty(navigator, "clipboard", {
+        configurable: true,
+        value: {
+          writeText: () =>
+            new Promise<void>((resolve, reject) => {
+              (
+                window as unknown as { finishCopy: (fail: boolean) => void }
+              ).finishCopy = (fail) =>
+                fail ? reject(new Error("denied")) : resolve();
+            }),
+        },
+      }),
+    );
+    await page.getByRole("button", { name: "Copy title", exact: true }).click();
+    await publishSession(page, session("66666666-6666-4666-8666-666666666666"));
+    await expect(page.getByLabel("Item title", { exact: true })).toHaveCount(0);
+    await page.evaluate(
+      (fail) =>
+        (
+          window as unknown as { finishCopy: (fail: boolean) => void }
+        ).finishCopy(fail),
+      outcome === "failure",
+    );
+    await expect(
+      page.getByRole("button", { name: "Add item", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Copied\. Paste into your listing/),
+    ).toHaveCount(0);
+    await expect(
+      page.getByRole("textbox", { name: "Copy listing manually", exact: true }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText("Private original owner copy", { exact: true }),
+    ).toHaveCount(0);
+  });
+}

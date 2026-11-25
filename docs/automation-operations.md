@@ -1,10 +1,12 @@
 # Operating Reseller Agent
 
-Current mode, 4 November 2026: private cloud inventory and assisted replies. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
+Current mode, 25 November 2026: private cloud inventory and assisted replies. Sites version 22 includes in-app email-code sign-in. The Mac worker is paused and its supervised-trial enrollment revoked. Automatic reading, posting and buyer sending are not enabled. [Acceptance register](automation-acceptance.md) · [current evidence](project-status.md).
 
 ## Everyday use
 
-1. Open [the private cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) with your invited ChatGPT account, then sign into the app with your own email link. Artie and Janyl have separate inventories; neither needs Supabase administrator access.
+[Step-by-step posting guide](selling-today.md). The live app requests an emailed code that is entered inside the same app/browser; opening an email link is no longer required for routine sign-in.
+
+1. Open [the private cloud app](https://reseller-agent-cloud.pandabur.chatgpt.site) with your invited ChatGPT account, then request a code for your own email and enter it in that app. Artie and Janyl have separate inventories; neither needs Supabase administrator access.
 2. Save the item first. Add its facts, asking price and up to ten supported photos. Review each platform's listing copy, especially after a price or condition change. Copy it and post through the platform yourself; record the resulting URL/publication status in the app.
 3. Choose **Open buyer inbox**, select the saved item, channel and question location, paste the buyer question, then **Save question**. Buyer name is optional. Automatic import is not available.
 4. For a supervised AI run, use the saved question’s **Request AI draft** panel, **Refresh draft status**, then **Load saved replies**. The button queues work but does not start the Mac worker. Use/edit a template or an existing AI draft. Review the saved facts and exact wording, save and explicitly approve the reply, then copy it. Send through the source platform yourself and separately mark the inquiry **Answered**.
@@ -27,7 +29,7 @@ After verifying the saved unapproved draft, pause the queue, revoke that tempora
 
 | Symptom                                                   | Response                                                                                                                                                                                             |
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sign-in link expired or already used                      | Open the cloud app first, request a fresh link for the existing app account, and use the newest email on the same device. Do not share its URL or grant Supabase admin access as an email workaround |
+| Sign-in code invalid, expired or already used             | Check the email/account, request one fresh code, and enter the newest code in the app where you want to sign in. Do not share it or grant Supabase admin access as an email workaround |
 | Save or photo upload fails                                | Preserve unsaved edits. After an uncertain save, reload/check inventory before any deliberate retry; do not assume the save failed or create a replacement item automatically                            |
 | Worker outcome is `unknown` or an acknowledgment was lost | Stop and inspect the saved queue/draft before another attempt. A successful save may already exist. Follow [network recovery](worker-recovery-acceptance.md); never blindly repeat inference         |
 | Worker cannot acquire its lock after a crash              | Keep the queue paused. Identify the exact worker/run and confirm its processes stopped before removing only that stale lock/run directory. No age/PID-only deletion or broad process killing         |
@@ -49,9 +51,9 @@ Never put credentials, buyer text, generated replies or production record identi
 
 ## Releases and rollback
 
-The live cloud app is Sites version **13**, published from source `b592ec18bddd9073ce8100e894086a68e13c9d69`, with its audience limited to Artie and Janyl. The [overnight release ledger](overnight-work-2026-11-04.md) records the current successful deployment and the pending signed-in UI check. GitHub and the separate Sites source repository have different release histories. The eight hosted migrations are mapped in [the setup record](cloud-workspace-setup.md); their remote identifiers differ from local filenames.
+The live cloud app is Sites version **22**, source `082b84d616fca8ba8baf1bbe420681af78c7a8ee`, with Artie/Janyl access unchanged. The owner confirmed the matching email-template save/read-back before the successful 25 November deployment. [Release receipt and outstanding device acceptance](releases/2026-11-25-phone-sign-in.md). The [overnight execution ledger](overnight-work-2026-11-18.md) records earlier verification/source changes; its save-only checkpoint is historical. A newer saved version number alone is not evidence of a production deployment.
 
-[Draft PR #29](https://github.com/artielopez/Reseller-agent/pull/29) contains the latest cumulative unmerged work, including request recovery and saved-question editing. See the [review map](release-review-map.md). Keep it reviewable; no merge or auto-merge without owner approval. Test/documentation-only increments need no cloud publication. A future publication must identify its exact source, preserve the private audience and verify the deployed behavior.
+The cumulative stack through PR #29 was merged by explicit owner instruction on 15 November. New PWA/email-code/recovery work remains in [PR #31](https://github.com/artielopez/Reseller-agent/pull/31), open and unmerged. Keep it reviewable; no merge or auto-merge without owner approval. GitHub and Sites have separate source histories. Test/documentation-only increments need no cloud publication. A future publication must use its exact pushed/built source, preserve the private audience and record the email-template prerequisite and runtime checks. The hosted migration mappings remain in [the setup record](cloud-workspace-setup.md).
 
 For a regression, first pause/revoke the affected worker capability and preserve the manual workflow. Prepare and verify a compatible prior app source before an authorized rollback. Do not revert to a client lacking save-revision support while the guard is active. Older open cloud editors must reload. Do not blindly revert to an older six-photo client after ten-photo data exists, reapply initial migrations, weaken RLS, or delete data to make an older build work. Disabling drafting is safer than guessing a migration downgrade.
 
